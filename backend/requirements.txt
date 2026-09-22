@@ -1,0 +1,15 @@
+# POLARIS-EMS Production Dependencies (Python 3.13 compatible)
+fastapi>=0.115.0
+uvicorn>=0.30.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+pandas>=2.2.0
+numpy>=2.0.0
+scipy>=1.14.0
+scikit-learn>=1.5.0
+xgboost>=2.1.0
+pyomo>=6.8.0
+highspy>=1.7.0
+pytest>=8.3.0
+python-dateutil>=2.9.0
+requests>=2.32.0
