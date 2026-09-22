@@ -1,0 +1,159 @@
+{
+  "dataset_version": "polaris-synthetic-v1.0",
+  "simulator_version": "polaris-sim-v2.0",
+  "station_id": "BHARATI",
+  "station_name": "Bharati Research Station",
+  "location": "Larsemann Hills, East Antarctica",
+  "latitude": -69.4064,
+  "longitude": 76.195,
+  "altitude_m": 35.0,
+  "climate_zone": "Coastal Antarctic Polar",
+  "global_seed": 42,
+  "station_seed": 142,
+  "generated_at_utc": "2026-09-22T16:55:36.364969+00:00",
+  "total_hours": 26304,
+  "calendar_policy": "Explicit UTC datetime with leap-year handling (2024=366d, 2025=365d, 2026=365d)",
+  "split_summary": {
+    "total_rows": 26304,
+    "train": {
+      "rows": 18412,
+      "ratio": 0.7,
+      "start_timestamp": "2024-01-01T00:00:00+00:00",
+      "end_timestamp": "2026-02-06T03:00:00+00:00"
+    },
+    "validation_calibration": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-02-06T04:00:00+00:00",
+      "end_timestamp": "2026-07-20T13:00:00+00:00"
+    },
+    "test": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-07-20T14:00:00+00:00",
+      "end_timestamp": "2026-12-31T23:00:00+00:00"
+    }
+  },
+  "summary_statistics": {
+    "temperature_c": {
+      "mean": -14.51,
+      "median": -14.32,
+      "std": 7.48,
+      "min": -28.05,
+      "max": -0.78,
+      "p10": -24.37,
+      "p50": -14.32,
+      "p90": -4.71
+    },
+    "wind_speed_ms": {
+      "mean": 8.01,
+      "median": 8.01,
+      "std": 1.77,
+      "min": 1.8,
+      "max": 15.63,
+      "p10": 5.73,
+      "p50": 8.01,
+      "p90": 10.26
+    },
+    "irradiance_wm2": {
+      "mean": 71.31,
+      "median": 0.0,
+      "std": 128.3,
+      "min": 0.0,
+      "max": 590.85,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 292.85
+    },
+    "total_load_kw": {
+      "mean": 86.84,
+      "median": 86.41,
+      "std": 8.33,
+      "min": 69.97,
+      "max": 109.4,
+      "p10": 76.08,
+      "p50": 86.41,
+      "p90": 98.04
+    },
+    "thermal_load_kw": {
+      "mean": 29.01,
+      "median": 28.82,
+      "std": 7.35,
+      "min": 15.07,
+      "max": 43.26,
+      "p10": 19.38,
+      "p50": 28.82,
+      "p90": 38.63
+    },
+    "critical_load_kw": {
+      "mean": 30.49,
+      "median": 30.13,
+      "std": 1.11,
+      "min": 29.5,
+      "max": 33.9,
+      "p10": 29.5,
+      "p50": 30.13,
+      "p90": 31.71
+    },
+    "solar_generation_kw": {
+      "mean": 2.33,
+      "median": 0.0,
+      "std": 4.15,
+      "min": 0.0,
+      "max": 18.69,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 9.6
+    },
+    "wind_generation_kw": {
+      "mean": 9.27,
+      "median": 8.14,
+      "std": 5.82,
+      "min": 0.0,
+      "max": 25.0,
+      "p10": 2.69,
+      "p50": 8.14,
+      "p90": 17.64
+    },
+    "battery_soc_pct": {
+      "mean": 20.0,
+      "median": 20.0,
+      "std": 0.1,
+      "min": 20.0,
+      "max": 36.96,
+      "p10": 20.0,
+      "p50": 20.0,
+      "p90": 20.0
+    },
+    "generator_power_kw": {
+      "mean": 72.32,
+      "median": 75.6,
+      "std": 9.01,
+      "min": 24.0,
+      "max": 80.0,
+      "p10": 58.71,
+      "p50": 75.6,
+      "p90": 80.0
+    },
+    "fuel_consumed_l": {
+      "mean": 24.75,
+      "median": 25.67,
+      "std": 2.52,
+      "min": 11.22,
+      "max": 26.9,
+      "p10": 20.94,
+      "p50": 25.67,
+      "p90": 26.9
+    },
+    "curtailment_kw": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 0.0
+    }
+  }
+}

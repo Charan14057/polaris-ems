@@ -1,0 +1,159 @@
+{
+  "dataset_version": "polaris-synthetic-v1.0",
+  "simulator_version": "polaris-sim-v2.0",
+  "station_id": "MAITRI",
+  "station_name": "Maitri Research Station",
+  "location": "Schirmacher Oasis, East Antarctica",
+  "latitude": -70.7667,
+  "longitude": 11.7333,
+  "altitude_m": 130.0,
+  "climate_zone": "Inland Oasis Antarctic Polar",
+  "global_seed": 42,
+  "station_seed": 242,
+  "generated_at_utc": "2026-09-22T16:55:51.882964+00:00",
+  "total_hours": 26304,
+  "calendar_policy": "Explicit UTC datetime with leap-year handling (2024=366d, 2025=365d, 2026=365d)",
+  "split_summary": {
+    "total_rows": 26304,
+    "train": {
+      "rows": 18412,
+      "ratio": 0.7,
+      "start_timestamp": "2024-01-01T00:00:00+00:00",
+      "end_timestamp": "2026-02-06T03:00:00+00:00"
+    },
+    "validation_calibration": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-02-06T04:00:00+00:00",
+      "end_timestamp": "2026-07-20T13:00:00+00:00"
+    },
+    "test": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-07-20T14:00:00+00:00",
+      "end_timestamp": "2026-12-31T23:00:00+00:00"
+    }
+  },
+  "summary_statistics": {
+    "temperature_c": {
+      "mean": -15.01,
+      "median": -14.98,
+      "std": 9.2,
+      "min": -31.48,
+      "max": 1.38,
+      "p10": -27.24,
+      "p50": -14.98,
+      "p90": -2.88
+    },
+    "wind_speed_ms": {
+      "mean": 8.02,
+      "median": 8.03,
+      "std": 1.78,
+      "min": 0.5,
+      "max": 14.83,
+      "p10": 5.75,
+      "p50": 8.03,
+      "p90": 10.28
+    },
+    "irradiance_wm2": {
+      "mean": 68.65,
+      "median": 0.0,
+      "std": 123.74,
+      "min": 0.0,
+      "max": 572.64,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 282.76
+    },
+    "total_load_kw": {
+      "mean": 81.76,
+      "median": 81.2,
+      "std": 11.42,
+      "min": 60.14,
+      "max": 108.58,
+      "p10": 66.85,
+      "p50": 81.2,
+      "p90": 96.96
+    },
+    "thermal_load_kw": {
+      "mean": 34.79,
+      "median": 34.8,
+      "std": 10.33,
+      "min": 15.8,
+      "max": 53.3,
+      "p10": 21.17,
+      "p50": 34.8,
+      "p90": 48.53
+    },
+    "critical_load_kw": {
+      "mean": 31.98,
+      "median": 31.68,
+      "std": 1.26,
+      "min": 30.8,
+      "max": 35.8,
+      "p10": 30.8,
+      "p50": 31.68,
+      "p90": 33.36
+    },
+    "solar_generation_kw": {
+      "mean": 1.34,
+      "median": 0.0,
+      "std": 2.39,
+      "min": 0.0,
+      "max": 10.69,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 5.53
+    },
+    "wind_generation_kw": {
+      "mean": 4.85,
+      "median": 4.23,
+      "std": 3.19,
+      "min": 0.0,
+      "max": 15.0,
+      "p10": 1.31,
+      "p50": 4.23,
+      "p90": 9.29
+    },
+    "battery_soc_pct": {
+      "mean": 20.0,
+      "median": 20.0,
+      "std": 0.03,
+      "min": 20.0,
+      "max": 24.86,
+      "p10": 20.0,
+      "p50": 20.0,
+      "p90": 20.0
+    },
+    "generator_power_kw": {
+      "mean": 61.53,
+      "median": 62.5,
+      "std": 2.55,
+      "min": 29.04,
+      "max": 62.5,
+      "p10": 58.42,
+      "p50": 62.5,
+      "p90": 62.5
+    },
+    "fuel_consumed_l": {
+      "mean": 22.46,
+      "median": 22.75,
+      "std": 0.76,
+      "min": 12.71,
+      "max": 22.75,
+      "p10": 21.52,
+      "p50": 22.75,
+      "p90": 22.75
+    },
+    "curtailment_kw": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 0.0
+    }
+  }
+}

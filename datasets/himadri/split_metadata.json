@@ -1,0 +1,21 @@
+{
+  "total_rows": 26304,
+  "train": {
+    "rows": 18412,
+    "ratio": 0.7,
+    "start_timestamp": "2024-01-01T00:00:00+00:00",
+    "end_timestamp": "2026-02-06T03:00:00+00:00"
+  },
+  "validation_calibration": {
+    "rows": 3946,
+    "ratio": 0.15,
+    "start_timestamp": "2026-02-06T04:00:00+00:00",
+    "end_timestamp": "2026-07-20T13:00:00+00:00"
+  },
+  "test": {
+    "rows": 3946,
+    "ratio": 0.15,
+    "start_timestamp": "2026-07-20T14:00:00+00:00",
+    "end_timestamp": "2026-12-31T23:00:00+00:00"
+  }
+}

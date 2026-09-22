@@ -1,0 +1,159 @@
+{
+  "dataset_version": "polaris-synthetic-v1.0",
+  "simulator_version": "polaris-sim-v2.0",
+  "station_id": "HIMADRI",
+  "station_name": "Himadri Research Station",
+  "location": "Ny-\u00c5lesund, Spitsbergen, Svalbard",
+  "latitude": 78.9244,
+  "longitude": 11.9286,
+  "altitude_m": 10.0,
+  "climate_zone": "High Arctic Marine",
+  "global_seed": 42,
+  "station_seed": 342,
+  "generated_at_utc": "2026-09-22T16:56:06.902582+00:00",
+  "total_hours": 26304,
+  "calendar_policy": "Explicit UTC datetime with leap-year handling (2024=366d, 2025=365d, 2026=365d)",
+  "split_summary": {
+    "total_rows": 26304,
+    "train": {
+      "rows": 18412,
+      "ratio": 0.7,
+      "start_timestamp": "2024-01-01T00:00:00+00:00",
+      "end_timestamp": "2026-02-06T03:00:00+00:00"
+    },
+    "validation_calibration": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-02-06T04:00:00+00:00",
+      "end_timestamp": "2026-07-20T13:00:00+00:00"
+    },
+    "test": {
+      "rows": 3946,
+      "ratio": 0.15,
+      "start_timestamp": "2026-07-20T14:00:00+00:00",
+      "end_timestamp": "2026-12-31T23:00:00+00:00"
+    }
+  },
+  "summary_statistics": {
+    "temperature_c": {
+      "mean": -5.49,
+      "median": -5.74,
+      "std": 6.78,
+      "min": -18.41,
+      "max": 8.15,
+      "p10": -14.34,
+      "p50": -5.74,
+      "p90": 3.46
+    },
+    "wind_speed_ms": {
+      "mean": 7.97,
+      "median": 7.97,
+      "std": 1.76,
+      "min": 0.78,
+      "max": 14.46,
+      "p10": 5.71,
+      "p50": 7.97,
+      "p90": 10.24
+    },
+    "irradiance_wm2": {
+      "mean": 55.49,
+      "median": 0.0,
+      "std": 94.01,
+      "min": 0.0,
+      "max": 427.09,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 214.14
+    },
+    "total_load_kw": {
+      "mean": 35.5,
+      "median": 35.64,
+      "std": 4.33,
+      "min": 26.71,
+      "max": 49.21,
+      "p10": 29.71,
+      "p50": 35.64,
+      "p90": 40.91
+    },
+    "thermal_load_kw": {
+      "mean": 13.56,
+      "median": 13.7,
+      "std": 4.19,
+      "min": 5.11,
+      "max": 22.18,
+      "p10": 8.03,
+      "p50": 13.7,
+      "p90": 19.04
+    },
+    "critical_load_kw": {
+      "mean": 11.5,
+      "median": 11.5,
+      "std": 0.0,
+      "min": 11.5,
+      "max": 11.5,
+      "p10": 11.5,
+      "p50": 11.5,
+      "p90": 11.5
+    },
+    "solar_generation_kw": {
+      "mean": 0.71,
+      "median": 0.0,
+      "std": 1.19,
+      "min": 0.0,
+      "max": 5.32,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 2.73
+    },
+    "wind_generation_kw": {
+      "mean": 4.15,
+      "median": 3.68,
+      "std": 2.53,
+      "min": 0.0,
+      "max": 10.0,
+      "p10": 1.22,
+      "p50": 3.68,
+      "p90": 8.03
+    },
+    "battery_soc_pct": {
+      "mean": 20.0,
+      "median": 20.0,
+      "std": 0.04,
+      "min": 20.0,
+      "max": 26.83,
+      "p10": 20.0,
+      "p50": 20.0,
+      "p90": 20.0
+    },
+    "generator_power_kw": {
+      "mean": 30.64,
+      "median": 31.02,
+      "std": 5.7,
+      "min": 14.84,
+      "max": 45.0,
+      "p10": 22.99,
+      "p50": 31.02,
+      "p90": 37.93
+    },
+    "fuel_consumed_l": {
+      "mean": 11.07,
+      "median": 11.17,
+      "std": 1.54,
+      "min": 6.81,
+      "max": 14.95,
+      "p10": 9.01,
+      "p50": 11.17,
+      "p90": 13.04
+    },
+    "curtailment_kw": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 0.0
+    }
+  }
+}
