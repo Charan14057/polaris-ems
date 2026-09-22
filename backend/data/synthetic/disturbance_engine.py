@@ -111,7 +111,8 @@ class PolarDisturbanceGenerator:
 
         # Normalize probabilities to sum to 1.0 exactly
         probs = np.array(probs) / np.sum(probs)
-        selected_type = self.rng.choice(choices, p=probs)
+        choice_idx = int(self.rng.choice(len(choices), p=probs))
+        selected_type = choices[choice_idx]
 
         # Build physical modifiers based on regime
         if selected_type == DisturbanceType.NORMAL:
