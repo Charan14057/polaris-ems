@@ -145,11 +145,22 @@ class ResilienceEngine:
         horizons.append((fuel_hours, "FUEL"))
 
         # B. Battery continuity
+        # Battery exhaustion is a binding station failure only if diesel cannot pick up the load
+        # (e.g. generator faulted, fuel exhausted, or load exceeds total generator rating).
+        diesel_headroom = 0.0
+        if state.diesel.generator_status in ("ONLINE", "STANDBY") and state.fuel.fuel_remaining_l > 0.01:
+            diesel_headroom = max(0.0, state.diesel.generator_max_power_kw - state.diesel.generator_power_kw)
+
         if state.battery.discharge_power_kw > 0.01:
             usable_energy = max(0.0, (state.battery.soc_pct - state.battery.soc_min) * state.battery.usable_capacity_kwh)
             dis_rate = state.battery.discharge_power_kw / max(0.01, state.battery.discharge_efficiency)
             bat_hours = usable_energy / max(0.01, dis_rate)
-            horizons.append((bat_hours, "BATTERY"))
+            if diesel_headroom < (state.battery.discharge_power_kw - 0.01):
+                # Diesel cannot cover the battery deficit when battery exhausts -> binding blackout horizon!
+                horizons.append((bat_hours, "BATTERY"))
+            else:
+                # Diesel has sufficient headroom to take over when battery reaches SOC_min
+                horizons.append((999.0, "BATTERY"))
         elif state.loads.unserved_total_kw > 1e-4 and state.battery.soc_pct <= state.battery.soc_min + 1e-4:
             horizons.append((0.0, "BATTERY"))
         else:
