@@ -1,0 +1,132 @@
+{
+  "model_name": "polaris-wind-xgb-maitri-v1.0",
+  "model_version": "v1.0",
+  "target": "wind_generation_kw",
+  "station": "MAITRI",
+  "feature_schema_version": "v1.0",
+  "preprocessing_version": "v1.0",
+  "calibration_version": "v1.0",
+  "dataset_version": "polaris-synthetic-v1.0",
+  "simulator_version": "polaris-sim-v2.0",
+  "git_commit": "f81f4a3",
+  "horizons": [
+    1,
+    2,
+    6,
+    12,
+    24,
+    48
+  ],
+  "capacity_kw": 15.0,
+  "val_metrics": {
+    "n_samples": 1758,
+    "mae": 2.496,
+    "rmse": 3.465,
+    "smape": 57.42,
+    "r2": 0.283,
+    "mbe": -0.077,
+    "nmae": 0.1664,
+    "nrmse": 0.231,
+    "capacity_kw": 15.0,
+    "capacity_norm_mae_pct": 16.64,
+    "capacity_norm_rmse_pct": 23.1
+  },
+  "test_metrics": {
+    "n_samples": 3732,
+    "mae": 2.272,
+    "rmse": 3.153,
+    "smape": 59.33,
+    "r2": 0.2465,
+    "mbe": -0.008,
+    "nmae": 0.1515,
+    "nrmse": 0.2102,
+    "capacity_kw": 15.0,
+    "capacity_norm_mae_pct": 15.15,
+    "capacity_norm_rmse_pct": 21.02
+  },
+  "test_coverage": {
+    "n_samples": 3732,
+    "cov_p10": 0.1568,
+    "cov_p90": 0.9011,
+    "cov_p95": 0.9716,
+    "interval_80_coverage": 0.813,
+    "interval_90_coverage": 0.8834,
+    "nominal_80_gap": 0.013,
+    "sharpness_80_kw": 6.85,
+    "sharpness_90_kw": 9.83,
+    "quantile_crossing_count": 0,
+    "quantile_crossing_rate": 0.0
+  },
+  "baselines_val": {
+    "persistence": {
+      "n_samples": 1758,
+      "mae": 2.895,
+      "rmse": 4.344,
+      "smape": 61.61,
+      "r2": -0.1265,
+      "mbe": -0.082,
+      "nmae": 0.193,
+      "nrmse": 0.2896,
+      "capacity_kw": 15.0,
+      "capacity_norm_mae_pct": 19.3,
+      "capacity_norm_rmse_pct": 28.96
+    },
+    "seasonal_naive": {
+      "n_samples": 1758,
+      "mae": 4.484,
+      "rmse": 5.862,
+      "smape": 93.55,
+      "r2": -1.052,
+      "mbe": -0.049,
+      "nmae": 0.2989,
+      "nrmse": 0.3908,
+      "capacity_kw": 15.0,
+      "capacity_norm_mae_pct": 29.89,
+      "capacity_norm_rmse_pct": 39.08
+    },
+    "ridge": {
+      "n_samples": 1758,
+      "mae": 2.696,
+      "rmse": 3.636,
+      "smape": 63.81,
+      "r2": 0.2108,
+      "mbe": -0.247,
+      "nmae": 0.1798,
+      "nrmse": 0.2424,
+      "capacity_kw": 15.0,
+      "capacity_norm_mae_pct": 17.98,
+      "capacity_norm_rmse_pct": 24.24
+    },
+    "tree": {
+      "n_samples": 1758,
+      "mae": 2.448,
+      "rmse": 3.44,
+      "smape": 60.81,
+      "r2": 0.2934,
+      "mbe": -0.233,
+      "nmae": 0.1632,
+      "nrmse": 0.2293,
+      "capacity_kw": 15.0,
+      "capacity_norm_mae_pct": 16.32,
+      "capacity_norm_rmse_pct": 22.93
+    }
+  },
+  "operational_impact": {
+    "n_hours_evaluated": 3732,
+    "renewable_shortfall_kwh": 4225.5,
+    "potential_curtailment_kwh": 4255.2,
+    "shortfall_pct_of_generation": 24.97
+  },
+  "has_calibrator": true,
+  "calibration_parameters": {
+    "is_calibrated": true,
+    "n_calib_samples": 1758,
+    "q_conformal_80": 0.09000000417232512,
+    "q_conformal_90": 0.580989346040394,
+    "delta_10": -0.06000002574920651,
+    "delta_50": -0.23500009536743183,
+    "delta_90": 0.24599993515014498,
+    "delta_95": 1.8904998912811182
+  },
+  "saved_at": "2026-09-22T17:53:28.379082+00:00"
+}
