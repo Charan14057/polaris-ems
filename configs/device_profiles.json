@@ -1,0 +1,779 @@
+{
+  "BHARATI": {
+    "station_id": "BHARATI",
+    "station_name": "Bharati Research Station",
+    "edge_node_id": "bh_edge_master_01",
+    "default_reporting_interval_sec": 10.0,
+    "default_freshness_threshold_sec": 60.0,
+    "devices": [
+      {
+        "device_id": "bh_pv_array_01",
+        "station_id": "BHARATI",
+        "device_type": "SOLAR",
+        "name": "Larsemann East 30kW Bifacial PV Array",
+        "rated_capacity": 30.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "tilt_angle_deg": 65.0,
+          "inverter_type": "MPPT High-Efficiency Polar Inverter",
+          "panel_technology": "Bifacial Monocrystalline PERC"
+        },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 35.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "irradiance_wm2", "unit": "W/m2", "min_val": 0.0, "max_val": 1200.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "panel_temp_c", "unit": "degC", "min_val": -60.0, "max_val": 60.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.10.21:502" }
+      },
+      {
+        "device_id": "bh_wind_turbine_01",
+        "station_id": "BHARATI",
+        "device_type": "WIND",
+        "name": "Coastal Polar Wind Turbine 25kW",
+        "rated_capacity": 25.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "cut_in_speed_ms": 3.0,
+          "rated_speed_ms": 11.5,
+          "cut_out_speed_ms": 25.0,
+          "blade_deicing_installed": true
+        },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 30.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "rotor_speed_rpm", "unit": "RPM", "min_val": 0.0, "max_val": 120.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 60.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "CAN_BUS", "bus_address": "CAN0_NODE_12" }
+      },
+      {
+        "device_id": "bh_gen_01",
+        "station_id": "BHARATI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Primary Diesel Generator 1 (80kW)",
+        "rated_capacity": 80.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "fuel_type": "Polar Grade ATF-50",
+          "min_loading_pct": 0.30,
+          "chp_heat_recovery": true
+        },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 95.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 35.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "oil_pressure_bar", "unit": "bar", "min_val": 0.0, "max_val": 10.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "operating_status", "unit": "status", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:1" }
+      },
+      {
+        "device_id": "bh_gen_02",
+        "station_id": "BHARATI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Secondary Diesel Generator 2 (80kW)",
+        "rated_capacity": 80.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "fuel_type": "Polar Grade ATF-50",
+          "min_loading_pct": 0.30,
+          "chp_heat_recovery": true
+        },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 95.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 35.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "oil_pressure_bar", "unit": "bar", "min_val": 0.0, "max_val": 10.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "operating_status", "unit": "status", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:2" }
+      },
+      {
+        "device_id": "bh_gen_03",
+        "station_id": "BHARATI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Reserve Diesel Generator 3 (80kW)",
+        "rated_capacity": 80.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "fuel_type": "Polar Grade ATF-50",
+          "min_loading_pct": 0.30,
+          "chp_heat_recovery": true
+        },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 95.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 35.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "oil_pressure_bar", "unit": "bar", "min_val": 0.0, "max_val": 10.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "operating_status", "unit": "status", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:3" }
+      },
+      {
+        "device_id": "bh_bess_01",
+        "station_id": "BHARATI",
+        "device_type": "BATTERY",
+        "name": "LiFePO4 Station Battery Energy Storage System (120kWh)",
+        "rated_capacity": 120.0,
+        "unit": "kWh",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "min_soc": 0.20,
+          "max_soc": 0.95,
+          "max_charge_kw": 35.0,
+          "max_discharge_kw": 40.0,
+          "thermal_chamber_controlled": true
+        },
+        "telemetry_channels": [
+          { "channel": "soc_fraction", "unit": "ratio", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "power_kw", "unit": "kW", "min_val": -45.0, "max_val": 45.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "voltage_v", "unit": "V", "min_val": 300.0, "max_val": 500.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "cell_temp_c", "unit": "degC", "min_val": -30.0, "max_val": 60.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "CAN_BUS", "bus_address": "BMS_NODE_01" }
+      },
+      {
+        "device_id": "bh_thermal_chp_01",
+        "station_id": "BHARATI",
+        "device_type": "THERMAL",
+        "name": "Main Building Heating & CHP Hydronic Loop",
+        "rated_capacity": 45.0,
+        "unit": "kW_thermal",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "target_temp_c": 20.0,
+          "min_safe_temp_c": 12.0
+        },
+        "telemetry_channels": [
+          { "channel": "indoor_temp_c", "unit": "degC", "min_val": -10.0, "max_val": 40.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "supply_temp_c", "unit": "degC", "min_val": 10.0, "max_val": 95.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "return_temp_c", "unit": "degC", "min_val": 10.0, "max_val": 85.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "thermal_heat_kw", "unit": "kW", "min_val": 0.0, "max_val": 60.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "BACNET_IP", "bus_address": "192.168.10.45:47808" }
+      },
+      {
+        "device_id": "bh_aws_met_01",
+        "station_id": "BHARATI",
+        "device_type": "WEATHER",
+        "name": "Automatic Weather Station (Larsemann Met Tower)",
+        "rated_capacity": null,
+        "unit": "sensor_suite",
+        "enabled": true,
+        "expected_reporting_interval_sec": 30.0,
+        "freshness_threshold_sec": 180.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "elevation_m": 35.0,
+          "wind_sensor_height_m": 10.0
+        },
+        "telemetry_channels": [
+          { "channel": "ambient_temp_c", "unit": "degC", "min_val": -60.0, "max_val": 25.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "solar_ghi_wm2", "unit": "W/m2", "min_val": 0.0, "max_val": 1300.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "barometric_pressure_hpa", "unit": "hPa", "min_val": 850.0, "max_val": 1050.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "relative_humidity_pct", "unit": "%", "min_val": 0.0, "max_val": 100.0, "freshness_limit_seconds": 180.0 }
+        ],
+        "source_metadata": { "protocol": "SERIAL_ASCII", "bus_address": "/dev/ttyUSB1" }
+      },
+      {
+        "device_id": "bh_meter_main_01",
+        "station_id": "BHARATI",
+        "device_type": "POWER_METER",
+        "name": "Main AC Switchboard Power Quality Analyzer",
+        "rated_capacity": 300.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "nominal_voltage_v": 400.0,
+          "grid_frequency_hz": 50.0
+        },
+        "telemetry_channels": [
+          { "channel": "bus_voltage_v", "unit": "V", "min_val": 340.0, "max_val": 460.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "grid_frequency_hz", "unit": "Hz", "min_val": 45.0, "max_val": 55.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "total_active_load_kw", "unit": "kW", "min_val": 0.0, "max_val": 350.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "critical_load_kw", "unit": "kW", "min_val": 0.0, "max_val": 150.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.10.10:502" }
+      },
+      {
+        "device_id": "bh_fuel_storage_01",
+        "station_id": "BHARATI",
+        "device_type": "FUEL",
+        "name": "Main Bulk Fuel Tank Telemetry System",
+        "rated_capacity": 160000.0,
+        "unit": "L",
+        "enabled": true,
+        "expected_reporting_interval_sec": 60.0,
+        "freshness_threshold_sec": 300.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "critical_reserve_liters": 25000.0,
+          "fluid_type": "Polar Grade ATF-50"
+        },
+        "telemetry_channels": [
+          { "channel": "storage_volume_l", "unit": "L", "min_val": 0.0, "max_val": 170000.0, "freshness_limit_seconds": 300.0 },
+          { "channel": "fuel_temp_c", "unit": "degC", "min_val": -50.0, "max_val": 30.0, "freshness_limit_seconds": 300.0 },
+          { "channel": "day_tank_level_pct", "unit": "%", "min_val": 0.0, "max_val": 100.0, "freshness_limit_seconds": 120.0 }
+        ],
+        "source_metadata": { "protocol": "HART_MODBUS", "bus_address": "192.168.10.60:502" }
+      },
+      {
+        "device_id": "bh_gps_timing_01",
+        "station_id": "BHARATI",
+        "device_type": "GPS",
+        "name": "NavIC / GPS Stratum-1 Time Receiver",
+        "rated_capacity": null,
+        "unit": "timing_unit",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "constellations": ["NavIC", "GPS", "GLONASS"],
+          "timing_accuracy_ns": 15.0
+        },
+        "telemetry_channels": [
+          { "channel": "clock_offset_ns", "unit": "ns", "min_val": -1000.0, "max_val": 1000.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "satellites_locked", "unit": "count", "min_val": 0.0, "max_val": 32.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "NTP_PTP", "bus_address": "192.168.10.2:123" }
+      },
+      {
+        "device_id": "bh_satcom_node_01",
+        "station_id": "BHARATI",
+        "device_type": "COMMUNICATIONS",
+        "name": "GSAT-14 / Iridium Polar Gateway Transceiver",
+        "rated_capacity": 2048.0,
+        "unit": "kbps",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {
+          "primary_link": "GSAT-14 C-Band",
+          "backup_link": "Iridium Certus 100",
+          "antenna_radome_heater": true
+        },
+        "telemetry_channels": [
+          { "channel": "uplink_rssi_dbm", "unit": "dBm", "min_val": -140.0, "max_val": -40.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "latency_ms", "unit": "ms", "min_val": 50.0, "max_val": 4000.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "packet_loss_pct", "unit": "%", "min_val": 0.0, "max_val": 100.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "SNMP_V3", "bus_address": "192.168.10.1:161" }
+      }
+    ]
+  },
+  "MAITRI": {
+    "station_id": "MAITRI",
+    "station_name": "Maitri Research Station",
+    "edge_node_id": "mt_edge_master_01",
+    "default_reporting_interval_sec": 10.0,
+    "default_freshness_threshold_sec": 60.0,
+    "devices": [
+      {
+        "device_id": "mt_wind_turbine_01",
+        "station_id": "MAITRI",
+        "device_type": "WIND",
+        "name": "Schirmacher Wind Turbine 1 (15kW)",
+        "rated_capacity": 15.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "cut_in_speed_ms": 3.0, "rated_speed_ms": 11.5, "cut_out_speed_ms": 25.0 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 20.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 60.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.20.21:502" }
+      },
+      {
+        "device_id": "mt_wind_turbine_02",
+        "station_id": "MAITRI",
+        "device_type": "WIND",
+        "name": "Schirmacher Wind Turbine 2 (15kW)",
+        "rated_capacity": 15.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "cut_in_speed_ms": 3.0, "rated_speed_ms": 11.5, "cut_out_speed_ms": 25.0 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 20.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 60.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.20.22:502" }
+      },
+      {
+        "device_id": "mt_gen_01",
+        "station_id": "MAITRI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Diesel Generator Unit 1 (62.5kW)",
+        "rated_capacity": 62.5,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "fuel_type": "ATF-50", "min_loading_pct": 0.30 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 28.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:1" }
+      },
+      {
+        "device_id": "mt_gen_02",
+        "station_id": "MAITRI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Diesel Generator Unit 2 (62.5kW)",
+        "rated_capacity": 62.5,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "fuel_type": "ATF-50", "min_loading_pct": 0.30 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 28.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:2" }
+      },
+      {
+        "device_id": "mt_gen_03",
+        "station_id": "MAITRI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Diesel Generator Unit 3 (62.5kW)",
+        "rated_capacity": 62.5,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "fuel_type": "ATF-50", "min_loading_pct": 0.30 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 28.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:3" }
+      },
+      {
+        "device_id": "mt_bess_01",
+        "station_id": "MAITRI",
+        "device_type": "BATTERY",
+        "name": "Maitri Station BESS (90kWh)",
+        "rated_capacity": 90.0,
+        "unit": "kWh",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "min_soc": 0.20, "max_soc": 0.95 },
+        "telemetry_channels": [
+          { "channel": "soc_fraction", "unit": "ratio", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "power_kw", "unit": "kW", "min_val": -35.0, "max_val": 35.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "CAN_BUS", "bus_address": "BMS_NODE_01" }
+      },
+      {
+        "device_id": "mt_thermal_boiler_01",
+        "station_id": "MAITRI",
+        "device_type": "THERMAL",
+        "name": "Main Station Hydronic Heating Circuit",
+        "rated_capacity": 35.0,
+        "unit": "kW_thermal",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "target_temp_c": 20.0, "min_safe_temp_c": 10.0 },
+        "telemetry_channels": [
+          { "channel": "indoor_temp_c", "unit": "degC", "min_val": -10.0, "max_val": 40.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.20.40:502" }
+      },
+      {
+        "device_id": "mt_aws_met_01",
+        "station_id": "MAITRI",
+        "device_type": "WEATHER",
+        "name": "Schirmacher Oasis AWS Meteorological Station",
+        "rated_capacity": null,
+        "unit": "sensor_suite",
+        "enabled": true,
+        "expected_reporting_interval_sec": 30.0,
+        "freshness_threshold_sec": 180.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "elevation_m": 130.0 },
+        "telemetry_channels": [
+          { "channel": "ambient_temp_c", "unit": "degC", "min_val": -60.0, "max_val": 25.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 180.0 }
+        ],
+        "source_metadata": { "protocol": "SERIAL_ASCII", "bus_address": "/dev/ttyUSB1" }
+      },
+      {
+        "device_id": "mt_meter_main_01",
+        "station_id": "MAITRI",
+        "device_type": "POWER_METER",
+        "name": "Maitri Main Bus Power Meter",
+        "rated_capacity": 250.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "nominal_voltage_v": 400.0, "grid_frequency_hz": 50.0 },
+        "telemetry_channels": [
+          { "channel": "bus_voltage_v", "unit": "V", "min_val": 340.0, "max_val": 460.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "grid_frequency_hz", "unit": "Hz", "min_val": 45.0, "max_val": 55.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "total_active_load_kw", "unit": "kW", "min_val": 0.0, "max_val": 250.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.20.10:502" }
+      },
+      {
+        "device_id": "mt_fuel_storage_01",
+        "station_id": "MAITRI",
+        "device_type": "FUEL",
+        "name": "Maitri Polar ATF Storage Tank",
+        "rated_capacity": 120000.0,
+        "unit": "L",
+        "enabled": true,
+        "expected_reporting_interval_sec": 60.0,
+        "freshness_threshold_sec": 300.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "critical_reserve_liters": 20000.0 },
+        "telemetry_channels": [
+          { "channel": "storage_volume_l", "unit": "L", "min_val": 0.0, "max_val": 130000.0, "freshness_limit_seconds": 300.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB2:1" }
+      },
+      {
+        "device_id": "mt_gps_timing_01",
+        "station_id": "MAITRI",
+        "device_type": "GPS",
+        "name": "Maitri GPS / Time Reference",
+        "rated_capacity": null,
+        "unit": "timing_unit",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {},
+        "telemetry_channels": [
+          { "channel": "clock_offset_ns", "unit": "ns", "min_val": -1000.0, "max_val": 1000.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "NTP_PTP", "bus_address": "192.168.20.2:123" }
+      },
+      {
+        "device_id": "mt_satcom_node_01",
+        "station_id": "MAITRI",
+        "device_type": "COMMUNICATIONS",
+        "name": "Maitri Satcom Terminal",
+        "rated_capacity": 1024.0,
+        "unit": "kbps",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "primary_link": "Inmarsat BGAN" },
+        "telemetry_channels": [
+          { "channel": "latency_ms", "unit": "ms", "min_val": 50.0, "max_val": 4000.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "packet_loss_pct", "unit": "%", "min_val": 0.0, "max_val": 100.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "SNMP_V3", "bus_address": "192.168.20.1:161" }
+      }
+    ]
+  },
+  "HIMADRI": {
+    "station_id": "HIMADRI",
+    "station_name": "Himadri Research Station",
+    "edge_node_id": "hm_edge_master_01",
+    "default_reporting_interval_sec": 10.0,
+    "default_freshness_threshold_sec": 60.0,
+    "devices": [
+      {
+        "device_id": "hm_pv_array_01",
+        "station_id": "HIMADRI",
+        "device_type": "SOLAR",
+        "name": "Ny-Alesund Experimental 15kW PV Array",
+        "rated_capacity": 15.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "tilt_angle_deg": 70.0 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 18.0, "freshness_limit_seconds": 60.0 },
+          { "channel": "irradiance_wm2", "unit": "W/m2", "min_val": 0.0, "max_val": 1200.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.30.21:502" }
+      },
+      {
+        "device_id": "hm_gen_01",
+        "station_id": "HIMADRI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Arctic Station Generator 1 (45kW)",
+        "rated_capacity": 45.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "fuel_type": "Arctic Diesel", "min_loading_pct": 0.30 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 55.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 20.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:1" }
+      },
+      {
+        "device_id": "hm_gen_02",
+        "station_id": "HIMADRI",
+        "device_type": "DIESEL_GENERATOR",
+        "name": "Arctic Station Generator 2 (45kW)",
+        "rated_capacity": 45.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "fuel_type": "Arctic Diesel", "min_loading_pct": 0.30 },
+        "telemetry_channels": [
+          { "channel": "power_output_kw", "unit": "kW", "min_val": 0.0, "max_val": 55.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "fuel_flow_l_per_h", "unit": "L/h", "min_val": 0.0, "max_val": 20.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "coolant_temp_c", "unit": "degC", "min_val": -40.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB0:2" }
+      },
+      {
+        "device_id": "hm_bess_01",
+        "station_id": "HIMADRI",
+        "device_type": "BATTERY",
+        "name": "Himadri BESS (60kWh)",
+        "rated_capacity": 60.0,
+        "unit": "kWh",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "min_soc": 0.20, "max_soc": 0.95 },
+        "telemetry_channels": [
+          { "channel": "soc_fraction", "unit": "ratio", "min_val": 0.0, "max_val": 1.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "power_kw", "unit": "kW", "min_val": -25.0, "max_val": 25.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "CAN_BUS", "bus_address": "BMS_NODE_01" }
+      },
+      {
+        "device_id": "hm_thermal_hvac_01",
+        "station_id": "HIMADRI",
+        "device_type": "THERMAL",
+        "name": "Himadri Laboratory HVAC & Heating",
+        "rated_capacity": 25.0,
+        "unit": "kW_thermal",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "target_temp_c": 21.0, "min_safe_temp_c": 14.0 },
+        "telemetry_channels": [
+          { "channel": "indoor_temp_c", "unit": "degC", "min_val": -10.0, "max_val": 40.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "BACNET_IP", "bus_address": "192.168.30.40:47808" }
+      },
+      {
+        "device_id": "hm_aws_met_01",
+        "station_id": "HIMADRI",
+        "device_type": "WEATHER",
+        "name": "Ny-Alesund Arctic AWS Weather Station",
+        "rated_capacity": null,
+        "unit": "sensor_suite",
+        "enabled": true,
+        "expected_reporting_interval_sec": 30.0,
+        "freshness_threshold_sec": 180.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "elevation_m": 12.0 },
+        "telemetry_channels": [
+          { "channel": "ambient_temp_c", "unit": "degC", "min_val": -60.0, "max_val": 25.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "wind_speed_ms", "unit": "m/s", "min_val": 0.0, "max_val": 75.0, "freshness_limit_seconds": 180.0 },
+          { "channel": "solar_ghi_wm2", "unit": "W/m2", "min_val": 0.0, "max_val": 1200.0, "freshness_limit_seconds": 180.0 }
+        ],
+        "source_metadata": { "protocol": "SERIAL_ASCII", "bus_address": "/dev/ttyUSB1" }
+      },
+      {
+        "device_id": "hm_meter_main_01",
+        "station_id": "HIMADRI",
+        "device_type": "POWER_METER",
+        "name": "Himadri Switchboard Power Quality Meter",
+        "rated_capacity": 150.0,
+        "unit": "kW",
+        "enabled": true,
+        "expected_reporting_interval_sec": 5.0,
+        "freshness_threshold_sec": 30.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "nominal_voltage_v": 400.0, "grid_frequency_hz": 50.0 },
+        "telemetry_channels": [
+          { "channel": "bus_voltage_v", "unit": "V", "min_val": 340.0, "max_val": 460.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "grid_frequency_hz", "unit": "Hz", "min_val": 45.0, "max_val": 55.0, "freshness_limit_seconds": 30.0 },
+          { "channel": "total_active_load_kw", "unit": "kW", "min_val": 0.0, "max_val": 120.0, "freshness_limit_seconds": 30.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_TCP", "bus_address": "192.168.30.10:502" }
+      },
+      {
+        "device_id": "hm_fuel_storage_01",
+        "station_id": "HIMADRI",
+        "device_type": "FUEL",
+        "name": "Himadri Arctic Diesel Fuel Storage",
+        "rated_capacity": 50000.0,
+        "unit": "L",
+        "enabled": true,
+        "expected_reporting_interval_sec": 60.0,
+        "freshness_threshold_sec": 300.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "critical_reserve_liters": 10000.0 },
+        "telemetry_channels": [
+          { "channel": "storage_volume_l", "unit": "L", "min_val": 0.0, "max_val": 55000.0, "freshness_limit_seconds": 300.0 }
+        ],
+        "source_metadata": { "protocol": "MODBUS_RTU", "bus_address": "/dev/ttyUSB2:1" }
+      },
+      {
+        "device_id": "hm_gps_timing_01",
+        "station_id": "HIMADRI",
+        "device_type": "GPS",
+        "name": "Himadri High-Latitude GPS / GNSS Receiver",
+        "rated_capacity": null,
+        "unit": "timing_unit",
+        "enabled": true,
+        "expected_reporting_interval_sec": 10.0,
+        "freshness_threshold_sec": 60.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": {},
+        "telemetry_channels": [
+          { "channel": "clock_offset_ns", "unit": "ns", "min_val": -1000.0, "max_val": 1000.0, "freshness_limit_seconds": 60.0 }
+        ],
+        "source_metadata": { "protocol": "NTP_PTP", "bus_address": "192.168.30.2:123" }
+      },
+      {
+        "device_id": "hm_satcom_node_01",
+        "station_id": "HIMADRI",
+        "device_type": "COMMUNICATIONS",
+        "name": "Himadri Polar Satcom Node",
+        "rated_capacity": 2048.0,
+        "unit": "kbps",
+        "enabled": true,
+        "expected_reporting_interval_sec": 15.0,
+        "freshness_threshold_sec": 90.0,
+        "health_state": "HEALTHY",
+        "connectivity_state": "CONNECTED",
+        "provenance": "CONFIGURED",
+        "configured_metadata": { "primary_link": "Fiber / Satellite hybrid" },
+        "telemetry_channels": [
+          { "channel": "latency_ms", "unit": "ms", "min_val": 10.0, "max_val": 2000.0, "freshness_limit_seconds": 90.0 },
+          { "channel": "packet_loss_pct", "unit": "%", "min_val": 0.0, "max_val": 100.0, "freshness_limit_seconds": 90.0 }
+        ],
+        "source_metadata": { "protocol": "SNMP_V3", "bus_address": "192.168.30.1:161" }
+      }
+    ]
+  }
+}

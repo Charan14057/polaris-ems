@@ -1,0 +1,54 @@
+{
+  "weights": {
+    "energy_adequacy": {
+      "weight": 0.15,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures total station electrical service coverage vs total requested demand"
+    },
+    "critical_load_resilience": {
+      "weight": 0.20,
+      "provenance": "CONFIGURED",
+      "rationale": "High priority: zero tolerance for unserved life-safety and comms critical load"
+    },
+    "thermal_resilience": {
+      "weight": 0.15,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures indoor habitability margin above pipe freeze and health safety limits"
+    },
+    "generation_resilience": {
+      "weight": 0.10,
+      "provenance": "CONFIGURED",
+      "rationale": "Evaluates N-1 generator redundancy and active operating headroom"
+    },
+    "storage_resilience": {
+      "weight": 0.10,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures deliverable battery reserve above minimum discharge cutoff"
+    },
+    "fuel_resilience": {
+      "weight": 0.10,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures days of fuel inventory remaining vs operational baseline"
+    },
+    "logistics_resilience": {
+      "weight": 0.10,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures capability to bridge the logistics gap until the next resupply event"
+    },
+    "renewable_resilience": {
+      "weight": 0.05,
+      "provenance": "CONFIGURED",
+      "rationale": "Measures independence from and vulnerability to sudden solar/wind dropouts"
+    },
+    "recovery_resilience": {
+      "weight": 0.05,
+      "provenance": "CONFIGURED",
+      "rationale": "Evaluates station capability and rate to restore depleted energy reserves"
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Authoritative multi-dimensional resilience index weights for Polaris-EMS Phase 7",
+    "composite_index_range": [0.0, 100.0]
+  }
+}

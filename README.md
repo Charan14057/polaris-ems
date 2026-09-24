@@ -47,15 +47,25 @@ polaris-ems/
 └── docs/                # Architecture docs & research registry
 ```
 
-## 5. Development Setup
+## 5. Phase 10 Production Documentation & Walkthrough
+Detailed operational walkthrough and audit verification reports:
+- [Phase 10 Production Integration Walkthrough](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase10_walkthrough.md)
+- [Phase 10 Runtime Freeze Audit Script](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase10_runtime.py)
+
+## 6. Execution & Verification Setup
 ```bash
-# 1. Activate virtual environment
-.venv\Scripts\activate   # Windows
-# source .venv/bin/activate # Linux/macOS
+# 1. Start FastAPI Backend (Port 8000)
+.venv\Scripts\activate
+python -m uvicorn backend.api.app:app --host 127.0.0.1 --port 8000
 
-# 2. Install dependencies
-pip install -r backend/requirements.txt
+# 2. Start Mission Control Frontend (Port 3000)
+cd frontend
+npm run dev
 
-# 3. Run Phase 1 Foundation tests
-pytest tests/test_phase1_foundation.py -v
+# 3. Run Automated Test Suites
+pytest tests/test_phase9_api.py -v       # Backend API tests (21/21 passed)
+cd frontend && npm test                  # Frontend Vitest suite (12/12 passed)
+
+# 4. Run Phase 10 Runtime Freeze Audit
+python scripts/verify_phase10_runtime.py # 13/13 gates passed (100%)
 ```

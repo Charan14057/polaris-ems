@@ -1,0 +1,141 @@
+{
+  "rules": {
+    "R1_CRITICAL_LOAD_PRESERVATION": {
+      "category": "CRITICAL_LOAD_PROTECTION",
+      "priority": 1,
+      "state": "PROTECT",
+      "action": "PRESERVE_CRITICAL_LOADS",
+      "threshold_field": "unserved_critical_kw",
+      "threshold_value": 1e-4,
+      "unit": "kW",
+      "provenance": "CONFIGURED",
+      "rationale": "Zero tolerance for unserved life-safety and comms critical load; immediate mandatory shedding of non-critical loads"
+    },
+    "R2_THERMAL_SAFETY_CRITICAL": {
+      "category": "THERMAL_PROTECTION",
+      "priority": 1,
+      "state": "PROTECT",
+      "action": "PROTECT_INDOOR_TEMPERATURE",
+      "threshold_field": "indoor_temperature_c",
+      "unit": "deg_C",
+      "provenance": "CONFIGURED",
+      "rationale": "Indoor temperature has dropped below station minimum safe threshold; mandatory heating power prioritization"
+    },
+    "R3_THERMAL_SAFETY_WARNING": {
+      "category": "THERMAL_PROTECTION",
+      "priority": 3,
+      "state": "PREPARE",
+      "action": "PREPARE_THERMAL_ENVELOPE",
+      "threshold_buffer_c": 2.0,
+      "hysteresis_c": 1.5,
+      "unit": "deg_C",
+      "provenance": "CONFIGURED",
+      "rationale": "Indoor temperature is within warning buffer of minimum safe threshold; prepare thermal envelope and preheat"
+    },
+    "R4_RESERVE_EROSION_CRITICAL": {
+      "category": "PREPAREDNESS",
+      "priority": 4,
+      "state": "PROTECT",
+      "action": "PREPARE_STANDBY_GENERATOR",
+      "threshold_field": "dependable_reserve_pct",
+      "threshold_value": 15.0,
+      "hysteresis_value": 5.0,
+      "unit": "percent",
+      "provenance": "CONFIGURED",
+      "rationale": "Operating dependable reserve margin is below the 15% high-risk emergency limit; commit/prepare standby generator"
+    },
+    "R5_RESERVE_EROSION_WARNING": {
+      "category": "MONITORING",
+      "priority": 4,
+      "state": "MONITOR",
+      "action": "MONITOR_RESERVES",
+      "threshold_field": "dependable_reserve_pct",
+      "threshold_value": 30.0,
+      "hysteresis_value": 5.0,
+      "unit": "percent",
+      "provenance": "CONFIGURED",
+      "rationale": "Operating dependable reserve margin is below 30% warning limit; elevated reserve observation active"
+    },
+    "R6_FUEL_EMERGENCY_PRESERVATION": {
+      "category": "FUEL_PRESERVATION",
+      "priority": 5,
+      "state": "PROTECT",
+      "action": "PRESERVE_EMERGENCY_FUEL",
+      "threshold_field": "fuel_remaining_l",
+      "unit": "liters",
+      "provenance": "CONFIGURED",
+      "rationale": "Remaining bulk diesel fuel inventory has reached or breached the station critical emergency reserve threshold"
+    },
+    "R7_RESUPPLY_GAP_VULNERABILITY": {
+      "category": "RESUPPLY_PROTECTION",
+      "priority": 5,
+      "state": "PROTECT",
+      "action": "CONSERVE_FUEL_UNTIL_RESUPPLY",
+      "threshold_field": "resupply_gap_survivability_h",
+      "unit": "hours",
+      "provenance": "CONFIGURED",
+      "rationale": "Station projected fuel endurance cannot bridge the logistics gap until the next scheduled convoy delivery"
+    },
+    "R8_STORAGE_DEPLETION_WARNING": {
+      "category": "STORAGE_PROTECTION",
+      "priority": 6,
+      "state": "PREPARE",
+      "action": "PRESERVE_MINIMUM_BATTERY_SOC",
+      "threshold_field": "battery_soc_pct",
+      "threshold_value": 0.25,
+      "hysteresis_value": 0.10,
+      "unit": "ratio",
+      "provenance": "CONFIGURED",
+      "rationale": "Battery state of charge is approaching the 20% minimum discharge cutoff; throttle discharge and preserve reserve"
+    },
+    "R9_STATION_RECOVERY_PROTOCOL": {
+      "category": "RECOVERY",
+      "priority": 7,
+      "state": "RECOVER",
+      "action": "ADOPT_STATION_RECOVERY_POSTURE",
+      "threshold_field": "resilience_state",
+      "threshold_value": "RECOVERY",
+      "unit": "state",
+      "provenance": "CONFIGURED",
+      "rationale": "Station is transitioning out of acute critical stress; adopt recovery posture, confirm bus health, recharge storage"
+    },
+    "R10_NOMINAL_MONITORING": {
+      "category": "MONITORING",
+      "priority": 8,
+      "state": "MONITOR",
+      "action": "MONITOR_RESERVES",
+      "threshold_field": "resilience_state",
+      "threshold_value": "SAFE",
+      "unit": "state",
+      "provenance": "CONFIGURED",
+      "rationale": "All station operational and life-safety parameters nominal; standard baseline monitoring posture"
+    },
+    "R11_DISCRETIONARY_LOAD_MITIGATION": {
+      "category": "CRITICAL_LOAD_PROTECTION",
+      "priority": 2,
+      "state": "MITIGATE",
+      "action": "BLOCK_DISCRETIONARY_LOADS",
+      "threshold_field": "resilience_state",
+      "threshold_value": "AT_RISK",
+      "unit": "state",
+      "provenance": "CONFIGURED",
+      "rationale": "Station under AT_RISK/THREATENED state with renewable generation failure; block discretionary loads to prevent escalation"
+    },
+    "R12_GOVERNANCE_ESCALATION": {
+      "category": "CRITICAL_LOAD_PROTECTION",
+      "priority": 1,
+      "state": "ESCALATE",
+      "action": "PRESERVE_CRITICAL_LOADS",
+      "threshold_field": "overall_station_survival_horizon_h",
+      "threshold_value": 6.0,
+      "unit": "hours",
+      "provenance": "CONFIGURED",
+      "rationale": "Critical compound station emergency or survival horizon critically short (<= 6.0 h); mandatory governance escalation"
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Authoritative deterministic policy configuration for Polaris-EMS Phase 8",
+    "provenance": "CONFIGURED"
+  }
+}

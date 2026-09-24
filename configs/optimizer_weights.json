@@ -1,0 +1,62 @@
+{
+  "optimizer_version": "0.6.0",
+  "weights_version": "1.0.0",
+  "provenance": "CONFIGURED",
+  "description": "Authoritative penalty weights for Polaris-EMS Phase 6 multi-objective risk-aware optimizer.",
+  "weights": {
+    "critical_unserved_penalty_per_kwh": {
+      "value": 100000.0,
+      "unit": "penalty/kWh",
+      "provenance": "CONFIGURED",
+      "rationale": "Life support, satcom, freeze protection must dominate operational decisions by 5 orders of magnitude."
+    },
+    "thermal_violation_penalty_per_deg_c": {
+      "value": 10000.0,
+      "unit": "penalty/(degC*h)",
+      "provenance": "CONFIGURED",
+      "rationale": "Habitability breach causes pipe freezing and hypothermia; second highest priority."
+    },
+    "noncritical_unserved_penalty_per_kwh": {
+      "value": 500.0,
+      "unit": "penalty/kWh",
+      "provenance": "CONFIGURED",
+      "rationale": "Protects scientific missions and operational loads unless station enters extreme deficit."
+    },
+    "reserve_deficit_penalty_per_kw": {
+      "value": 50.0,
+      "unit": "penalty/kW",
+      "provenance": "CONFIGURED",
+      "rationale": "Penalizes operating below the dependable reserve margin to buffer sudden gusts and cloud transients."
+    },
+    "fuel_cost_per_liter": {
+      "value": 1.0,
+      "unit": "penalty/L",
+      "provenance": "CONFIGURED",
+      "rationale": "Direct fuel preservation objective: minimize liters of polar winter diesel consumed."
+    },
+    "generator_startup_penalty": {
+      "value": 5.0,
+      "unit": "penalty/start",
+      "provenance": "CONFIGURED",
+      "rationale": "Starter motor and thermal stress wear cost (equivalent to ~5 liters fuel burn per startup)."
+    },
+    "battery_wear_penalty_per_kwh": {
+      "value": 0.05,
+      "unit": "penalty/kWh",
+      "provenance": "CONFIGURED",
+      "rationale": "Throughput cycling wear proxy discouraging unnecessary micro-cycling."
+    },
+    "renewable_curtailment_penalty_per_kwh": {
+      "value": 0.01,
+      "unit": "penalty/kWh",
+      "provenance": "CONFIGURED",
+      "rationale": "Small tie-breaking penalty ensuring renewable power is prioritized over diesel and storage."
+    }
+  },
+  "terminal_protection": {
+    "default_terminal_soc_target": 0.50,
+    "default_reserve_margin_pct": 0.30,
+    "provenance": "CONFIGURED",
+    "rationale": "Prevents optimizer from draining battery storage or reserves at horizon boundary."
+  }
+}

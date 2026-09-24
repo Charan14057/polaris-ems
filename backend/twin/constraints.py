@@ -156,8 +156,8 @@ class ConstraintEvaluator:
 
         # 8. Electrical Power Balance Conservation
         p_sources = (
-            state.solar.solar_generation_kw
-            + state.wind.wind_generation_kw
+            state.solar.solar_available_kw
+            + state.wind.wind_available_kw
             + state.diesel.generator_power_kw
             + state.battery.discharge_kw
         )
