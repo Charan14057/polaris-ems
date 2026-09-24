@@ -13,12 +13,15 @@ Enforces realistic Antarctic/Arctic environmental constraints:
 """
 
 import math
-from datetime import datetime, timezone
-from typing import Optional, List, Tuple
+from datetime import datetime, timezone, timedelta
+from typing import Optional, List, Tuple, Dict, Any
 
 from backend.integrations.schemas import (
     ExternalWeatherObservation,
+    ExternalForecastSeries,
+    ExternalFeedCompleteness,
     ExternalValidationResult,
+    ProviderStatus,
     StalenessStatus,
 )
 
@@ -152,3 +155,127 @@ class ExternalDataValidator:
             validated_observation=obs if is_valid else None,
             provenance=obs.provenance
         )
+
+    def validate_forecast_series(
+        self,
+        series: ExternalForecastSeries,
+        reference_time: Optional[datetime] = None
+    ) -> Tuple[bool, List[ExternalValidationResult], List[str]]:
+        """Validates a multi-horizon forecast series against polar bounds and temporal order."""
+        now = reference_time or datetime.now(timezone.utc)
+        step_results: List[ExternalValidationResult] = []
+        series_errors: List[str] = []
+
+        if not series.steps:
+            return False, [], ["Empty forecast series (0 steps provided)"]
+
+        # Check origin timestamp
+        origin = series.forecast_origin
+        if origin.tzinfo is None:
+            origin = origin.replace(tzinfo=timezone.utc)
+        if now.tzinfo is None:
+            now = now.replace(tzinfo=timezone.utc)
+
+        # Origin should not be in the distant future
+        age_sec = (now - origin).total_seconds()
+        if age_sec < -self.max_future_tolerance_sec:
+            series_errors.append(f"Forecast origin {origin.isoformat()} is in the future relative to {now.isoformat()}")
+
+        # Check steps
+        last_ts = None
+        for idx, step in enumerate(series.steps):
+            step_ts = step.timestamp
+            if step_ts.tzinfo is None:
+                step_ts = step_ts.replace(tzinfo=timezone.utc)
+            if last_ts is not None and step_ts <= last_ts:
+                series_errors.append(f"Step {idx} timestamp {step_ts.isoformat()} is not strictly monotonic after {last_ts.isoformat()}")
+            last_ts = step_ts
+
+            # Validate physical metrics using validate_weather but skipping freshness check for forward forecast steps
+            res = self.validate_weather(step, reference_time=step_ts)
+            step_results.append(res)
+            if not res.is_valid:
+                series_errors.extend([f"Step {idx} ({step_ts.isoformat()}): {e}" for e in res.errors])
+
+        is_valid = len(series_errors) == 0
+        return is_valid, step_results, series_errors
+
+    def validate_feed_completeness(
+        self,
+        station_id: str,
+        observations: List[ExternalWeatherObservation],
+        expected_interval_minutes: int = 60
+    ) -> ExternalFeedCompleteness:
+        """Evaluates timestamp continuity and identifies missing intervals."""
+        if not observations:
+            now = datetime.now(timezone.utc)
+            return ExternalFeedCompleteness(
+                station_id=station_id.upper(),
+                start_time=now,
+                end_time=now,
+                expected_intervals=0,
+                received_intervals=0,
+                missing_intervals=0,
+                completeness_ratio=0.0,
+                is_complete=False,
+                missing_timestamps=[]
+            )
+
+        sorted_obs = sorted(observations, key=lambda o: o.timestamp)
+        start_ts = sorted_obs[0].timestamp
+        end_ts = sorted_obs[-1].timestamp
+        if start_ts.tzinfo is None:
+            start_ts = start_ts.replace(tzinfo=timezone.utc)
+        if end_ts.tzinfo is None:
+            end_ts = end_ts.replace(tzinfo=timezone.utc)
+
+        interval_delta = timedelta(minutes=expected_interval_minutes)
+        total_span_sec = (end_ts - start_ts).total_seconds()
+        expected_intervals = max(1, int(round(total_span_sec / (expected_interval_minutes * 60))) + 1)
+        received_intervals = len(sorted_obs)
+
+        # Detect gaps
+        obs_times = {o.timestamp.replace(tzinfo=timezone.utc) if o.timestamp.tzinfo is None else o.timestamp for o in sorted_obs}
+        missing_timestamps: List[datetime] = []
+        curr = start_ts
+        while curr <= end_ts:
+            if not any(abs((curr - t).total_seconds()) < (expected_interval_minutes * 30) for t in obs_times):
+                missing_timestamps.append(curr)
+            curr += interval_delta
+
+        missing_count = len(missing_timestamps)
+        completeness_ratio = min(1.0, max(0.0, (expected_intervals - missing_count) / expected_intervals))
+        is_complete = missing_count == 0
+
+        return ExternalFeedCompleteness(
+            station_id=station_id.upper(),
+            start_time=start_ts,
+            end_time=end_ts,
+            expected_intervals=expected_intervals,
+            received_intervals=received_intervals,
+            missing_intervals=missing_count,
+            completeness_ratio=round(completeness_ratio, 4),
+            is_complete=is_complete,
+            missing_timestamps=missing_timestamps
+        )
+
+    def evaluate_provider_state(
+        self,
+        consecutive_failures: int,
+        consecutive_invalid: int,
+        last_success_age_sec: Optional[float],
+        enabled: bool = True,
+        quarantine_threshold: int = 3
+    ) -> ProviderStatus:
+        """Determines provider operational state matching Phase 15 requirements."""
+        if not enabled:
+            return ProviderStatus.DISABLED
+        if consecutive_invalid >= quarantine_threshold:
+            return ProviderStatus.QUARANTINED
+        if consecutive_failures >= 5:
+            return ProviderStatus.FAILED
+        if consecutive_failures > 0:
+            return ProviderStatus.DEGRADED
+        if last_success_age_sec is not None and last_success_age_sec > self.max_freshness_sec:
+            return ProviderStatus.STALE
+        return ProviderStatus.AVAILABLE

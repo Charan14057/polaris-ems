@@ -14,12 +14,15 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class ProviderStatus(str, Enum):
-    """Health classification for external providers."""
-    HEALTHY = "HEALTHY"
+    """Health and operational classification for external providers."""
+    AVAILABLE = "AVAILABLE"
+    HEALTHY = "HEALTHY"          # backward compatibility alias for AVAILABLE
     DEGRADED = "DEGRADED"
-    UNAVAILABLE = "UNAVAILABLE"
-    DISABLED = "DISABLED"
     STALE = "STALE"
+    FAILED = "FAILED"
+    UNAVAILABLE = "UNAVAILABLE"  # backward compatibility alias for FAILED
+    QUARANTINED = "QUARANTINED"
+    DISABLED = "DISABLED"
 
 
 class StalenessStatus(str, Enum):
@@ -106,3 +109,129 @@ class ProviderHealthRecord(BaseModel):
     successful_requests: int = 0
     average_latency_ms: float = 0.0
     freshness_status: StalenessStatus = StalenessStatus.EXPIRED
+
+
+class ExternalForecastSeries(BaseModel):
+    """Multi-horizon time series of external weather forecasts (e.g. 48h/168h)."""
+    station_id: str
+    forecast_origin: datetime
+    horizon_hours: int
+    steps: List[ExternalWeatherObservation]
+    source_provider: str
+    provenance: str = "SYNTHETIC"
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("provenance")
+    @classmethod
+    def validate_provenance(cls, v: str) -> str:
+        if v not in LOCKED_PROVENANCE_TIERS:
+            raise ValueError(f"Invalid provenance '{v}'. Must be one of: {sorted(LOCKED_PROVENANCE_TIERS)}")
+        return v
+
+
+class ExternalFeedCompleteness(BaseModel):
+    """Tracking of feed completeness, missing intervals, and arrival frequency."""
+    station_id: str
+    start_time: datetime
+    end_time: datetime
+    expected_intervals: int
+    received_intervals: int
+    missing_intervals: int
+    completeness_ratio: float = Field(..., ge=0.0, le=1.0)
+    is_complete: bool
+    missing_timestamps: List[datetime] = Field(default_factory=list)
+
+
+class ModelVsObservedMetric(BaseModel):
+    """Real-world operational accuracy and calibration metrics against paired observations."""
+    station_id: str
+    target: str
+    horizon_h: int
+    n_samples: int
+    observed_mean: float
+    forecast_mean: float
+    residuals: List[float] = Field(default_factory=list)
+    mae: float
+    rmse: float
+    mbe: float  # Signed Mean Bias Error (observed - forecast)
+    smape: float
+    interval_80_coverage: float
+    evidence_type: str = "EXTERNAL_VALIDATION"
+    reference_provenance: str = "SYNTHETIC"
+
+    @field_validator("reference_provenance")
+    @classmethod
+    def validate_reference_provenance(cls, v: str) -> str:
+        if v not in LOCKED_PROVENANCE_TIERS:
+            raise ValueError(f"Invalid reference_provenance '{v}'. Must be one of: {sorted(LOCKED_PROVENANCE_TIERS)}")
+        return v
+
+
+class TwinRealityMetric(BaseModel):
+    """Evaluation of Digital Twin physical conservation against reference measurements."""
+    station_id: str
+    subsystem: str  # electrical, thermal, battery, fuel
+    n_evaluations: int
+    observed_value: float
+    simulated_value: float
+    residual: float
+    residual_pct: float
+    within_tolerance: bool
+    status: str  # VALIDATED, DISCREPANCY_NOTED, CALIBRATION_CANDIDATE
+    reference_provenance: str = "SYNTHETIC"
+    details: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("reference_provenance")
+    @classmethod
+    def validate_reference_provenance(cls, v: str) -> str:
+        if v not in LOCKED_PROVENANCE_TIERS:
+            raise ValueError(f"Invalid reference_provenance '{v}'. Must be one of: {sorted(LOCKED_PROVENANCE_TIERS)}")
+        return v
+
+
+class CalibrationCandidate(BaseModel):
+    """Governed proposal for future model recalibration (preserves frozen baseline)."""
+    candidate_id: str
+    target_subsystem: str
+    parameter_name: str
+    current_value: float
+    proposed_value: float
+    deviation_reason: str
+    empirical_residual_reduction_pct: float
+    governance_status: str = "PENDING_CONTROLLED_REVIEW"
+    immutable_baseline_preserved: bool = True
+
+
+class DriftType(str, Enum):
+    """Taxonomy of operational drift categories."""
+    DATA_DRIFT = "DATA_DRIFT"
+    MODEL_DRIFT = "MODEL_DRIFT"
+    PHYSICAL_MODEL_MISMATCH = "PHYSICAL_MODEL_MISMATCH"
+    PROVIDER_FAILURE = "PROVIDER_FAILURE"
+    NOMINAL = "NOMINAL"
+
+
+class DriftIndicator(BaseModel):
+    """Real-time operational drift detection indicator."""
+    metric_name: str
+    drift_type: DriftType
+    detected: bool
+    severity: str  # LOW, MEDIUM, HIGH, CRITICAL
+    z_score: float
+    p_value: Optional[float] = None
+    description: str
+    recommendation: str
+
+
+class OperationalReplayResult(BaseModel):
+    """Result of passing external weather through the full frozen intelligence pipeline."""
+    replay_id: str
+    station_id: str
+    horizon_hours: int
+    trace_id: str
+    external_weather_used: bool
+    optimization_status: str
+    twin_replay_pass: bool
+    resilience_state: str
+    policy_directive: str
+    discrepancy_vs_baseline: Dict[str, Any] = Field(default_factory=dict)

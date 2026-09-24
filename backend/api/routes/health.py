@@ -140,7 +140,9 @@ async def health_physical(request: Request) -> APIResponse[Dict[str, Any]]:
     req_id = getattr(request.state, "request_id", "req-health-physical")
     data = {
         "physical_scada_connected": False,
+        "physical_scada_link": False,
         "hardware_status": "DISCONNECTED",
+        "physical_validation": "NOT_AVAILABLE",
         "operational_mode": "CALIBRATED_DIGITAL_TWIN",
         "station_locations": {
             "BHARATI": "Larsemann Hills (69°24'S, 76°11'E, Antarctica)",

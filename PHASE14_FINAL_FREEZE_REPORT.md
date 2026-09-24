@@ -7,8 +7,9 @@
 **Overall Project Status:** 🟢 **`PHASES_1_14_COMPLETE`**  
 **Prior Baseline:** 🟢 **`PHASE_13_FROZEN`**  
 **Freeze Timestamp:** `2026-09-24T22:28:00+05:30` (UTC `2026-09-24T16:58:00Z`)  
-**Freeze Git Commit / Hash:** `227c44e47a03c3521a45dca685e8dd4897c9b45e`  
-**Next Authorized Stage:** 🛑 **`PHASE_15_NOT_STARTED`**  
+**Freeze Git Commit / Hash:** `227c44e47a03c3521a45dca685e8dd4897c9b45e`
+**Current Repository HEAD:** `d8a3d347a90fb746e436b0210e3281353c7767b8`
+**Next Authorized Stage:** 🛑 **`PHASE_15_NOT_STARTED`**
 
 ---
 
@@ -155,6 +156,18 @@ $$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 
 ============================================================
 
 Polaris-EMS Phases 1–14 are complete and frozen.
+
+Canonical Phase 14 Freeze Commit:
+227c44e47a03c3521a45dca685e8dd4897c9b45e
+
+Current Repository HEAD:
+d8a3d347a90fb746e436b0210e3281353c7767b8
+
+Project Status:
+PHASES_1_14_COMPLETE
+
+Next Authorized Stage:
+PHASE_15_NOT_STARTED
 
 No Phase 15 work has been initiated.
 

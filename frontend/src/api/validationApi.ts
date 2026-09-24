@@ -213,4 +213,85 @@ export const validationApi = {
 
   getPerformance: (stationId: string = 'BHARATI') =>
     apiRequest<Record<string, Record<string, number>>>(`/api/v1/validation/performance?station_id=${stationId}`),
+
+  // Phase 15 — Real-World Integration, Drift & Twin Calibration Endpoints
+  getRealityMetrics: (stationId?: string) =>
+    apiRequest<RealityMetricItem[]>(`/api/v1/integrations/validation/metrics${stationId ? `?station_id=${stationId}` : ''}`),
+
+  getDriftIndicators: () =>
+    apiRequest<DriftIndicatorItem[]>('/api/v1/integrations/validation/drift'),
+
+  getTwinRealityChecks: (stationId?: string) =>
+    apiRequest<TwinRealityItem[]>(`/api/v1/integrations/validation/twin-check${stationId ? `?station_id=${stationId}` : ''}`),
+
+  getCalibrationCandidates: () =>
+    apiRequest<CalibrationCandidateItem[]>('/api/v1/integrations/validation/candidates'),
+
+  getProviders: () =>
+    apiRequest<ProviderHealthItem[]>('/api/v1/integrations/providers'),
+
+  getIntegrationStatus: () =>
+    apiRequest<Record<string, any>>('/api/v1/integrations/status'),
 };
+
+export interface RealityMetricItem {
+  station_id: string;
+  target: string;
+  horizon_hours: number;
+  n_samples: number;
+  mae: number;
+  rmse: number;
+  smape: number;
+  signed_bias: number;
+  interval_80_coverage: number;
+  source: string;
+  weather_regime?: string | null;
+  provenance: string;
+}
+
+export interface TwinRealityItem {
+  station_id: string;
+  subsystem: 'electrical' | 'thermal' | 'battery' | 'fuel';
+  timestamp: string;
+  observed_value: number;
+  simulated_value: number;
+  residual: number;
+  relative_error_pct: number;
+  status: 'VALIDATED' | 'DISCREPANCY' | 'CALIBRATION_CANDIDATE';
+  candidate_id?: string | null;
+  unit: string;
+}
+
+export interface DriftIndicatorItem {
+  metric_name: string;
+  station_id: string;
+  drift_type: 'DATA_DRIFT' | 'MODEL_DRIFT' | 'PHYSICAL_MODEL_MISMATCH' | 'PROVIDER_FAILURE';
+  severity: 'NOMINAL' | 'WARNING' | 'ALERT';
+  score: number;
+  threshold: number;
+  p_value?: number | null;
+  description: string;
+  detected_at: string;
+}
+
+export interface CalibrationCandidateItem {
+  candidate_id: string;
+  target_subsystem: string;
+  model_or_param: string;
+  created_at: string;
+  baseline_metric: number;
+  candidate_metric: number;
+  quantified_degradation: number;
+  status: 'PROPOSED' | 'REVIEWED' | 'APPLIED' | 'REJECTED';
+  evidence_summary: string;
+}
+
+export interface ProviderHealthItem {
+  provider_name: string;
+  status: 'AVAILABLE' | 'DEGRADED' | 'STALE' | 'FAILED' | 'QUARANTINED' | 'DISABLED';
+  latency_ms: number;
+  last_success_timestamp?: string | null;
+  error_count: number;
+  failure_reason?: string | null;
+  consecutive_failures: number;
+}

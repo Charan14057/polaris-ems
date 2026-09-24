@@ -15,13 +15,14 @@ If an external provider is disabled, times out, rate-limited, stale, or malforme
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Set
 from datetime import datetime, timezone
 from functools import lru_cache
 
 from backend.config.settings import get_settings
 from backend.integrations.schemas import (
     ExternalWeatherObservation,
+    ExternalForecastSeries,
     ExternalValidationResult,
     ProviderHealthRecord,
     ProviderStatus,
@@ -64,11 +65,24 @@ class ExternalRealityBridge:
 
         # Cache of latest validated observations by station
         self._latest_validated: Dict[str, ExternalWeatherObservation] = {}
+        self._consecutive_invalid: Dict[str, int] = {}
+        self._quarantined_providers: Set[str] = set()
 
     def register_adapter(self, adapter: AbstractBaseProviderAdapter):
         """Registers a custom provider adapter."""
         self.adapters[adapter.name.lower()] = adapter
         logger.info(f"Registered external reality adapter: {adapter.name}")
+
+    def quarantine_provider(self, provider_name: str):
+        """Explicitly quarantines a provider adapter."""
+        self._quarantined_providers.add(provider_name)
+        logger.warning(f"Provider '{provider_name}' manually or automatically QUARANTINED.")
+
+    def unquarantine_provider(self, provider_name: str):
+        """Restores a provider from quarantine."""
+        self._quarantined_providers.discard(provider_name)
+        self._consecutive_invalid[provider_name] = 0
+        logger.info(f"Provider '{provider_name}' restored from quarantine.")
 
     def get_weather_observation(
         self,
@@ -120,6 +134,10 @@ class ExternalRealityBridge:
         # 3. Query adapters in order
         all_errors: List[str] = []
         for adp in adapters_to_try:
+            if adp.name in self._quarantined_providers:
+                all_errors.append(f"Provider '{adp.name}' is QUARANTINED due to repeated integrity/bound violations")
+                continue
+
             try:
                 obs = adp.fetch_latest_weather(station_key)
                 if obs is None:
@@ -130,9 +148,14 @@ class ExternalRealityBridge:
                 result = self.validator.validate_weather(obs, reference_time=now)
                 if result.is_valid and result.validated_observation:
                     self._latest_validated[station_key] = result.validated_observation
+                    self._consecutive_invalid[adp.name] = 0
                     logger.info(f"Validated external weather from {adp.name} for {station_key} (Quality: {result.quality_score})")
                     return result
                 else:
+                    self._consecutive_invalid[adp.name] = self._consecutive_invalid.get(adp.name, 0) + 1
+                    if self._consecutive_invalid[adp.name] >= 3:
+                        self._quarantined_providers.add(adp.name)
+                        logger.error(f"Provider '{adp.name}' QUARANTINED after 3 consecutive invalid payloads.")
                     all_errors.extend([f"[{adp.name}] {e}" for e in result.errors])
 
             except Exception as e:
@@ -151,9 +174,57 @@ class ExternalRealityBridge:
             provenance="CONFIGURED"
         )
 
+    def get_forecast_series(
+        self,
+        station_id: str,
+        horizon_hours: int = 48,
+        preferred_provider: Optional[str] = None
+    ) -> Optional[ExternalForecastSeries]:
+        """Fetches and validates a multi-horizon forward forecast series."""
+        if not self.enabled and preferred_provider != "spooler":
+            logger.info("External reality bridge disabled; forecast series fallback active.")
+            return None
+
+        station_key = station_id.upper()
+        now = datetime.now(timezone.utc)
+
+        target_adapter = None
+        if preferred_provider and preferred_provider.lower() in self.adapters:
+            target_adapter = self.adapters[preferred_provider.lower()]
+        else:
+            target_adapter = self.adapters.get("openmeteo")
+
+        if not target_adapter or not target_adapter.enabled:
+            return None
+
+        if target_adapter.name in self._quarantined_providers:
+            logger.warning(f"Cannot fetch series: provider '{target_adapter.name}' is QUARANTINED")
+            return None
+
+        if hasattr(target_adapter, "fetch_forecast_series"):
+            try:
+                series = target_adapter.fetch_forecast_series(station_key, horizon_hours=horizon_hours)
+                if series:
+                    is_valid, step_results, errors = self.validator.validate_forecast_series(series, reference_time=now)
+                    if is_valid:
+                        logger.info(f"Validated multi-horizon forecast series ({len(series.steps)} steps) from {target_adapter.name}")
+                        return series
+                    else:
+                        logger.warning(f"Forecast series validation failed: {'; '.join(errors)}")
+            except Exception as e:
+                logger.error(f"Error fetching forecast series from {target_adapter.name}: {e}")
+
+        return None
+
     def get_provider_health(self) -> List[ProviderHealthRecord]:
         """Returns diagnostic health records for all registered external providers."""
-        return [adapter.get_health_record() for adapter in self.adapters.values()]
+        records = []
+        for adp in self.adapters.values():
+            rec = adp.get_health_record()
+            if adp.name in self._quarantined_providers:
+                rec.status = ProviderStatus.QUARANTINED
+            records.append(rec)
+        return records
 
     def get_bridge_summary(self) -> Dict[str, Any]:
         """Provides an executive status of the reality bridge."""

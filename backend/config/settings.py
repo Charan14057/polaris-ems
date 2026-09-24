@@ -74,6 +74,8 @@ class ProductSettings:
     operator_mode: str = field(default_factory=lambda: os.getenv("POLARIS_OPERATOR_MODE", "ADVISORY").upper())
     # Physical SCADA presence flag: Strictly False unless physical hardware exists
     physical_scada_connected: bool = False  # Strictly False under current polar deployment constraint
+    physical_scada_link: bool = False
+    physical_validation: str = "NOT_AVAILABLE"
 
 
 @dataclass
