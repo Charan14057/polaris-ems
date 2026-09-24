@@ -2,8 +2,8 @@
 **Enterprise Deployment, Containerization & Operational Runbook**
 
 **System:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061  
-**Target Release:** Phase 14 (`PHASE_14_READY_TO_FREEZE`)  
+**Target Release:** Phase 14 (`PHASE_14_FROZEN`)  
+**Project Status:** `PHASES_1_14_COMPLETE`  
 **Deployment Profile:** Air-Gapped Polar Microgrid & Mission-Control Gateway
 
 ---
