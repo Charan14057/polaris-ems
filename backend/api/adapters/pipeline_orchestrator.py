@@ -48,6 +48,7 @@ from backend.api.adapters.policy_adapter import PolicyAPIAdapter
 from backend.api.schemas.forecast import ForecastRequestSchema, ForecastResponseData, QuantilePointSchema
 from backend.api.schemas.scenario import ScenarioEvaluateResponseData, ScenarioImpactMetricsSchema
 from backend.api.schemas.optimizer import OptimizeResponseData, OptimizationSummarySchema
+from backend.trace.engine import get_trace_service
 
 
 class PipelineOrchestrator:
@@ -359,7 +360,7 @@ class PipelineOrchestrator:
             ))
             overall_status = "PARTIAL"
 
-        return PipelineAnalyzeResponseData(
+        pipeline_resp = PipelineAnalyzeResponseData(
             pipeline_run_id=run_id,
             station_id=sid,
             horizon_hours=horizon_h,
@@ -373,3 +374,17 @@ class PipelineOrchestrator:
             policy=policy_data,
             provenance="SIMULATED"
         )
+
+        try:
+            trace_service = get_trace_service()
+            trace_rec = trace_service.record_pipeline_run(
+                station_id=sid,
+                pipeline_data=pipeline_resp,
+                request_schema=req
+            )
+            pipeline_resp.decision_trace_id = trace_rec.decision_trace_id
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Trace recording failed: {e}")
+
+        return pipeline_resp

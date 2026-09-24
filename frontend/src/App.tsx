@@ -12,6 +12,8 @@ import { ResilienceView } from './views/ResilienceView';
 import { PolicyView } from './views/PolicyView';
 import { DecisionTraceView } from './views/DecisionTraceView';
 import { EdgeView } from './views/EdgeView';
+import { ValidationView } from './views/ValidationView';
+import { OperatorApprovalBanner } from './components/common/OperatorApprovalBanner';
 import { ShieldAlert, Server, Info } from 'lucide-react';
 
 const AppContent: React.FC = () => {
@@ -26,8 +28,14 @@ const AppContent: React.FC = () => {
       {/* Primary Navigation */}
       <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
 
-      {/* Real-time Threat / Policy Ribbon */}
+      {/* Active Threat / Policy Ribbon */}
       <AlertRibbon threats={activeThreats} onNavigateToPolicy={() => setActiveTab('policy')} />
+
+      {/* Operator Dispatch Approval Boundary (Workstream G) */}
+      <OperatorApprovalBanner
+        onNavigateToOptimization={() => setActiveTab('optimization')}
+        onNavigateToTwin={() => setActiveTab('twin')}
+      />
 
       {/* Main Operational Stage */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
@@ -40,6 +48,7 @@ const AppContent: React.FC = () => {
         {activeTab === 'policy' && <PolicyView />}
         {activeTab === 'trace' && <DecisionTraceView />}
         {activeTab === 'edge' && <EdgeView />}
+        {activeTab === 'validation' && <ValidationView />}
       </main>
 
       {/* Polar Station Telemetry & Compliance Footer */}
@@ -51,7 +60,7 @@ const AppContent: React.FC = () => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
             <span className="font-mono text-polar-400 font-semibold tracking-wider">
-              POLARIS-EMS // SIH26061
+              POLARIS-EMS // POLAR MISSION CONTROL
             </span>
             <span className="text-polar-700">|</span>
             <span>Station ID: <strong className="text-polar-300">{stationId}</strong></span>
@@ -85,8 +94,8 @@ const AppContent: React.FC = () => {
               All power values, forecasts, optimization dispatches, and policy directives are snapshot-evaluated by frozen server-side physical and mathematical engines.
             </span>
           </div>
-          <div className="font-mono tracking-tight text-polar-500">
-            PROVENANCE: REAL | CONFIGURED | ASSUMED | SYNTHETIC | FORECAST | SIMULATED
+          <div className="font-mono tracking-tight text-polar-400">
+            DATA CLASSIFICATION: SNAPSHOT TELEMETRY • STATION SPEC • PHYSICAL DIGITAL TWIN
           </div>
         </div>
       </footer>

@@ -48,13 +48,12 @@ export const ForecastView: React.FC = () => {
   const points = forecastData?.quantiles || [];
   
   // Calculate chart boundaries
-  const maxVal = Math.max(
-    ...points.map(p => Math.max(p.p90 || 0, p.p95 || 0, p.point)),
-    10
-  );
-  const peakVal = Math.max(...points.map(p => p.p50), 0);
-  const avgVal = points.length > 0 ? (points.reduce((acc, p) => acc + p.p50, 0) / points.length) : 0;
-  const minVal = points.length > 0 ? Math.min(...points.map(p => p.p10)) : 0;
+  const maxVal = points.length > 0 
+    ? Math.max(...points.map(p => Math.max(p.p90 || 0, p.p95 || 0, p.point || 0)), 10)
+    : 10;
+  const peakVal = points.length > 0 ? Math.max(...points.map(p => p.p50 || 0), 0) : 0;
+  const avgVal = points.length > 0 ? (points.reduce((acc, p) => acc + (p.p50 || 0), 0) / points.length) : 0;
+  const minVal = points.length > 0 ? Math.min(...points.map(p => p.p10 || 0)) : 0;
 
   // Render SVG chart
   const width = 800;
@@ -85,7 +84,7 @@ export const ForecastView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Probabilistic Operational Forecasting (Phase 3)
+              Probabilistic Operational Forecasting
             </h2>
             <ProvenanceTag provenance="FORECAST" size="xs" />
           </div>

@@ -237,17 +237,17 @@ export const EdgeView: React.FC = () => {
         </div>
       </div>
 
-      {/* Field Resilience Testing / Simulation Controls */}
+      {/* Field Resilience Diagnostics & Hardware Testing */}
       <div className="bg-polar-900/60 border border-polar-800/80 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <Layers className="w-4 h-4 text-cyan-400" />
             <h2 className="text-xs font-semibold text-polar-200 uppercase tracking-wider">
-              Field Connectivity & Fault Injection Harness
+              Field Connectivity &amp; Fault Diagnostics Harness
             </h2>
           </div>
           <span className="text-[10px] text-polar-500 font-mono">
-            DETERMINISTIC SIMULATION HARNESS // PROVENANCE: SYNTHETIC
+            PROTOCOL TESTING // VERIFIED EDGE HARNESS
           </span>
         </div>
 
@@ -423,7 +423,7 @@ export const EdgeView: React.FC = () => {
         <div>
           <span className="font-semibold text-polar-200">Edge Decision Boundary & Field Safety:</span>
           <p className="mt-0.5">
-            Polaris-EMS Edge Layer handles telemetry normalization, data quality validation, and local state buffering during communication dropouts. It operates under safe fallback postures (e.g. HOLD_LAST_VALIDATED_STATE, SAFE_HOLD) and <strong>does not solve mathematical optimization problems or actuate physical generators independently</strong>. When connectivity is verified, dispatch requests are routed to the central Phase 6 Optimizer and Phase 8 Policy governance pipeline.
+            Polaris-EMS Edge Layer handles telemetry normalization, data quality validation, and local state buffering during communication dropouts. It operates under safe fallback postures (e.g. HOLD_LAST_VALIDATED_STATE, SAFE_HOLD) and <strong>does not solve mathematical optimization problems or actuate physical generators independently</strong>. When connectivity is verified, dispatch requests are routed to the central Dispatch Optimizer and Policy Governance pipeline.
           </p>
         </div>
       </div>

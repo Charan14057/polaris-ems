@@ -1,0 +1,47 @@
+# ============================================================
+# POLARIS-EMS — Production Docker Compose Orchestration
+# SIH26061: Polar Energy Management & Resilience System
+# ============================================================
+
+services:
+  polaris-ems:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    image: polaris-ems:latest
+    container_name: polaris-ems-production
+    restart: unless-stopped
+    ports:
+      - "${POLARIS_API_PORT:-8000}:8000"
+    environment:
+      - POLARIS_API_HOST=0.0.0.0
+      - POLARIS_API_PORT=8000
+      - POLARIS_ENVIRONMENT=PRODUCTION
+      - POLARIS_SERVE_FRONTEND=true
+      - POLARIS_FRONTEND_DIST=/app/frontend/dist
+      - POLARIS_LOG_LEVEL=${POLARIS_LOG_LEVEL:-INFO}
+      - POLARIS_CORS_ORIGINS=${POLARIS_CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      - POLARIS_EXTERNAL_DATA_ENABLED=${POLARIS_EXTERNAL_DATA_ENABLED:-false}
+    volumes:
+      # Persistent local storage for immutable decision traces
+      - polaris-traces:/app/reports/traces
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/ready"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4096M
+        reservations:
+          cpus: '0.5'
+          memory: 1024M
+
+volumes:
+  polaris-traces:
+    driver: local

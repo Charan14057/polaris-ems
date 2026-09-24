@@ -1,0 +1,26 @@
+{
+  "forecast_inference_ms": {
+    "median_ms": 421.65,
+    "p95_ms": 478.25,
+    "max_ms": 484.54,
+    "samples": 2
+  },
+  "tree_shap_explainability_ms": {
+    "median_ms": 101.8,
+    "p95_ms": 105.79,
+    "max_ms": 106.23,
+    "samples": 2
+  },
+  "scenario_stress_execution_ms": {
+    "median_ms": 12.01,
+    "p95_ms": 12.01,
+    "max_ms": 12.01,
+    "samples": 2
+  },
+  "optimizer_and_twin_replay_ms": {
+    "median_ms": 2193.49,
+    "p95_ms": 2193.49,
+    "max_ms": 2193.49,
+    "samples": 1
+  }
+}

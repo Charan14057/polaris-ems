@@ -1,0 +1,274 @@
+{
+  "decision_trace_id": "DT-20260924-HIMADRI-22C266",
+  "station_id": "HIMADRI",
+  "pipeline_run_id": "pipe-bd938d08",
+  "request_id": null,
+  "creation_timestamp": "2026-09-24T14:58:53.346473+00:00",
+  "completion_timestamp": "2026-09-24T14:58:53.346676+00:00",
+  "execution_status": "COMPLETED",
+  "horizon_hours": 24,
+  "scenario_id": "EXTREME_COLD",
+  "optimization_mode": "EXPECTED",
+  "primary_directive": "NORMAL_OPERATION",
+  "policy_state": "NO_ACTION",
+  "resilience_state": "AT_RISK",
+  "edge_mode": "CONNECTED_OPERATION",
+  "events": [
+    {
+      "event_id": "evt_edge_d1714916",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "EDGE",
+      "event_type": "EDGE_CONTEXT_INSPECTION",
+      "timestamp": "2026-09-24T14:58:53.346473+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "EDGE_CONNECTED",
+      "summary": "Edge node in CONNECTED_OPERATION (CONNECTED). Fallback posture: WAIT_FOR_BACKEND_DECISION. Buffer queue depth: 0 observations.",
+      "inputs": {
+        "station_id": "HIMADRI"
+      },
+      "outputs": {
+        "edge_mode": "CONNECTED_OPERATION",
+        "connectivity_state": "CONNECTED",
+        "fallback_posture": "WAIT_FOR_BACKEND_DECISION",
+        "buffer_depth": 0,
+        "healthy_devices": 0,
+        "active_devices": 10
+      },
+      "validation_tier": "SIMULATED",
+      "provenance": "CONFIGURED",
+      "parent_event_id": null,
+      "request_id": null,
+      "duration_ms": 0.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_forecast_86023046",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "FORECAST",
+      "event_type": "ML_INFERENCE_EXECUTION",
+      "timestamp": "2026-09-24T14:58:53.346534+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "FORECAST_AVAILABLE",
+      "summary": "Generated 0 probabilistic forecast steps for 24h horizon (P10–P95 calibrated bounds).",
+      "inputs": {
+        "station_id": "HIMADRI",
+        "horizon_hours": 24
+      },
+      "outputs": {
+        "points_count": 0,
+        "model_id": "registered_xgboost_residual_v1",
+        "horizon_hours": 24,
+        "provenance": "FORECAST"
+      },
+      "validation_tier": "COMPUTED",
+      "provenance": "FORECAST",
+      "parent_event_id": "evt_edge_d1714916",
+      "request_id": null,
+      "duration_ms": 366.3,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_scenario_2a0c903e",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "SCENARIO",
+      "event_type": "SCENARIO_STRESS_TEST",
+      "timestamp": "2026-09-24T14:58:53.346567+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "SCENARIO_STRESS_APPLIED",
+      "summary": "Evaluated scenario 'EXTREME_COLD'. Delta Unserved Energy: 0.00 kWh, Delta Fuel: 0.00 L.",
+      "inputs": {
+        "scenario_id": "EXTREME_COLD"
+      },
+      "outputs": {
+        "scenario_name": "EXTREME_COLD",
+        "delta_unserved_energy_kwh": 0.0,
+        "delta_fuel_consumed_liters": 0.0
+      },
+      "validation_tier": "SIMULATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_forecast_86023046",
+      "request_id": null,
+      "duration_ms": 21.5,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_optimizer_60d45d27",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "OPTIMIZER",
+      "event_type": "MILP_DISPATCH_OPTIMIZATION",
+      "timestamp": "2026-09-24T14:58:53.346593+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "OPTIMIZATION_MIP_GAP",
+      "summary": "Phase 6 HiGHS solved schedule (EXPECTED mode) with status OPTIMAL (MIP_GAP_OPTIMAL, MIP Gap: 1.80%). Proposed objective: 304.85.",
+      "inputs": {
+        "mode": "EXPECTED"
+      },
+      "outputs": {
+        "solver_status": "OPTIMAL",
+        "optimality_tier": "MIP_GAP_OPTIMAL",
+        "relative_gap": 0.018,
+        "objective_value": 304.85,
+        "dispatch_nature": "PROPOSED_SCHEDULE"
+      },
+      "validation_tier": "COMPUTED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_scenario_2a0c903e",
+      "request_id": null,
+      "duration_ms": 201.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_twin_replay_fa42f824",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "TWIN_REPLAY",
+      "event_type": "PHYSICAL_TWIN_VALIDATION",
+      "timestamp": "2026-09-24T14:58:53.346618+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "TWIN_VALIDATED",
+      "summary": "Digital Twin physical validation: VALIDATED. Verified Unserved Load: 0.00 kWh, Fuel Consumption: 304.42 L.",
+      "inputs": {
+        "validation_authority": "Phase 4 Digital Twin Engine"
+      },
+      "outputs": {
+        "physically_validated": true,
+        "total_unserved_load_kwh": 0.0,
+        "total_fuel_consumed_liters": 304.42
+      },
+      "validation_tier": "VALIDATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_optimizer_60d45d27",
+      "request_id": null,
+      "duration_ms": 0.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_resilience_58c6b4e9",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "RESILIENCE",
+      "event_type": "RESILIENCE_ASSESSMENT",
+      "timestamp": "2026-09-24T14:58:53.346642+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "RESILIENCE_AT_RISK",
+      "summary": "Resilience Engine assessed state: AT_RISK (Composite Index: 90.4/100). Survival Horizon: 24.0h (Binding Constraint: NONE). Recovery pathways: ESTIMATED.",
+      "inputs": {
+        "evaluation_authority": "Phase 7 Resilience Engine"
+      },
+      "outputs": {
+        "resilience_state": "AT_RISK",
+        "composite_resilience_index": 90.41,
+        "binding_subsystem": "NONE",
+        "survival_horizon_h": 24.0,
+        "recovery_projection_tier": "ESTIMATED"
+      },
+      "validation_tier": "ESTIMATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_twin_replay_fa42f824",
+      "request_id": null,
+      "duration_ms": 3.6,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_policy_4e7a8935",
+      "trace_id": "DT-20260924-HIMADRI-22C266",
+      "stage": "POLICY",
+      "event_type": "POLICY_GOVERNANCE",
+      "timestamp": "2026-09-24T14:58:53.346676+00:00",
+      "station_id": "HIMADRI",
+      "status": "COMPLETED",
+      "reason_code": "POLICY_NOMINAL",
+      "summary": "Policy Engine governed state: NO_ACTION (Directive: NORMAL_OPERATION). Fired rules count: 0. Priority compliance verified against P1–P8 hierarchy.",
+      "inputs": {
+        "governance_authority": "Phase 8 Policy Engine"
+      },
+      "outputs": {
+        "policy_state": "NO_ACTION",
+        "primary_directive": "NORMAL_OPERATION",
+        "active_rules_count": 0,
+        "advisory_rationale": "Policy dispatched in mode=EXPECTED with 0 generator overrides. "
+      },
+      "validation_tier": "ADVISORY",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_resilience_58c6b4e9",
+      "request_id": null,
+      "duration_ms": 0.1,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    }
+  ],
+  "lineage_graph": {
+    "__root__": [
+      "evt_edge_d1714916"
+    ],
+    "evt_edge_d1714916": [
+      "evt_forecast_86023046"
+    ],
+    "evt_forecast_86023046": [
+      "evt_scenario_2a0c903e"
+    ],
+    "evt_scenario_2a0c903e": [
+      "evt_optimizer_60d45d27"
+    ],
+    "evt_optimizer_60d45d27": [
+      "evt_twin_replay_fa42f824"
+    ],
+    "evt_twin_replay_fa42f824": [
+      "evt_resilience_58c6b4e9"
+    ],
+    "evt_resilience_58c6b4e9": [
+      "evt_policy_4e7a8935"
+    ],
+    "evt_policy_4e7a8935": []
+  },
+  "explanation": {
+    "trace_id": "DT-20260924-HIMADRI-22C266",
+    "station_id": "HIMADRI",
+    "headline": "Decision Trace for HIMADRI: Policy directed 'NORMAL_OPERATION' under AT_RISK resilience posture (COMPLETED).",
+    "why_this_state": "Station entered 'AT_RISK' resilience posture with a composite index of 90.4/100. Survival horizon is assessed at 24.0 hours, with 'NONE' as the binding subsystem constraint.",
+    "why_this_policy": "Policy Engine transitioned to state 'NO_ACTION' and issued directive 'NORMAL_OPERATION' based on 0 active rules evaluated against the P1–P8 governance hierarchy. Advisory rationale: Policy dispatched in mode=EXPECTED with 0 generator overrides. ",
+    "why_this_schedule": "Phase 6 HiGHS solved the dispatch schedule in 'EXPECTED' mode, achieving optimality tier 'MIP_GAP_OPTIMAL' with a relative MIP gap of 1.80%. The proposed dispatch prioritizes critical thermal and life-support loads while minimizing unserved energy.",
+    "what_data_used": [
+      "Phase 3 Probabilistic Forecaster: 0 hourly steps (provenance=FORECAST).",
+      "Phase 5 Scenario: 'EXTREME_COLD' environmental stress parameters.",
+      "Phase 11 Edge Context: CONNECTED_OPERATION node state."
+    ],
+    "what_was_validated": [
+      "Digital Twin Replay: Electrical power balance, battery SoC bounds, and thermal indoor thresholds were physically simulated and validated.",
+      "Observed Unserved Load: 0.00 kWh."
+    ],
+    "what_remains_estimated": [
+      "Resilience recovery trajectories and counterfactual options are modeled estimations (provenance=SIMULATED).",
+      "Load and renewable profiles beyond the immediate observation horizon are conformal machine learning estimates (P10–P95)."
+    ],
+    "what_is_next": "Station operational posture maintained under directive 'NORMAL_OPERATION'. Next scheduled pipeline re-evaluation in 1 hour.",
+    "reason_codes": [
+      "EDGE_CONNECTED",
+      "FORECAST_AVAILABLE",
+      "SCENARIO_STRESS_APPLIED",
+      "OPTIMIZATION_MIP_GAP",
+      "TWIN_VALIDATED",
+      "RESILIENCE_AT_RISK",
+      "POLICY_NOMINAL"
+    ]
+  },
+  "provenance": "SIMULATED",
+  "schema_version": "1.0.0"
+}

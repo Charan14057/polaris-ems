@@ -163,7 +163,7 @@ Every single metric, card, table, and chart in the user interface renders an exp
 [CONFIGURED]  -> Manufacturer nameplate ratings, fuel tank sizes, generator ratings
 [ASSUMED]     -> Stated engineering approximations (building heat transfer U-values)
 [SYNTHETIC]   -> Physics-informed base environment generation
-[FORECAST]    -> Calibrated ML model quantiles (P10, P50, P80, P90, P95)
+[FORECAST]    -> Calibrated ML model quantiles (P10, P50, P90, P95)
 [SIMULATED]   -> Digital Twin continuous simulation & optimizer dispatch trajectories
 ```
 

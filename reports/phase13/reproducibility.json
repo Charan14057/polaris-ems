@@ -1,0 +1,104 @@
+[
+  {
+    "original_trace_id": "DT-20260924-MAITRI-F9A8C4",
+    "station_id": "MAITRI",
+    "reproduction_category": "IDENTICAL",
+    "max_absolute_error": 0.0,
+    "max_relative_error": 0.0,
+    "stages_reproduced": [
+      "FORECAST",
+      "OPTIMIZER",
+      "RESILIENCE",
+      "POLICY"
+    ],
+    "matches": {
+      "policy_state_match": true,
+      "resilience_state_match": true,
+      "objective_value_match": true
+    },
+    "notes": "Replayed decision produced bit-for-bit identical outcomes.",
+    "replayed_at": "2026-09-24T13:57:38.307744+00:00"
+  },
+  {
+    "original_trace_id": "DT-20260924-MAITRI-3C26C7",
+    "station_id": "MAITRI",
+    "reproduction_category": "IDENTICAL",
+    "max_absolute_error": 0.0,
+    "max_relative_error": 0.0,
+    "stages_reproduced": [
+      "FORECAST",
+      "OPTIMIZER",
+      "RESILIENCE",
+      "POLICY"
+    ],
+    "matches": {
+      "policy_state_match": true,
+      "resilience_state_match": true,
+      "objective_value_match": true
+    },
+    "notes": "Replayed decision produced bit-for-bit identical outcomes.",
+    "replayed_at": "2026-09-24T13:57:42.497489+00:00"
+  },
+  {
+    "original_trace_id": "DT-20260924-MAITRI-36C2DE",
+    "station_id": "MAITRI",
+    "reproduction_category": "IDENTICAL",
+    "max_absolute_error": 0.0,
+    "max_relative_error": 0.0,
+    "stages_reproduced": [
+      "FORECAST",
+      "OPTIMIZER",
+      "RESILIENCE",
+      "POLICY"
+    ],
+    "matches": {
+      "policy_state_match": true,
+      "resilience_state_match": true,
+      "objective_value_match": true
+    },
+    "notes": "Replayed decision produced bit-for-bit identical outcomes.",
+    "replayed_at": "2026-09-24T13:57:46.763541+00:00"
+  },
+  {
+    "original_trace_id": "DT-20260924-MAITRI-2C8124",
+    "station_id": "MAITRI",
+    "reproduction_category": "IDENTICAL",
+    "max_absolute_error": 0.0,
+    "max_relative_error": 0.0,
+    "stages_reproduced": [
+      "FORECAST",
+      "OPTIMIZER",
+      "RESILIENCE",
+      "POLICY"
+    ],
+    "matches": {
+      "policy_state_match": true,
+      "resilience_state_match": true,
+      "objective_value_match": true
+    },
+    "notes": "Replayed decision produced bit-for-bit identical outcomes.",
+    "replayed_at": "2026-09-24T13:57:51.019645+00:00"
+  },
+  {
+    "original_trace_id": "DT-20260924-HIMADRI-E39672",
+    "station_id": "HIMADRI",
+    "reproduction_category": "IDENTICAL",
+    "max_absolute_error": 0.0,
+    "max_relative_error": 0.0,
+    "stages_reproduced": [
+      "FORECAST",
+      "SCENARIO",
+      "OPTIMIZER",
+      "TWIN_REPLAY",
+      "RESILIENCE",
+      "POLICY"
+    ],
+    "matches": {
+      "policy_state_match": true,
+      "resilience_state_match": true,
+      "objective_value_match": true
+    },
+    "notes": "Replayed decision produced bit-for-bit identical outcomes.",
+    "replayed_at": "2026-09-24T13:57:51.817718+00:00"
+  }
+]

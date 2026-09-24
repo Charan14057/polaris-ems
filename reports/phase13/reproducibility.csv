@@ -1,0 +1,6 @@
+Trace ID,Station,Category,Max Abs Error,Max Rel Error,Policy Match,Resilience Match,Objective Match,Notes
+DT-20260924-MAITRI-F9A8C4,MAITRI,IDENTICAL,0.0,0.0,True,True,True,Replayed decision produced bit-for-bit identical outcomes.
+DT-20260924-MAITRI-3C26C7,MAITRI,IDENTICAL,0.0,0.0,True,True,True,Replayed decision produced bit-for-bit identical outcomes.
+DT-20260924-MAITRI-36C2DE,MAITRI,IDENTICAL,0.0,0.0,True,True,True,Replayed decision produced bit-for-bit identical outcomes.
+DT-20260924-MAITRI-2C8124,MAITRI,IDENTICAL,0.0,0.0,True,True,True,Replayed decision produced bit-for-bit identical outcomes.
+DT-20260924-HIMADRI-E39672,HIMADRI,IDENTICAL,0.0,0.0,True,True,True,Replayed decision produced bit-for-bit identical outcomes.

@@ -87,7 +87,7 @@ export const ResilienceView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Station Resilience Engine (Phase 7)
+              Station Resilience Engine
             </h2>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>

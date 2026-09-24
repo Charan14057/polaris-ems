@@ -48,7 +48,7 @@ export const EnergyTwinView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              {stationDetail.name} • Physical Digital Twin (Phase 4)
+              {stationDetail.name} • Physical Digital Twin
             </h2>
             <ProvenanceTag provenance="CONFIGURED" size="xs" />
           </div>

@@ -1,0 +1,273 @@
+{
+  "decision_trace_id": "DT-20260924-BHARATI-9559DD",
+  "station_id": "BHARATI",
+  "pipeline_run_id": "pipe-c7a39f73",
+  "request_id": null,
+  "creation_timestamp": "2026-09-24T16:09:19.488528+00:00",
+  "completion_timestamp": "2026-09-24T16:09:19.488891+00:00",
+  "execution_status": "FAILED",
+  "horizon_hours": 24,
+  "scenario_id": "BLIZZARD",
+  "optimization_mode": "SCENARIO_ROBUST",
+  "primary_directive": "NORMAL_OPERATION",
+  "policy_state": "MITIGATE",
+  "resilience_state": "AT_RISK",
+  "edge_mode": "CONNECTED_OPERATION",
+  "events": [
+    {
+      "event_id": "evt_edge_84c13731",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "EDGE",
+      "event_type": "EDGE_CONTEXT_INSPECTION",
+      "timestamp": "2026-09-24T16:09:19.488528+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "EDGE_CONNECTED",
+      "summary": "Edge node in CONNECTED_OPERATION (CONNECTED). Fallback posture: WAIT_FOR_BACKEND_DECISION. Buffer queue depth: 0 observations.",
+      "inputs": {
+        "station_id": "BHARATI"
+      },
+      "outputs": {
+        "edge_mode": "CONNECTED_OPERATION",
+        "connectivity_state": "CONNECTED",
+        "fallback_posture": "WAIT_FOR_BACKEND_DECISION",
+        "buffer_depth": 0,
+        "healthy_devices": 0,
+        "active_devices": 12
+      },
+      "validation_tier": "SIMULATED",
+      "provenance": "CONFIGURED",
+      "parent_event_id": null,
+      "request_id": null,
+      "duration_ms": 0.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_forecast_741a8364",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "FORECAST",
+      "event_type": "ML_INFERENCE_EXECUTION",
+      "timestamp": "2026-09-24T16:09:19.488624+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "FORECAST_AVAILABLE",
+      "summary": "Generated 0 probabilistic forecast steps for 24h horizon (P10–P95 calibrated bounds).",
+      "inputs": {
+        "station_id": "BHARATI",
+        "horizon_hours": 24
+      },
+      "outputs": {
+        "points_count": 0,
+        "model_id": "registered_xgboost_residual_v1",
+        "horizon_hours": 24,
+        "provenance": "FORECAST"
+      },
+      "validation_tier": "COMPUTED",
+      "provenance": "FORECAST",
+      "parent_event_id": "evt_edge_84c13731",
+      "request_id": null,
+      "duration_ms": 483.4,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_scenario_b0d0a226",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "SCENARIO",
+      "event_type": "SCENARIO_STRESS_TEST",
+      "timestamp": "2026-09-24T16:09:19.488683+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "SCENARIO_STRESS_APPLIED",
+      "summary": "Evaluated scenario 'BLIZZARD'. Delta Unserved Energy: 0.00 kWh, Delta Fuel: 0.00 L.",
+      "inputs": {
+        "scenario_id": "BLIZZARD"
+      },
+      "outputs": {
+        "scenario_name": "BLIZZARD",
+        "delta_unserved_energy_kwh": 0.0,
+        "delta_fuel_consumed_liters": 0.0
+      },
+      "validation_tier": "SIMULATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_forecast_741a8364",
+      "request_id": null,
+      "duration_ms": 26.7,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_optimizer_47374271",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "OPTIMIZER",
+      "event_type": "MILP_DISPATCH_OPTIMIZATION",
+      "timestamp": "2026-09-24T16:09:19.488748+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "OPTIMIZATION_MIP_GAP",
+      "summary": "Phase 6 HiGHS solved schedule (SCENARIO_ROBUST mode) with status OPTIMAL (MIP_GAP_OPTIMAL, MIP Gap: 0.34%). Proposed objective: 670.25.",
+      "inputs": {
+        "mode": "SCENARIO_ROBUST"
+      },
+      "outputs": {
+        "solver_status": "OPTIMAL",
+        "optimality_tier": "MIP_GAP_OPTIMAL",
+        "relative_gap": 0.00341,
+        "objective_value": 670.25,
+        "dispatch_nature": "PROPOSED_SCHEDULE"
+      },
+      "validation_tier": "COMPUTED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_scenario_b0d0a226",
+      "request_id": null,
+      "duration_ms": 1114.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_twin_replay_0f5b2801",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "TWIN_REPLAY",
+      "event_type": "PHYSICAL_TWIN_VALIDATION",
+      "timestamp": "2026-09-24T16:09:19.488792+00:00",
+      "station_id": "BHARATI",
+      "status": "FAILED",
+      "reason_code": "TWIN_VALIDATION_FAILED",
+      "summary": "Digital Twin physical validation: FAILED. Verified Unserved Load: 0.00 kWh, Fuel Consumption: 658.15 L.",
+      "inputs": {
+        "validation_authority": "Phase 4 Digital Twin Engine"
+      },
+      "outputs": {
+        "physically_validated": false,
+        "total_unserved_load_kwh": 0.0,
+        "total_fuel_consumed_liters": 658.15
+      },
+      "validation_tier": "SIMULATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_optimizer_47374271",
+      "request_id": null,
+      "duration_ms": 0.0,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_resilience_5580b11f",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "RESILIENCE",
+      "event_type": "RESILIENCE_ASSESSMENT",
+      "timestamp": "2026-09-24T16:09:19.488834+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "RESILIENCE_AT_RISK",
+      "summary": "Resilience Engine assessed state: AT_RISK (Composite Index: 91.8/100). Survival Horizon: 24.0h (Binding Constraint: NONE). Recovery pathways: ESTIMATED.",
+      "inputs": {
+        "evaluation_authority": "Phase 7 Resilience Engine"
+      },
+      "outputs": {
+        "resilience_state": "AT_RISK",
+        "composite_resilience_index": 91.76,
+        "binding_subsystem": "NONE",
+        "survival_horizon_h": 24.0,
+        "recovery_projection_tier": "ESTIMATED"
+      },
+      "validation_tier": "ESTIMATED",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_twin_replay_0f5b2801",
+      "request_id": null,
+      "duration_ms": 6.6,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    },
+    {
+      "event_id": "evt_policy_6b8ccb91",
+      "trace_id": "DT-20260924-BHARATI-9559DD",
+      "stage": "POLICY",
+      "event_type": "POLICY_GOVERNANCE",
+      "timestamp": "2026-09-24T16:09:19.488891+00:00",
+      "station_id": "BHARATI",
+      "status": "COMPLETED",
+      "reason_code": "POLICY_MITIGATE",
+      "summary": "Policy Engine governed state: MITIGATE (Directive: NORMAL_OPERATION). Fired rules count: 0. Priority compliance verified against P1–P8 hierarchy.",
+      "inputs": {
+        "governance_authority": "Phase 8 Policy Engine"
+      },
+      "outputs": {
+        "policy_state": "MITIGATE",
+        "primary_directive": "NORMAL_OPERATION",
+        "active_rules_count": 0,
+        "advisory_rationale": "Policy dispatched in mode=CONSERVATIVE with 0 generator overrides. "
+      },
+      "validation_tier": "ADVISORY",
+      "provenance": "SIMULATED",
+      "parent_event_id": "evt_resilience_5580b11f",
+      "request_id": null,
+      "duration_ms": 0.3,
+      "engine_version": "v1",
+      "schema_version": "1.0.0",
+      "diagnostics": []
+    }
+  ],
+  "lineage_graph": {
+    "__root__": [
+      "evt_edge_84c13731"
+    ],
+    "evt_edge_84c13731": [
+      "evt_forecast_741a8364"
+    ],
+    "evt_forecast_741a8364": [
+      "evt_scenario_b0d0a226"
+    ],
+    "evt_scenario_b0d0a226": [
+      "evt_optimizer_47374271"
+    ],
+    "evt_optimizer_47374271": [
+      "evt_twin_replay_0f5b2801"
+    ],
+    "evt_twin_replay_0f5b2801": [
+      "evt_resilience_5580b11f"
+    ],
+    "evt_resilience_5580b11f": [
+      "evt_policy_6b8ccb91"
+    ],
+    "evt_policy_6b8ccb91": []
+  },
+  "explanation": {
+    "trace_id": "DT-20260924-BHARATI-9559DD",
+    "station_id": "BHARATI",
+    "headline": "Decision Trace for BHARATI: Policy directed 'NORMAL_OPERATION' under AT_RISK resilience posture (FAILED).",
+    "why_this_state": "Station entered 'AT_RISK' resilience posture with a composite index of 91.8/100. Survival horizon is assessed at 24.0 hours, with 'NONE' as the binding subsystem constraint.",
+    "why_this_policy": "Policy Engine transitioned to state 'MITIGATE' and issued directive 'NORMAL_OPERATION' based on 0 active rules evaluated against the P1–P8 governance hierarchy. Advisory rationale: Policy dispatched in mode=CONSERVATIVE with 0 generator overrides. ",
+    "why_this_schedule": "Phase 6 HiGHS solved the dispatch schedule in 'SCENARIO_ROBUST' mode, achieving optimality tier 'MIP_GAP_OPTIMAL' with a relative MIP gap of 0.34%. The proposed dispatch prioritizes critical thermal and life-support loads while minimizing unserved energy.",
+    "what_data_used": [
+      "Phase 3 Probabilistic Forecaster: 0 hourly steps (provenance=FORECAST).",
+      "Phase 5 Scenario: 'BLIZZARD' environmental stress parameters.",
+      "Phase 11 Edge Context: CONNECTED_OPERATION node state."
+    ],
+    "what_was_validated": [
+      "Digital Twin Replay was bypassed or unverified; schedule remains in PROPOSED state."
+    ],
+    "what_remains_estimated": [
+      "Resilience recovery trajectories and counterfactual options are modeled estimations (provenance=SIMULATED).",
+      "Load and renewable profiles beyond the immediate observation horizon are conformal machine learning estimates (P10–P95)."
+    ],
+    "what_is_next": "Pipeline execution halted with status 'FAILED'. Investigate stage failure diagnostics.",
+    "reason_codes": [
+      "EDGE_CONNECTED",
+      "FORECAST_AVAILABLE",
+      "SCENARIO_STRESS_APPLIED",
+      "OPTIMIZATION_MIP_GAP",
+      "TWIN_VALIDATION_FAILED",
+      "RESILIENCE_AT_RISK",
+      "POLICY_MITIGATE"
+    ]
+  },
+  "provenance": "SIMULATED",
+  "schema_version": "1.0.0"
+}

@@ -43,7 +43,7 @@ describe('Common Polaris Components', () => {
     expect(screen.getByText('FORECAST')).toBeInTheDocument();
 
     rerender(<ProvenanceTag provenance="SIMULATED" />);
-    expect(screen.getByText('SIMULATED')).toBeInTheDocument();
+    expect(screen.getByText('DIGITAL TWIN')).toBeInTheDocument();
   });
 
   it('MetricCard renders tabular values, units, and snapshot timestamps', () => {

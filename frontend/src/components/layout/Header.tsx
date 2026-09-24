@@ -54,12 +54,15 @@ export const Header: React.FC = () => {
               <h1 className="text-base font-bold text-polar-50 tracking-wider font-mono">
                 POLARIS<span className="text-cyan-400 font-sans font-light">EMS</span>
               </h1>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-600/40 text-cyan-300 font-medium">
-                ENERGY TWIN
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-medium">
+                PRODUCTION
+              </span>
+              <span className="hidden sm:inline text-[10px] font-mono px-1.5 py-0.5 rounded bg-polar-800 border border-polar-700 text-polar-300">
+                ADVISORY
               </span>
             </div>
             <p className="text-[11px] text-polar-400">
-              Indian Polar Research Stations • SIH26061 Mission Control
+              Polar Energy Management &amp; Resilience System • Mission Control
             </p>
           </div>
         </div>
@@ -112,6 +115,15 @@ export const Header: React.FC = () => {
           <div className="hidden xl:flex items-center space-x-2 text-[11px] font-mono bg-polar-900/60 border border-polar-800 px-2.5 py-1 rounded-md text-polar-300">
             <Clock className="w-3.5 h-3.5 text-polar-400" />
             <span className="font-mono-numbers">{utcTime}</span>
+          </div>
+
+          {/* SCADA Hardware Status Disclaimer */}
+          <div 
+            className="hidden lg:flex items-center space-x-1.5 px-2 py-1 rounded-md text-[11px] font-mono border bg-amber-950/30 border-amber-500/30 text-amber-300"
+            title="Current deployment constraint: Zero physical polar SCADA connected; operating in physics-calibrated digital twin mode."
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>SCADA: SIMULATION ONLY</span>
           </div>
 
           {/* Readiness Probe Status */}

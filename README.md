@@ -1,5 +1,5 @@
 # Polaris-EMS: Polar Energy Management & Resilience System
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**AI-Driven Smart Energy Management System for Polar Research Stations**  
 **Status**: LOCKED FOR PRODUCTION  
 **Core Philosophy**: Predict → Simulate → Optimize → Protect → Preserve  
 
@@ -47,9 +47,16 @@ polaris-ems/
 └── docs/                # Architecture docs & research registry
 ```
 
-## 5. Phase 10 Production Documentation & Walkthrough
-Detailed operational walkthrough and audit verification reports:
+## 5. Production Documentation & Walkthroughs
+Detailed operational walkthroughs and audit verification reports:
+- [Master System Walkthrough & Current Operational Stage](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/master_walkthrough.md)
+- [Phase 12 Decision Trace & Explainability Walkthrough](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase12_walkthrough.md)
+- [Phase 12 Decision Trace Architecture Specification](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase12_architecture.md)
+- [Phase 11 Field Resilience & Device Intelligence Walkthrough](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase11_walkthrough.md)
+- [Phase 11 Field Architecture Specification](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase11_architecture.md)
 - [Phase 10 Production Integration Walkthrough](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase10_walkthrough.md)
+- [Phase 12 Runtime Audit Script](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase12_runtime.py)
+- [Phase 11 Runtime Audit Script](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase11_runtime.py)
 - [Phase 10 Runtime Freeze Audit Script](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase10_runtime.py)
 
 ## 6. Execution & Verification Setup
@@ -63,9 +70,14 @@ cd frontend
 npm run dev
 
 # 3. Run Automated Test Suites
-pytest tests/test_phase9_api.py -v       # Backend API tests (21/21 passed)
-cd frontend && npm test                  # Frontend Vitest suite (12/12 passed)
+pytest tests/ -v                           # Full backend regression suite (227/227 passed)
+pytest tests/test_phase12_trace.py -v      # Phase 12 Decision Trace suite (10/10 passed)
+pytest tests/test_phase11_edge.py -v       # Phase 11 Edge Resilience suite (11/11 passed)
+cd frontend && npm test                    # Frontend Vitest suite (12/12 passed)
+cd frontend && npm run build               # Frontend production bundle (0 errors)
 
-# 4. Run Phase 10 Runtime Freeze Audit
-python scripts/verify_phase10_runtime.py # 13/13 gates passed (100%)
+# 4. Run Runtime Audits via Reverse Proxy
+python scripts/verify_phase12_runtime.py   # Phase 12 trace audit (11/11 gates passed)
+python scripts/verify_phase11_runtime.py   # Phase 11 edge audit (10/10 gates passed)
+python scripts/verify_phase10_runtime.py   # Phase 10 runtime audit (13/13 gates passed)
 ```

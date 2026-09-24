@@ -12,6 +12,10 @@ from backend.api.routes.resilience import router as resilience_router
 from backend.api.routes.policy import router as policy_router
 from backend.api.routes.pipeline import router as pipeline_router
 from backend.api.routes.edge import router as edge_router
+from backend.api.routes.traces import router as traces_router
+from backend.api.routes.validation import router as validation_router
+from backend.api.routes.integrations import router as integrations_router
+from backend.api.routes.observability import router as observability_router
 
 __all__ = [
     "health_router",
@@ -22,5 +26,9 @@ __all__ = [
     "resilience_router",
     "policy_router",
     "pipeline_router",
-    "edge_router"
+    "edge_router",
+    "traces_router",
+    "validation_router",
+    "integrations_router",
+    "observability_router",
 ]

@@ -98,7 +98,7 @@ export const ScenariosView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Polar Stress Scenarios (Phase 5)
+              Polar Stress Contingency &amp; Scenarios
             </h2>
             <ProvenanceTag provenance="CONFIGURED" size="xs" />
           </div>
@@ -187,7 +187,7 @@ export const ScenariosView: React.FC = () => {
                     className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold rounded-lg transition-all shadow-md shadow-cyan-950/30 shrink-0"
                   >
                     <Play className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
-                    <span>{evaluating ? 'Simulating Replay...' : 'Run Stress Test'}</span>
+                    <span>{evaluating ? 'Executing Dynamic Replay...' : 'Run Contingency Stress Test'}</span>
                   </button>
                 </div>
 

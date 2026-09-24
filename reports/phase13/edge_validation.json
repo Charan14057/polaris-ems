@@ -1,0 +1,72 @@
+[
+  {
+    "station_id": "BHARATI",
+    "condition": "NORMAL",
+    "edge_mode": "CONNECTED_OPERATION",
+    "connectivity_state": "CONNECTED",
+    "fallback_posture": "WAIT_FOR_BACKEND_DECISION",
+    "central_solver_invoked": true,
+    "offline_safety_verified": true,
+    "buffered_observations": 0
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "DEVICE_STALE",
+    "edge_mode": "CONNECTED_OPERATION",
+    "connectivity_state": "CONNECTED",
+    "fallback_posture": "WAIT_FOR_BACKEND_DECISION",
+    "central_solver_invoked": true,
+    "offline_safety_verified": true,
+    "buffered_observations": 0
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "DEVICE_FAILURE",
+    "edge_mode": "SAFE_HOLD",
+    "connectivity_state": "CONNECTED",
+    "fallback_posture": "PROTECT_CRITICAL_SYSTEMS",
+    "central_solver_invoked": true,
+    "offline_safety_verified": true,
+    "buffered_observations": 0
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "CONNECTIVITY_DEGRADED",
+    "edge_mode": "DEGRADED_CONNECTIVITY",
+    "connectivity_state": "DEGRADED",
+    "fallback_posture": "HOLD_LAST_VALIDATED_STATE",
+    "central_solver_invoked": false,
+    "offline_safety_verified": true,
+    "buffered_observations": 12
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "CONNECTIVITY_OFFLINE",
+    "edge_mode": "OFFLINE_EDGE",
+    "connectivity_state": "OFFLINE",
+    "fallback_posture": "SAFE_HOLD",
+    "central_solver_invoked": false,
+    "offline_safety_verified": true,
+    "buffered_observations": 10
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "BUFFER_GROWTH",
+    "edge_mode": "OFFLINE_EDGE",
+    "connectivity_state": "OFFLINE",
+    "fallback_posture": "SAFE_HOLD",
+    "central_solver_invoked": false,
+    "offline_safety_verified": true,
+    "buffered_observations": 5
+  },
+  {
+    "station_id": "BHARATI",
+    "condition": "RECONNECT",
+    "edge_mode": "CONNECTED_OPERATION",
+    "connectivity_state": "RECONNECTING",
+    "fallback_posture": "BUFFER_AND_FORWARD",
+    "central_solver_invoked": false,
+    "offline_safety_verified": true,
+    "buffered_observations": 1
+  }
+]

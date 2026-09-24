@@ -1,6 +1,6 @@
 /**
  * POLARIS-EMS — API Endpoints
- * SIH26061: Polar Energy Management & Resilience System
+ * Polaris-EMS — Polar Energy Management & Resilience System
  * 
  * Provides typed functions mapping to Phase 9 FastAPI endpoints.
  */
@@ -124,4 +124,34 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(params),
     }),
+
+  // Phase 12 — Decision Trace & Audit Endpoints
+  listTraces: (params?: { station_id?: string; status?: string; policy_state?: string; resilience_state?: string; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.station_id) q.set('station_id', params.station_id);
+    if (params?.status) q.set('status', params.status);
+    if (params?.policy_state) q.set('policy_state', params.policy_state);
+    if (params?.resilience_state) q.set('resilience_state', params.resilience_state);
+    if (params?.limit) q.set('limit', String(params.limit));
+    const qs = q.toString();
+    return apiRequest<import('./types').TraceSummary[]>(`/api/v1/traces${qs ? `?${qs}` : ''}`);
+  },
+
+  getTrace: (traceId: string) =>
+    apiRequest<import('./types').TraceDetail>(`/api/v1/traces/${traceId}`),
+
+  getTraceEvents: (traceId: string) =>
+    apiRequest<import('./types').TraceEventItem[]>(`/api/v1/traces/${traceId}/events`),
+
+  getTraceSummary: (traceId: string) =>
+    apiRequest<import('./types').TraceSummary>(`/api/v1/traces/${traceId}/summary`),
+
+  getTraceExplanation: (traceId: string) =>
+    apiRequest<import('./types').DecisionExplanation>(`/api/v1/traces/${traceId}/explanation`),
+
+  compareTraces: (baseTraceId: string, compareTraceId: string) =>
+    apiRequest<import('./types').DecisionDelta>(`/api/v1/traces/${baseTraceId}/compare/${compareTraceId}`),
+
+  exportTrace: (traceId: string, format: 'json' | 'csv' = 'json') =>
+    fetch(`/api/v1/traces/${traceId}/export?format=${format}`).then(r => r.text()),
 };

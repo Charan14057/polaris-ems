@@ -8,7 +8,8 @@ import {
   ShieldAlert, 
   Scale, 
   GitCommit,
-  Radio
+  Radio,
+  ShieldCheck
 } from 'lucide-react';
 
 export type TabType = 
@@ -20,7 +21,8 @@ export type TabType =
   | 'resilience' 
   | 'policy' 
   | 'trace'
-  | 'edge';
+  | 'edge'
+  | 'validation';
 
 export type ActiveTab = TabType;
 
@@ -37,15 +39,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onSelec
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode; phase: string }[] = [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, phase: 'Snapshot' },
-    { id: 'twin', label: 'Energy Twin', icon: <Cpu className="w-4 h-4" />, phase: 'Phase 4' },
-    { id: 'forecast', label: 'Forecast', icon: <TrendingUp className="w-4 h-4" />, phase: 'Phase 3' },
-    { id: 'scenarios', label: 'Scenarios', icon: <AlertTriangle className="w-4 h-4" />, phase: 'Phase 5' },
-    { id: 'optimization', label: 'Optimizer', icon: <Zap className="w-4 h-4" />, phase: 'Phase 6' },
-    { id: 'resilience', label: 'Resilience', icon: <ShieldAlert className="w-4 h-4" />, phase: 'Phase 7' },
-    { id: 'policy', label: 'Policy', icon: <Scale className="w-4 h-4" />, phase: 'Phase 8' },
-    { id: 'trace', label: 'Decision Trace', icon: <GitCommit className="w-4 h-4" />, phase: 'Pipeline' },
-    { id: 'edge', label: 'Edge & Devices', icon: <Radio className="w-4 h-4" />, phase: 'Phase 11' },
+    { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, phase: 'Operations' },
+    { id: 'twin', label: 'Energy Twin', icon: <Cpu className="w-4 h-4" />, phase: 'Digital Twin' },
+    { id: 'forecast', label: 'Forecast', icon: <TrendingUp className="w-4 h-4" />, phase: 'AI Predictor' },
+    { id: 'scenarios', label: 'Scenarios', icon: <AlertTriangle className="w-4 h-4" />, phase: 'Contingency' },
+    { id: 'optimization', label: 'Optimizer', icon: <Zap className="w-4 h-4" />, phase: 'Dispatch' },
+    { id: 'resilience', label: 'Resilience', icon: <ShieldAlert className="w-4 h-4" />, phase: 'Survival' },
+    { id: 'policy', label: 'Policy', icon: <Scale className="w-4 h-4" />, phase: 'Governance' },
+    { id: 'trace', label: 'Decision Trace', icon: <GitCommit className="w-4 h-4" />, phase: 'Audit Lineage' },
+    { id: 'edge', label: 'Edge & Devices', icon: <Radio className="w-4 h-4" />, phase: 'Field Nodes' },
+    { id: 'validation', label: 'Validation', icon: <ShieldCheck className="w-4 h-4" />, phase: 'Benchmarks' },
   ];
 
   return (

@@ -65,4 +65,5 @@ class PipelineAnalyzeResponseData(BaseModel):
     optimizer: Optional[OptimizeResponseData] = None
     resilience: Optional[ResilienceEvaluateResponseData] = None
     policy: Optional[PolicyEvaluateResponseData] = None
+    decision_trace_id: Optional[str] = Field(None, description="Unique linked Phase 12 Decision Trace ID")
     provenance: str = "SIMULATED"

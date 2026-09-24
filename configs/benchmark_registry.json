@@ -1,0 +1,84 @@
+{
+  "benchmark_schema_version": "1.0.0",
+  "system": "Polaris-EMS",
+  "problem_statement": "SIH26061",
+  "benchmark_suite_id": "POLARIS_BENCHMARK_SUITE_V1",
+  "created_at": "2026-09-24T12:00:00Z",
+  "stations": ["BHARATI", "MAITRI", "HIMADRI"],
+  "targets": ["total_load_kw", "solar_generation_kw", "wind_generation_kw"],
+  "horizons_hours": [1, 6, 12, 24, 48, 168],
+  "baselines": [
+    {
+      "id": "persistence",
+      "name": "Persistence Baseline",
+      "description": "Naive t-step persistence forecast y(t+k) = y(t)",
+      "type": "NAIVE"
+    },
+    {
+      "id": "seasonal_naive",
+      "name": "Seasonal Naive (24h)",
+      "description": "Diurnal periodic repetition y(t+k) = y(t+k-24)",
+      "type": "PERIODIC"
+    },
+    {
+      "id": "ridge",
+      "name": "L2 Regularized Linear Model",
+      "description": "Ridge linear regression on normalized feature matrix",
+      "type": "LINEAR"
+    },
+    {
+      "id": "tree",
+      "name": "Random Forest Regressor",
+      "description": "Standard ensemble of uncalibrated regression trees",
+      "type": "TREE_ENSEMBLE"
+    },
+    {
+      "id": "production_xgb",
+      "name": "Production Physics-Informed XGBoost",
+      "description": "Phase 3 production residual learner with conformal calibration",
+      "type": "HYBRID_PHYSICS_ML"
+    }
+  ],
+  "optimizer_benchmarks": [
+    {
+      "mode": "EXPECTED",
+      "baseline_counterpart": "BASELINE_SIMULATION_DISPATCH",
+      "target_objective": "MINIMIZE_EXPECTED_COST_AND_FUEL"
+    },
+    {
+      "mode": "CONSERVATIVE",
+      "baseline_counterpart": "BASELINE_SIMULATION_DISPATCH",
+      "target_objective": "MAXIMIZE_RESERVE_MARGIN_AND_STORAGE_BUFFER"
+    },
+    {
+      "mode": "SCENARIO_ROBUST",
+      "baseline_counterpart": "BASELINE_SIMULATION_DISPATCH",
+      "target_objective": "WORST_CASE_STRESS_HARDENING"
+    }
+  ],
+  "scenarios": [
+    "NORMAL_BASELINE",
+    "POLAR_NIGHT",
+    "BLIZZARD",
+    "EXTREME_COLD",
+    "SOLAR_GENERATION_FAILURE",
+    "WIND_GENERATION_FAILURE",
+    "BATTERY_DEGRADATION",
+    "FUEL_RESUPPLY_DELAY",
+    "COMBINED_POLAR_STRESS"
+  ],
+  "tolerances": {
+    "reproducibility_numerical_rtol": 1e-4,
+    "reproducibility_numerical_atol": 1e-3,
+    "shap_additivity_atol": 1e-2,
+    "quantile_crossing_max_allowed": 0
+  },
+  "provenance_mapping": {
+    "model_inference": "FORECAST",
+    "twin_replay": "SIMULATED",
+    "optimizer_schedule": "SIMULATED",
+    "station_parameters": "CONFIGURED",
+    "weather_observations": "REAL",
+    "synthetic_benchmark_dataset": "SYNTHETIC"
+  }
+}

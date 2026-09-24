@@ -66,7 +66,7 @@ export const OptimizationView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Microgrid Dispatch Optimization (Phase 6)
+              Microgrid Dispatch Optimization
             </h2>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
@@ -138,7 +138,7 @@ export const OptimizationView: React.FC = () => {
             />
             <MetricCard
               title="Battery Terminal SOC"
-              value={(summary.final_battery_soc_pct * 100).toFixed(1)}
+              value={(summary.final_battery_soc_pct > 1 ? summary.final_battery_soc_pct : summary.final_battery_soc_pct * 100).toFixed(1)}
               unit="% SOC"
               subtitle="Closed-loop terminal state"
               provenance="SIMULATED"
@@ -203,7 +203,9 @@ export const OptimizationView: React.FC = () => {
                         }`}>
                           {netBess > 0 ? `+${netBess.toFixed(1)}` : netBess.toFixed(1)}
                         </td>
-                        <td className="py-1.5 px-3 text-right text-polar-200 font-mono-numbers">{(step.battery_soc * 100).toFixed(1)}%</td>
+                        <td className="py-1.5 px-3 text-right text-polar-200 font-mono-numbers">
+                          {(step.battery_soc > 1 ? step.battery_soc : step.battery_soc * 100).toFixed(1)}%
+                        </td>
                         <td className="py-1.5 px-3 text-right text-polar-100 font-mono-numbers">{step.p_served_load_kw.toFixed(1)}</td>
                         <td className={`py-1.5 px-3 text-right font-mono-numbers ${step.reserve_margin_pct < 15 ? 'text-amber-400' : 'text-polar-300'}`}>
                           {step.reserve_margin_pct.toFixed(0)}%

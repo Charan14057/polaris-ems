@@ -34,3 +34,12 @@ Desktop.ini
 scratch/
 tmp/
 *.log
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.production
+
+# Node
+node_modules/
+frontend/dist/

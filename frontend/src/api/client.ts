@@ -1,6 +1,6 @@
 /**
  * POLARIS-EMS — Typed API Client
- * SIH26061: Polar Energy Management & Resilience System
+ * Polaris-EMS — Polar Energy Management & Resilience System
  * 
  * Centralized HTTP request handling, correlation ID injection,
  * and unified response envelope parsing for Phase 9 FastAPI backend.

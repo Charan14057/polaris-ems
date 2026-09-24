@@ -1,6 +1,6 @@
 /**
  * POLARIS-EMS — Synchronized Frontend Type Definitions
- * SIH26061: Polar Energy Management & Resilience System
+ * Polaris-EMS — Polar Energy Management & Resilience System
  * 
  * Accurately mirrors Phase 9 FastAPI schemas in backend/api/schemas/.
  * Preserves strict 6-tier provenance: REAL, CONFIGURED, ASSUMED, SYNTHETIC, FORECAST, SIMULATED.
@@ -420,6 +420,7 @@ export interface PipelineStageStatus {
 export interface PipelineAnalyzeResponseData {
   pipeline_run_id: string;
   station_id: string;
+  decision_trace_id?: string | null;
   horizon_hours: number;
   scenario_id?: string | null;
   overall_status: 'SUCCESS' | 'PARTIAL' | 'ERROR';
@@ -430,6 +431,109 @@ export interface PipelineAnalyzeResponseData {
   resilience?: ResilienceEvaluateResponseData | null;
   policy?: PolicyEvaluateResponseData | null;
   provenance: ProvenanceTier;
+}
+
+// Phase 12 — Decision Trace & Explainability Types
+export type TraceLifecycleState = 
+  | 'CREATED'
+  | 'RUNNING'
+  | 'COMPLETED'
+  | 'PARTIAL'
+  | 'BLOCKED'
+  | 'INFEASIBLE'
+  | 'FALLBACK'
+  | 'FAILED';
+
+export type TraceStage = 
+  | 'EDGE'
+  | 'FORECAST'
+  | 'SCENARIO'
+  | 'OPTIMIZER'
+  | 'TWIN_REPLAY'
+  | 'RESILIENCE'
+  | 'POLICY'
+  | 'RECONCILIATION';
+
+export type ValidationTier = 
+  | 'REQUESTED'
+  | 'COMPUTED'
+  | 'SIMULATED'
+  | 'VALIDATED'
+  | 'ESTIMATED'
+  | 'ADVISORY';
+
+export interface TraceEventItem {
+  event_id: string;
+  trace_id: string;
+  stage: TraceStage;
+  event_type: string;
+  timestamp: string;
+  station_id: string;
+  status: string;
+  reason_code: string;
+  summary: string;
+  inputs: Record<string, any>;
+  outputs: Record<string, any>;
+  validation_tier: ValidationTier;
+  provenance: ProvenanceTier;
+  parent_event_id?: string | null;
+  request_id?: string | null;
+  duration_ms: number;
+  engine_version: string;
+  schema_version: string;
+  diagnostics: string[];
+}
+
+export interface DecisionExplanation {
+  trace_id: string;
+  station_id: string;
+  headline: string;
+  why_this_state: string;
+  why_this_policy: string;
+  why_this_schedule: string;
+  what_data_used: string[];
+  what_was_validated: string[];
+  what_remains_estimated: string[];
+  what_is_next: string;
+  reason_codes: string[];
+}
+
+export interface DecisionDelta {
+  base_trace_id: string;
+  compare_trace_id: string;
+  station_id: string;
+  state_transitions: Record<string, [string, string]>;
+  numerical_deltas: Record<string, number>;
+  policy_directive_changed: boolean;
+  edge_mode_changed: boolean;
+  summary_narrative: string;
+}
+
+export interface TraceSummary {
+  decision_trace_id: string;
+  station_id: string;
+  pipeline_run_id?: string | null;
+  request_id?: string | null;
+  creation_timestamp: string;
+  completion_timestamp?: string | null;
+  execution_status: TraceLifecycleState;
+  horizon_hours: number;
+  scenario_id?: string | null;
+  optimization_mode: string;
+  primary_directive?: string | null;
+  policy_state?: string | null;
+  resilience_state?: string | null;
+  edge_mode?: string | null;
+  event_count: number;
+  terminal_stage?: string | null;
+  provenance: ProvenanceTier;
+}
+
+export interface TraceDetail extends TraceSummary {
+  events: TraceEventItem[];
+  lineage_graph: Record<string, string[]>;
+  explanation?: DecisionExplanation | null;
+  schema_version: string;
 }
 
 // Phase 11 — Edge & Device Intelligence Types

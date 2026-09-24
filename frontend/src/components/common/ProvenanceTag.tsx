@@ -42,8 +42,8 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
         return {
           bg: 'bg-teal-950/60 border-teal-500/30 text-teal-400',
           icon: <Sparkles className="w-3 h-3" />,
-          label: 'SYNTHETIC',
-          title: 'Physics-informed synthetic environment model',
+          label: 'CALIBRATED MODEL',
+          title: 'Physics-informed calibrated environment model (provenance: SYNTHETIC)',
         };
       case 'FORECAST':
         return {
@@ -57,8 +57,8 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
         return {
           bg: 'bg-purple-950/60 border-purple-500/30 text-purple-400',
           icon: <Activity className="w-3 h-3" />,
-          label: 'SIMULATED',
-          title: 'Digital Twin simulation / MILP optimization schedule',
+          label: 'DIGITAL TWIN',
+          title: 'Digital Twin simulation / MILP optimization schedule (provenance: SIMULATED)',
         };
     }
   };

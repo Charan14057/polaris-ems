@@ -74,7 +74,7 @@ export const PolicyView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Policy Governance Engine (Phase 8)
+              Autonomous Policy Governance Engine
             </h2>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>

@@ -165,7 +165,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNaviga
                 {surv.binding_subsystem}
               </div>
               <div className="text-[10px] text-polar-500 pt-1">
-                Snapshot: {resilience.assessment_timestamp.split('T')[1]?.substring(0, 5) || '12:00'} UTC
+                Snapshot: {resilience.assessment_timestamp?.split('T')[1]?.substring(0, 5) || '12:00'} UTC
               </div>
             </div>
           </div>
@@ -227,7 +227,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNaviga
             <div className="flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-cyan-400" />
               <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-polar-200">
-                Resilience Health Index (Phase 7)
+                Station Resilience Health Index
               </h3>
             </div>
             <div className="flex items-center space-x-2">

@@ -1,0 +1,120 @@
+{
+  "station_id": "BHARATI",
+  "target": "total_load_kw",
+  "model_name": "polaris-load-xgb-bharati-v1.0",
+  "model_version": "v1.0",
+  "explanation_method": "EXACT_TREE_SHAP_NATIVE",
+  "base_value": 33.9487,
+  "predicted_value": 34.9728,
+  "additivity_verified": true,
+  "label_warning": "MODEL CONTRIBUTION ONLY \u2014 NOT PHYSICAL CAUSATION",
+  "contributions": [
+    {
+      "feature_name": "rolling_mean_168h",
+      "feature_value": 0.0,
+      "shapley_value": 3.567,
+      "relative_contribution_pct": 20.09,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "origin_temperature_c",
+      "feature_value": -17.2,
+      "shapley_value": -1.8703,
+      "relative_contribution_pct": 10.54,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "horizon_k",
+      "feature_value": 0.0,
+      "shapley_value": -1.555,
+      "relative_contribution_pct": 8.76,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "target_lag_0",
+      "feature_value": 0.0,
+      "shapley_value": -1.3813,
+      "relative_contribution_pct": 7.78,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "occupancy_state",
+      "feature_value": 1.0,
+      "shapley_value": -0.9386,
+      "relative_contribution_pct": 5.29,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "origin_pressure_hpa",
+      "feature_value": 0.0,
+      "shapley_value": 0.8285,
+      "relative_contribution_pct": 4.67,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "rolling_std_3h",
+      "feature_value": 0.0,
+      "shapley_value": 0.7631,
+      "relative_contribution_pct": 4.3,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "forecast_temperature_c",
+      "feature_value": -18.5,
+      "shapley_value": 0.7574,
+      "relative_contribution_pct": 4.27,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "rolling_max_24h",
+      "feature_value": 0.0,
+      "shapley_value": 0.5894,
+      "relative_contribution_pct": 3.32,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "rolling_mean_24h",
+      "feature_value": 34.2,
+      "shapley_value": 0.4846,
+      "relative_contribution_pct": 2.73,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "origin_wind_speed_ms",
+      "feature_value": 10.8,
+      "shapley_value": -0.4691,
+      "relative_contribution_pct": 2.64,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "doy_sin",
+      "feature_value": 0.0,
+      "shapley_value": 0.4299,
+      "relative_contribution_pct": 2.42,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "doy_cos",
+      "feature_value": 0.0,
+      "shapley_value": -0.4198,
+      "relative_contribution_pct": 2.36,
+      "direction": "DECREASES_PREDICTION"
+    },
+    {
+      "feature_name": "rolling_min_24h",
+      "feature_value": 0.0,
+      "shapley_value": 0.3839,
+      "relative_contribution_pct": 2.16,
+      "direction": "INCREASES_PREDICTION"
+    },
+    {
+      "feature_name": "research_activity_state",
+      "feature_value": 0.0,
+      "shapley_value": -0.38,
+      "relative_contribution_pct": 2.14,
+      "direction": "DECREASES_PREDICTION"
+    }
+  ],
+  "explanation_timestamp": "2026-09-24T13:57:32.958597+00:00",
+  "provenance": "FORECAST"
+}

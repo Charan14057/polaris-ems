@@ -1,0 +1,24 @@
+{
+  "station_id": "BHARATI",
+  "scenario_sequence": [
+    "NORMAL",
+    "CLOUD_SURGE",
+    "BLIZZARD",
+    "COMBINED_POLAR_STRESS"
+  ],
+  "observed_states": [
+    "THREATENED",
+    "THREATENED",
+    "THREATENED",
+    "THREATENED"
+  ],
+  "observed_composite_indices": [
+    88.45,
+    88.28,
+    88.08,
+    87.97
+  ],
+  "stress_consistency_verified": true,
+  "invariants_passed_count": 5,
+  "total_invariants_count": 5
+}
