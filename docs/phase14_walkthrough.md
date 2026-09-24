@@ -180,7 +180,7 @@ The following primary documents guide Phase 14 deployment and operations:
 - **Phase 1–13 Computational Baseline**: 🟢 **`PHASE_13_FROZEN`**
 - **Phase 14 Freeze Status**: 🟢 **`PHASE_14_FROZEN`**
 - **Project Canonical Status**: 🟢 **`PHASES_1_14_COMPLETE`**
-- **Freeze Commit / Hash**: `227c44e47a03c3521a45dca685e8dd4897c9b45e`
+- **Freeze Commit / Hash**: `227c44e47a03c3521a45dca685e8dd4897c9b45e` *(Canonical freeze commit; post-freeze documentation synchronization at HEAD `1ef85297fe336b1830f965fde70e4abd1609b116`; audited in [PHASE14_METADATA_RECONCILIATION.md](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_METADATA_RECONCILIATION.md))*
 - **Freeze Timestamp**: `2026-09-24T22:28:00+05:30` (UTC `2026-09-24T16:58:00Z`)
 - **Deployment Container Smoke Test**: `CONTAINER_SMOKE_TEST = NOT_EXECUTED` *(Docker engine/CLI not installed in current host environment; Dockerfile, docker-compose.yml, and Nginx reverse proxy verified structurally and syntactically)*
 - **Authorized Next Stage**: 🛑 **`PHASE_15_NOT_STARTED`** *(Halted at the freeze boundary. No Phase 15 work permitted without explicit authorization)*.
