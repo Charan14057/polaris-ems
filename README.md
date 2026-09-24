@@ -1,5 +1,5 @@
 # Polaris-EMS: Polar Energy Management & Resilience System
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**SIH Problem Statement**: — 
 **Status**: LOCKED FOR PRODUCTION  
 **Core Philosophy**: Predict → Simulate → Optimize → Protect → Preserve  
 
