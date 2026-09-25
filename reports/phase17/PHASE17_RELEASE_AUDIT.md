@@ -14,9 +14,9 @@
 | Audit Field | Verified Value |
 | :--- | :--- |
 | **Current Git Branch** | `main` |
-| **Current Commit HEAD** | `707dc36` (`docs(phase15): add Phase 15 final freeze report`) |
+| **Current Commit HEAD** | `5b7256d` (`release: finalize Polaris-EMS Phase 17`) |
 | **Prior Frozen Baselines** | Phases 1–16 complete and frozen |
-| **Working Tree Modifications** | Phase 16 & 17 release artifacts, clean uncommitted modifications |
+| **Working Tree Modifications** | Clean synchronized working tree (`HEAD == origin/main`) |
 | **Commit Cleanliness** | Zero committed private keys, zero committed credentials, zero merge conflict markers |
 
 ---

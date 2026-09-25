@@ -19,7 +19,7 @@
 - **Maitri Station** (70°S, Schirmacher Oasis, East Antarctica)
 - **Himadri Station** (79°N, Ny-Ålesund, Svalbard, Arctic)
 
-Polar grids face steep operational challenges: severe wind volatility, complete absence of solar generation during months of polar night, high solar irradiance during midnight sun, diesel generator freezing risks, rapid battery capacity degradation in sub-zero temperatures, and prolonged communications blackouts. Polaris-EMS provides an end-to-end, multi-stage resilience architecture that guarantees uninterrupted power to life-support systems under black-sky conditions.
+Polar grids face steep operational challenges: severe wind volatility, complete absence of solar generation during months of polar night, high solar irradiance during midnight sun, diesel generator freezing risks, rapid battery capacity degradation in sub-zero temperatures, and prolonged communications blackouts. Polaris-EMS provides an end-to-end, multi-stage resilience architecture designed to protect critical life-support loads and support continuous operation under stressed, black-sky scenarios.
 
 ---
 

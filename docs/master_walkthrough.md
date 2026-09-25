@@ -389,7 +389,7 @@ EXTERNAL WEATHER (Open-Meteo)
 
 ## 10. Phase 16: Field / Hardware-in-the-Loop Validation & Reliability
 
-Phase 16 bridges Polaris-EMS with physical polar field deployment requirements through robust, truthful Hardware-in-the-Loop (HIL) and adapter layers:
+Phase 16 models polar device integration requirements through robust, truthful Hardware-in-the-Loop (HIL) and adapter simulation layers:
 
 1. **Concrete Device Adapters & Adapter Registry**:
    - `SimulatorAdapter` (`SIMULATOR`): Pure software deterministic generator.

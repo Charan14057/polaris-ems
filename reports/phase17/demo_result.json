@@ -1,17 +1,17 @@
 {
   "title": "POLARIS-EMS Phase 17 Final Demonstration",
-  "timestamp": "2026-09-25T04:14:14.899965+00:00",
+  "timestamp": "2026-09-25T04:23:16.134644+00:00",
   "epistemic_boundary": {
     "physical_connectivity": "DISCONNECTED",
     "physical_scada_link": false,
     "physical_validation": "NOT_AVAILABLE",
     "provenance_tiers": [
-      "FORECAST",
-      "SYNTHETIC",
-      "CONFIGURED",
-      "SIMULATED",
       "REAL",
-      "ASSUMED"
+      "FORECAST",
+      "ASSUMED",
+      "SIMULATED",
+      "SYNTHETIC",
+      "CONFIGURED"
     ]
   },
   "stages": [
@@ -19,7 +19,7 @@
       "stage": 1,
       "name": "Station Profile Resolution",
       "status": "PASS",
-      "latency_ms": 2.42,
+      "latency_ms": 1.98,
       "details": {
         "fleet_size": 3,
         "selected_station": "BHARATI",
@@ -51,7 +51,7 @@
       "stage": "3-8",
       "name": "Computational Pipeline (ML, Twin, Scenario, Optimizer, Resilience, Policy)",
       "status": "PASS",
-      "latency_ms": 1960.78,
+      "latency_ms": 2028.89,
       "details": {
         "forecast_quantiles": [
           "P10",
@@ -63,14 +63,14 @@
         "solver_status": "OPTIMAL",
         "resilience_state": "AT_RISK",
         "policy_directive": "MITIGATE",
-        "trace_id": "DT-20260925-BHARATI-F61E72"
+        "trace_id": "DT-20260925-BHARATI-B9EBEA"
       }
     },
     {
       "stage": 9,
       "name": "Edge Field Intelligence & State Tracking",
       "status": "PASS",
-      "latency_ms": 0.48,
+      "latency_ms": 0.44,
       "details": {
         "station_id": "BHARATI",
         "edge_mode": "CONNECTED_OPERATION",
@@ -83,7 +83,7 @@
       "stage": 10,
       "name": "Fault Injection & Connectivity Loss",
       "status": "PASS",
-      "latency_ms": 0.47,
+      "latency_ms": 0.36,
       "details": {
         "fault_injected": "STALE on gen-001::power_output_kw",
         "edge_mode_after_fault": "OFFLINE_EDGE",
@@ -108,7 +108,7 @@
       "stage": 12,
       "name": "Actuation Safety Boundary & Verification",
       "status": "PASS",
-      "latency_ms": 0.14,
+      "latency_ms": 0.11,
       "details": {
         "action": "SET_OUTPUT_KW",
         "authorized": true,
@@ -123,7 +123,7 @@
       "status": "PASS",
       "latency_ms": 0.01,
       "details": {
-        "trace_id": "DT-20260925-BHARATI-F61E72",
+        "trace_id": "DT-20260925-BHARATI-B9EBEA",
         "event_count": 7,
         "explainer_headline": "Decision Trace for BHARATI: Policy directed 'NORMAL_OPERATION' under AT_RISK resilience posture (FAILED)."
       }
@@ -140,5 +140,5 @@
     }
   ],
   "overall_status": "PASS",
-  "total_duration_sec": 1.97
+  "total_duration_sec": 2.04
 }
