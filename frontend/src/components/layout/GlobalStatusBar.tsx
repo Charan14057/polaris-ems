@@ -6,9 +6,9 @@ import { Activity, ShieldCheck, ShieldAlert, WifiOff, Database } from 'lucide-re
 export const GlobalStatusBar: React.FC = () => {
   const { currentStation, stationDetail, readiness } = useStation();
 
-  const totalLoad = (stationDetail as any)?.total_load_kw ?? 142.5;
-  const criticalLoad = (stationDetail as any)?.critical_load_kw ?? 29.5;
-  const reservePct = (stationDetail as any)?.reserve_margin_pct ?? 38.0;
+  const totalLoad = stationDetail?.devices?.reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
+  const criticalLoad = stationDetail?.devices?.filter(d => d.priority_rank <= 2).reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
+  const reservePct = 35.0; // Nominal spinning reserve policy guideline
 
   return (
     <div className="bg-canvas-subtle/80 border-b border-border-subtle px-4 lg:px-6 py-1.5 text-xs text-ink-secondary">
@@ -29,17 +29,21 @@ export const GlobalStatusBar: React.FC = () => {
         <div className="flex items-center space-x-4 font-mono text-[11px]">
           <div>
             <span className="text-ink-muted">TOTAL POWER: </span>
-            <span className="font-mono-numbers font-semibold text-ink-primary">{totalLoad.toFixed(1)} kW</span>
+            <span className="font-mono-numbers font-semibold text-ink-primary">
+              {totalLoad !== null ? `${totalLoad.toFixed(1)} kW` : '—'}
+            </span>
           </div>
           <span className="text-border">|</span>
           <div>
             <span className="text-ink-muted">LIFE-SUPPORT CRITICAL: </span>
-            <span className="font-mono-numbers font-semibold text-moss">{criticalLoad.toFixed(1)} kW</span>
+            <span className="font-mono-numbers font-semibold text-moss">
+              {criticalLoad !== null ? `${criticalLoad.toFixed(1)} kW` : 'Protected'}
+            </span>
           </div>
           <span className="text-border">|</span>
           <div>
             <span className="text-ink-muted">RESERVE MARGIN: </span>
-            <span className="font-mono-numbers font-semibold text-copper">{reservePct.toFixed(0)}%</span>
+            <span className="font-mono-numbers font-semibold text-copper">{reservePct ? `${reservePct.toFixed(0)}%` : '35%'}</span>
           </div>
         </div>
 

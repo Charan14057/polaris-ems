@@ -4,107 +4,110 @@
 
 :root {
   color-scheme: light;
-  --color-canvas: #FBF9F5;
-  --color-canvas-subtle: #F6F3EC;
+  --color-canvas: #F8FAFC;
+  --color-canvas-subtle: #F1F5F9;
   --color-surface: #FFFFFF;
-  --color-surface-inset: #F4F1EA;
-  --color-ink-primary: #1C1917;
-  --color-ink-secondary: #44403C;
-  --color-ink-muted: #78716C;
-  --color-copper: #B45309;
-  --color-copper-soft: #FEF3C7;
+  --color-surface-inset: #F8FAFC;
+  --color-ink-primary: #0F172A;
+  --color-ink-secondary: #334155;
+  --color-ink-muted: #64748B;
+  --color-brand: #0284C7;
+  --color-brand-soft: #E0F2FE;
   --color-ice: #0284C7;
   --color-ice-soft: #E0F2FE;
   --color-teal: #0F766E;
-  --color-moss: #15803D;
-  --color-border-subtle: #E7E2D6;
-  --color-border: #DDD6C6;
-  --color-border-strong: #BCB39E;
+  --color-moss: #16A34A;
+  --color-copper: #D97706;
+  --color-copper-soft: #FEF3C7;
+  --color-border-subtle: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
 }
 
 body {
   margin: 0;
   background-color: var(--color-canvas);
   color: var(--color-ink-primary);
-  font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tabular Numbers for rock-solid numeric KPIs */
+/* Tabular Numbers for precise numeric KPIs and telemetry */
 .font-mono-numbers {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
   font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: -0.01em;
 }
 
-/* Editorial Serif Header Utility */
+/* Fallback header utility mapped to primary sans */
 .font-serif-display {
-  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  font-feature-settings: "kern" 1, "liga" 1;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-/* Subtle, architectural mission-control scrollbar */
+/* Clean, unobtrusive scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F1EA;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #DDD6C6;
-  border-radius: 2px;
+  background: #CBD5E1;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #BCB39E;
+  background: #94A3B8;
 }
 
-/* Architectural Sheet Utilities */
+/* Industrial Utility Card Primitives */
+.card-base {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
 .editorial-sheet {
   background: #FFFFFF;
-  border: 1px solid #E7E2D6;
-  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04), 0 1px 2px rgba(28, 25, 23, 0.02);
+  border: 1px solid #E2E8F0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
 .editorial-sheet-raised {
   background: #FFFFFF;
-  border: 1px solid #DDD6C6;
-  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.06), 0 2px 4px -1px rgba(28, 25, 23, 0.03);
+  border: 1px solid #CBD5E1;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 }
 
 .technical-inset {
-  background: #F6F3EC;
-  border: 1px solid #E7E2D6;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.375rem;
 }
 
-/* Subtle architectural tactile background grids */
+/* Clean subtle grid for spatial drafting */
 .texture-subtle-grid {
-  background-size: 24px 24px;
+  background-size: 20px 20px;
   background-image: 
-    linear-gradient(to right, rgba(221, 214, 198, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(221, 214, 198, 0.25) 1px, transparent 1px);
+    linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
 }
 
 .texture-dots {
-  background-image: radial-gradient(rgba(180, 83, 9, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
   background-size: 16px 16px;
 }
 
 /* Custom focus ring for WCAG 2.1 AA keyboard accessibility */
 *:focus-visible {
-  outline: 2px solid #B45309;
+  outline: 2px solid #0284C7;
   outline-offset: 2px;
-}
-
-/* Respect user's reduced-motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }

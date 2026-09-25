@@ -1,61 +1,68 @@
 /**
  * POLARIS-EMS DESIGN SYSTEM TOKENS
- * Direction: Copper × Ice (Editorial Control Room)
- * Light-first, warm material palette with Indian mineral accents and polar precision.
+ * Direction: Quiet Industrial / Arctic Utility
+ * Clean white/cool-gray canvas, deep slate typography, restrained blue/teal accents.
  */
 
 export const colors = {
   // Canvas & Surfaces
   canvas: {
-    DEFAULT: '#FBF9F5', // Warm Ivory / Alabaster
-    subtle: '#F6F3EC',  // Soft Parchment
-    muted: '#EFECE3',   // Muted Sandstone
+    DEFAULT: '#F8FAFC', // Slate 50
+    subtle: '#F1F5F9',  // Slate 100
+    muted: '#E2E8F0',   // Slate 200
   },
   surface: {
-    DEFAULT: '#FFFFFF', // Crisp Chalk White
+    DEFAULT: '#FFFFFF', // Pure White
     raised: '#FFFFFF',  // Elevated Card Sheet
-    inset: '#F4F1EA',   // Inset Technical Plate
-    overlay: 'rgba(251, 249, 245, 0.94)',
+    inset: '#F8FAFC',   // Inset Slate Plate
+    overlay: 'rgba(15, 23, 42, 0.4)',
   },
   // Typography Ink
   ink: {
-    primary: '#1C1917',   // Deep Mineral Charcoal (Stone 900)
-    secondary: '#44403C', // Weathered Iron (Stone 700)
-    muted: '#78716C',     // Technical Caption (Stone 500)
-    subtle: '#A8A29E',    // Alignment Mark / Watermark (Stone 400)
-    inverse: '#FAFAF9',   // Crisp White for high-contrast pills
+    primary: '#0F172A',   // Slate 900
+    secondary: '#334155', // Slate 700
+    muted: '#64748B',     // Slate 500
+    subtle: '#94A3B8',    // Slate 400
+    inverse: '#FFFFFF',   // White
   },
   // Signature Accents
-  copper: {
-    DEFAULT: '#B45309', // Burnished Terracotta Copper (Amber 700)
-    dark: '#92400E',    // Deep Copper
-    light: '#D97706',   // Radiant Copper
-    soft: '#FEF3C7',    // Warm Amber Wash (Amber 100)
-    subtle: '#FFFBEB',  // Pale Tint (Amber 50)
+  brand: {
+    DEFAULT: '#0284C7', // Sky 600
+    dark: '#0369A1',    // Sky 700
+    light: '#38BDF8',   // Sky 400
+    soft: '#E0F2FE',    // Sky 100
+    subtle: '#F0F9FF',  // Sky 50
   },
   ice: {
-    DEFAULT: '#0284C7', // Antarctic Glacial Ice (Sky 600)
-    dark: '#0369A1',    // Deep Polar Crevasse (Sky 700)
-    light: '#38BDF8',   // Surface Ice Reflection
-    soft: '#E0F2FE',    // Glacial Mist Wash (Sky 100)
-    subtle: '#F0F9FF',  // Pale Ice Tint (Sky 50)
+    DEFAULT: '#0284C7',
+    dark: '#0369A1',
+    light: '#38BDF8',
+    soft: '#E0F2FE',
+    subtle: '#F0F9FF',
   },
   teal: {
-    DEFAULT: '#0F766E', // Himalayan Mineral Teal (Teal 700)
-    dark: '#115E59',    // Deep Pine Teal
-    soft: '#CCFBF1',    // Sage Mist (Teal 100)
+    DEFAULT: '#0F766E', // Renewable Deep Teal
+    dark: '#115E59',
+    soft: '#CCFBF1',
     subtle: '#F0FDFA',
   },
+  copper: {
+    DEFAULT: '#D97706', // Alert & Diesel Amber
+    dark: '#B45309',
+    light: '#F59E0B',
+    soft: '#FEF3C7',
+    subtle: '#FFFBEB',
+  },
   moss: {
-    DEFAULT: '#15803D', // Arctic Lichen Moss (Green 700)
-    dark: '#166534',
+    DEFAULT: '#16A34A', // Green
+    dark: '#15803D',
     soft: '#DCFCE7',
     subtle: '#F0FDF4',
   },
   // Operational Status Tokens (Accessible WCAG 2.1 AA)
   status: {
     safe: {
-      ink: '#166534',
+      ink: '#15803D',
       bg: '#F0FDF4',
       border: '#BBF7D0',
       dot: '#16A34A',
@@ -67,7 +74,7 @@ export const colors = {
       dot: '#0284C7',
     },
     atRisk: {
-      ink: '#92400E',
+      ink: '#B45309',
       bg: '#FFFBEB',
       border: '#FDE68A',
       dot: '#D97706',
@@ -79,13 +86,13 @@ export const colors = {
       dot: '#EA580C',
     },
     critical: {
-      ink: '#991B1B',
+      ink: '#B91C1C',
       bg: '#FEF2F2',
       border: '#FECACA',
       dot: '#DC2626',
     },
     recovery: {
-      ink: '#3730A3',
+      ink: '#4338CA',
       bg: '#EEF2FF',
       border: '#C7D2FE',
       dot: '#4F46E5',
@@ -99,78 +106,50 @@ export const colors = {
   },
   // Rules, Dividers & Outlines
   border: {
-    subtle: '#E7E2D6',  // Delicate Paper Edge
-    DEFAULT: '#DDD6C6', // Architectural Divider
-    strong: '#BCB39E',  // Emphasized Technical Border
-    dark: '#292524',    // High-contrast Anchor
+    subtle: '#F1F5F9',
+    DEFAULT: '#E2E8F0', // Slate 200
+    strong: '#CBD5E1', // Slate 300
+    dark: '#1E293B',
   },
-  // Subsystem Generation Colors
-  generation: {
-    solar: '#D97706',
-    wind: '#0284C7',
-    diesel: '#B45309',
-    battery: '#15803D',
-    thermal: '#BE185D',
-    grid: '#4F46E5',
-  },
-};
+} as const;
 
 export const typography = {
-  fontSerif: '"Cormorant Garamond", Georgia, "Times New Roman", serif',
-  fontSans: '"IBM Plex Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontMono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-  scale: {
-    displayXl: 'clamp(2.5rem, 4vw, 3.75rem)',
-    displayL: 'clamp(2rem, 3vw, 2.75rem)',
-    displayM: 'clamp(1.5rem, 2.5vw, 2.125rem)',
-    headingL: '1.5rem',
-    headingM: '1.25rem',
-    headingS: '1rem',
-    bodyL: '1.125rem',
-    body: '0.9375rem',
-    bodyS: '0.8125rem',
-    caption: '0.75rem',
-    micro: '0.6875rem',
+  fontFamily: {
+    sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace',
   },
-};
+  fontSize: {
+    display: ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.02em' }],
+    h1: ['1.875rem', { lineHeight: '2.25rem', letterSpacing: '-0.02em' }],
+    h2: ['1.5rem', { lineHeight: '2rem', letterSpacing: '-0.01em' }],
+    h3: ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '-0.01em' }],
+    h4: ['1.125rem', { lineHeight: '1.5rem', letterSpacing: '0em' }],
+    body: ['0.875rem', { lineHeight: '1.25rem' }],
+    bodySm: ['0.8125rem', { lineHeight: '1.125rem' }],
+    caption: ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.01em' }],
+    tiny: ['0.6875rem', { lineHeight: '0.875rem', letterSpacing: '0.02em' }],
+  },
+} as const;
 
 export const spacing = {
-  unit: 8,
-  layout: {
-    gutter: 'clamp(1rem, 2vw, 2rem)',
-    maxWidth: '1520px',
-  },
-};
+  containerMax: '1520px',
+  headerHeight: '52px',
+  sidebarWidth: '240px',
+  sidebarCollapsedWidth: '64px',
+} as const;
 
 export const radii = {
-  none: '0px',
-  subtle: '2px',
-  sm: '4px',
-  md: '6px',
-  lg: '8px',
-  pill: '9999px',
-};
+  xs: '0.125rem',
+  sm: '0.25rem',
+  md: '0.375rem',
+  lg: '0.5rem',
+  xl: '0.75rem',
+  full: '9999px',
+} as const;
 
 export const shadows = {
-  sheet: '0 1px 3px rgba(28, 25, 23, 0.05), 0 1px 2px rgba(28, 25, 23, 0.03)',
-  raised: '0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05)',
-  floating: '0 12px 24px -4px rgba(28, 25, 23, 0.09), 0 4px 8px -2px rgba(28, 25, 23, 0.04)',
-  inset: 'inset 0 1px 2px rgba(28, 25, 23, 0.04)',
-};
-
-export const motion = {
-  micro: '140ms cubic-bezier(0.16, 1, 0.3, 1)',
-  hover: '180ms cubic-bezier(0.16, 1, 0.3, 1)',
-  panel: '240ms cubic-bezier(0.16, 1, 0.3, 1)',
-  drawer: '320ms cubic-bezier(0.16, 1, 0.3, 1)',
-  page: '380ms cubic-bezier(0.16, 1, 0.3, 1)',
-};
-
-export const breakpoints = {
-  sm: '640px',
-  md: '768px',
-  lg: '1024px',
-  xl: '1280px',
-  '2xl': '1440px',
-  '3xl': '1600px',
-};
+  card: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  sheet: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+  raised: '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+  floating: '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04)',
+} as const;

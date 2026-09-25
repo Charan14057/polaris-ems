@@ -86,11 +86,11 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
   return (
     <div className="space-y-3 font-sans select-none">
       {/* Top Filter and Display Mode Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-lg bg-surface border border-border shadow-xs text-xs font-mono">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-lg bg-white border border-slate-200 shadow-xs text-xs font-mono">
         {/* Device Filter Buttons */}
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-ink-muted text-[11px] flex items-center space-x-1 mr-1">
-            <Filter className="w-3 h-3 text-copper" />
+          <span className="text-slate-500 text-[11px] flex items-center space-x-1 mr-1">
+            <Filter className="w-3 h-3 text-sky-600" />
             <span>FILTER:</span>
           </span>
           {filterOptions.map(opt => (
@@ -100,8 +100,8 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
               onClick={() => onFilterChange(opt.id)}
               className={`px-2.5 py-1 rounded transition-colors ${
                 activeFilter === opt.id
-                  ? 'bg-copper text-ink-inverse font-semibold shadow-xs'
-                  : 'bg-canvas-subtle text-ink-secondary hover:text-ink-primary hover:bg-canvas border border-border-subtle'
+                  ? 'bg-sky-600 text-white font-semibold shadow-xs'
+                  : 'bg-slate-50 text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200'
               }`}
             >
               {opt.label}
@@ -111,15 +111,15 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
 
         {/* View Mode (Architectural vs Schematic) */}
         <div className="flex items-center space-x-2">
-          <span className="text-ink-muted text-[11px] hidden sm:inline">VIEW:</span>
-          <div className="flex items-center rounded border border-border bg-canvas-subtle p-0.5">
+          <span className="text-slate-500 text-[11px] hidden sm:inline">VIEW:</span>
+          <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
             <button
               type="button"
               onClick={() => onViewModeChange('ARCHITECTURAL')}
               className={`px-2.5 py-0.5 rounded text-[11px] transition-colors ${
                 viewMode === 'ARCHITECTURAL'
-                  ? 'bg-surface text-ink-primary font-bold shadow-xs'
-                  : 'text-ink-muted hover:text-ink-primary'
+                  ? 'bg-white text-slate-900 font-bold shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               2D Architectural
@@ -129,8 +129,8 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
               onClick={() => onViewModeChange('SCHEMATIC')}
               className={`px-2.5 py-0.5 rounded text-[11px] transition-colors ${
                 viewMode === 'SCHEMATIC'
-                  ? 'bg-surface text-ink-primary font-bold shadow-xs'
-                  : 'text-ink-muted hover:text-ink-primary'
+                  ? 'bg-white text-slate-900 font-bold shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               Schematic Bus
@@ -146,14 +146,14 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        className="editorial-sheet rounded-lg border border-border relative overflow-hidden texture-subtle-grid min-h-[580px] h-[640px] cursor-grab active:cursor-grabbing shadow-sheet"
+        className="bg-white rounded-lg border border-slate-200 relative overflow-hidden texture-subtle-grid min-h-[580px] h-[640px] cursor-grab active:cursor-grabbing shadow-xs"
       >
         {/* Floating Viewport Navigation Toolbar (Bottom Left) */}
-        <div className="absolute bottom-4 left-4 z-20 flex items-center space-x-1.5 p-1 rounded bg-surface/90 border border-border shadow-md backdrop-blur-xs">
+        <div className="absolute bottom-4 left-4 z-20 flex items-center space-x-1.5 p-1 rounded-md bg-white/95 border border-slate-200 shadow-md">
           <button
             type="button"
             onClick={zoomIn}
-            className="p-1.5 rounded hover:bg-canvas text-ink-secondary hover:text-ink-primary transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
             title="Zoom In (+)"
           >
             <ZoomIn className="w-4 h-4" />
@@ -161,7 +161,7 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           <button
             type="button"
             onClick={zoomOut}
-            className="p-1.5 rounded hover:bg-canvas text-ink-secondary hover:text-ink-primary transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
             title="Zoom Out (-)"
           >
             <ZoomOut className="w-4 h-4" />
@@ -169,7 +169,7 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           <button
             type="button"
             onClick={() => fitToView(containerRef.current?.clientWidth, containerRef.current?.clientHeight)}
-            className="p-1.5 rounded hover:bg-canvas text-ink-secondary hover:text-ink-primary transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
             title="Fit to View"
           >
             <Maximize2 className="w-4 h-4" />
@@ -177,7 +177,7 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           <button
             type="button"
             onClick={reset}
-            className="p-1.5 rounded hover:bg-canvas text-ink-secondary hover:text-ink-primary transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors"
             title="Reset Viewport"
           >
             <RotateCcw className="w-4 h-4" />
@@ -185,13 +185,13 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
         </div>
 
         {/* Floating Architectural Information Tag (Top Left) */}
-        <div className="absolute top-4 left-4 z-20 flex items-center space-x-2 font-mono text-[10px] text-ink-muted bg-surface/90 px-3 py-1.5 rounded border border-border shadow-xs backdrop-blur-xs">
-          <Compass className="w-3.5 h-3.5 text-copper" />
-          <span className="font-bold text-ink-primary uppercase tracking-wide">
+        <div className="absolute top-4 left-4 z-20 flex items-center space-x-2 font-mono text-[10px] text-slate-500 bg-white/95 px-3 py-1.5 rounded-md border border-slate-200 shadow-xs">
+          <Compass className="w-3.5 h-3.5 text-sky-600" />
+          <span className="font-bold text-slate-900 uppercase tracking-wide">
             {viewModel.stationId} SPATIAL MODEL
           </span>
           <span>•</span>
-          <span className="text-copper">{viewModel.geometryBasis}</span>
+          <span className="text-sky-700">{viewModel.geometryBasis}</span>
           <span>•</span>
           <span>SCALE 1:250</span>
         </div>

@@ -8,29 +8,30 @@ export default {
     extend: {
       colors: {
         canvas: {
-          DEFAULT: '#FBF9F5',
-          subtle: '#F6F3EC',
-          muted: '#EFECE3',
+          DEFAULT: '#F8FAFC', // Slate 50
+          subtle: '#F1F5F9',  // Slate 100
+          muted: '#E2E8F0',   // Slate 200
         },
         surface: {
           DEFAULT: '#FFFFFF',
           raised: '#FFFFFF',
-          inset: '#F4F1EA',
+          inset: '#F8FAFC',
         },
         ink: {
-          primary: '#1C1917',
-          secondary: '#44403C',
-          muted: '#78716C',
-          subtle: '#A8A29E',
-          inverse: '#FAFAF9',
+          primary: '#0F172A',   // Slate 900
+          secondary: '#334155', // Slate 700
+          muted: '#64748B',     // Slate 500
+          subtle: '#94A3B8',    // Slate 400
+          inverse: '#FFFFFF',
         },
-        copper: {
-          DEFAULT: '#B45309',
-          dark: '#92400E',
-          light: '#D97706',
-          soft: '#FEF3C7',
-          subtle: '#FFFBEB',
+        brand: {
+          DEFAULT: '#0284C7', // Sky 600
+          dark: '#0369A1',    // Sky 700
+          light: '#38BDF8',   // Sky 400
+          soft: '#E0F2FE',    // Sky 100
+          subtle: '#F0F9FF',  // Sky 50
         },
+        // Restrained utility accents
         ice: {
           DEFAULT: '#0284C7',
           dark: '#0369A1',
@@ -39,52 +40,59 @@ export default {
           subtle: '#F0F9FF',
         },
         teal: {
-          DEFAULT: '#0F766E',
+          DEFAULT: '#0F766E', // Deep Teal (Renewables)
           dark: '#115E59',
           soft: '#CCFBF1',
           subtle: '#F0FDFA',
         },
+        copper: {
+          DEFAULT: '#D97706', // Reserved for amber/diesel/warning state
+          dark: '#B45309',
+          light: '#F59E0B',
+          soft: '#FEF3C7',
+          subtle: '#FFFBEB',
+        },
         moss: {
-          DEFAULT: '#15803D',
-          dark: '#166534',
+          DEFAULT: '#16A34A', // Green 600
+          dark: '#15803D',
           soft: '#DCFCE7',
           subtle: '#F0FDF4',
         },
         border: {
-          subtle: '#E7E2D6',
-          DEFAULT: '#DDD6C6',
-          strong: '#BCB39E',
-          dark: '#292524',
+          subtle: '#F1F5F9',
+          DEFAULT: '#E2E8F0', // Slate 200
+          strong: '#CBD5E1', // Slate 300
+          dark: '#1E293B',
         },
         // Operational Status mapping
         state: {
-          safe: '#15803D',
+          safe: '#16A34A',
           watch: '#0284C7',
-          atrisk: '#B45309',
-          threatened: '#C2410C',
-          critical: '#B91C1C',
-          recovery: '#4338CA',
+          atrisk: '#D97706',
+          threatened: '#EA580C',
+          critical: '#DC2626',
+          recovery: '#4F46E5',
           blocked: '#64748B',
         },
         resource: {
           solar: '#D97706',
           wind: '#0284C7',
           diesel: '#B45309',
-          battery: '#15803D',
-          thermal: '#BE185D',
-          fuel: '#78716C',
-          grid: '#4338CA',
+          battery: '#16A34A',
+          thermal: '#9333EA',
+          fuel: '#64748B',
+          grid: '#4F46E5',
         },
       },
       fontFamily: {
-        serif: ['"Cormorant Garamond"', 'Georgia', '"Times New Roman"', 'serif'],
-        sans: ['"IBM Plex Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'monospace'],
       },
       boxShadow: {
-        sheet: '0 1px 3px rgba(28, 25, 23, 0.05), 0 1px 2px rgba(28, 25, 23, 0.03)',
-        raised: '0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05)',
-        floating: '0 12px 24px -4px rgba(28, 25, 23, 0.09), 0 4px 8px -2px rgba(28, 25, 23, 0.04)',
+        card: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        sheet: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+        raised: '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+        floating: '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04)',
       },
     },
   },

@@ -1,6 +1,6 @@
 /**
  * POLARIS-EMS — Spatial Energy Digital Twin View
- * Phase 18: Master Implementation — Spatial Digital Twin Engine
+ * Quiet Industrial / Arctic Utility Design
  * 
  * Top-down architectural microgrid floor-plan, thermal zone layout,
  * and physical source-to-load electrical flow platform.
@@ -25,21 +25,13 @@ import { TwinSummaryStrip } from '../features/twin/components/TwinSummaryStrip';
 import { TwinSourceMix } from '../features/twin/components/TwinSourceMix';
 import { TwinInspector } from '../features/twin/components/TwinInspector';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
-import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
-import { ErrorCard } from '../components/common/ErrorCard';
 import { ExplainThis } from '../components/common/ExplainThis';
 import { NextStepExplanation } from '../components/common/NextStepExplanation';
 import { 
-  Boxes, 
-  Layers, 
-  Compass, 
-  MapPin, 
+  Zap, 
   ShieldCheck, 
-  Sliders, 
-  Sparkles,
-  Info,
-  ShieldAlert,
-  ArrowRight
+  RotateCw,
+  Info
 } from 'lucide-react';
 
 export const EnergyTwinView: React.FC = () => {
@@ -100,7 +92,6 @@ export const EnergyTwinView: React.FC = () => {
         setTrajectoryData(trajectoryRes.data);
       }
     } catch (err: any) {
-      // Non-blocking: keep fallback profile
       console.warn('Twin API load advisory:', err.message);
     } finally {
       setLoading(false);
@@ -188,34 +179,35 @@ export const EnergyTwinView: React.FC = () => {
   const selectedNode = selectedNodeId ? viewModel.nodes.find(n => n.id === selectedNodeId) : null;
 
   return (
-    <div className="space-y-6 max-w-[1520px] mx-auto pb-12 font-sans">
-      {/* 1. Editorial Header */}
-      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+    <div className="space-y-6 max-w-[1520px] mx-auto pb-10 font-sans">
+      {/* 1. Header Banner */}
+      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
-            <Boxes className="w-4 h-4" />
-            <span>03 SPATIAL DIGITAL TWIN ENGINE • {currentStation}</span>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
+            <span className="font-semibold text-slate-800">{stationDetail?.name || currentStation}</span>
+            <span className="text-slate-300">•</span>
+            <span>Spatial Energy Twin</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
-            Spatial Energy Digital Twin
-          </h2>
-          <p className="text-sm text-ink-secondary mt-1 font-sans">
-            Top-down architectural microgrid floor-plan, thermal zone layout, and physical power flow platform.
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Energy Distribution & Spatial Layout
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+            Top-down polar microgrid spatial blueprint, thermal zone distribution, and electrical power flow.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <ProvenanceTag provenance={viewModel.provenance} size="sm" />
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
-            TARGET: {stationDetail?.name || currentStation}
+          <span className="text-xs font-mono px-2 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600">
+            {viewModel.layoutStatus} MODEL
           </span>
         </div>
       </div>
 
-      {/* 2. Executive Summary Strip & Narrative */}
+      {/* 2. Executive Summary Strip */}
       <TwinSummaryStrip viewModel={viewModel} />
 
       {/* 3. Source Mix Bar */}
-      <div className="editorial-sheet rounded-lg p-3 sm:p-4 border border-border shadow-xs">
+      <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-xs">
         <TwinSourceMix
           solarKw={viewModel.powerSummary.solarGenerationKw}
           windKw={viewModel.powerSummary.windGenerationKw}
@@ -275,30 +267,23 @@ export const EnergyTwinView: React.FC = () => {
         )}
       </div>
 
-      {/* 5. Non-Technical "Explain This" Component */}
+      {/* 5. Progressive Disclosure: Explain This Component */}
       <ExplainThis
-        title="How does the Spatial Digital Twin work in plain English?"
-        whatAmILookingAt="This is a top-down virtual blueprint of the polar station. It maps every physical building, generation source (wind, solar, diesel, battery), distribution switchboard, and electrical load so operators can watch electricity flow through the station in real time."
-        whyIsItImportant="In extreme polar cold (-40°C), physical access between station outposts is impossible during storms. The Spatial Twin gives engineers an immediate visual view of which circuits are powered, where energy is flowing, and whether any equipment has tripped."
-        howIsItCalculated="Driven strictly by the Phase 4 Digital Twin physics engine. Energy balances follow exact Kirchhoff conservation laws: Sum(P_gen) = Total Load + Battery Delta. Line colors update dynamically: green for renewable power, glacial blue for battery, and copper/alert when diesel generators contribute."
+        title="Spatial Digital Twin Physics & Flow Mechanics"
+        whatAmILookingAt="Top-down virtual blueprint of the polar station. Maps every physical room, generation asset (wind, solar, diesel, battery), distribution switchboard, and electrical load to monitor power flow in real time."
+        whyIsItImportant="During polar storms (-40°C), manual outdoor inspection is impossible. The Spatial Twin provides immediate insight into circuit health and branch loading."
+        howIsItCalculated="Driven by the Digital Twin physics engine. Energy balances follow exact Kirchhoff conservation laws: Sum(P_gen) = Total Load + Battery Delta."
         technicalEvidence="Governing formulation: Exact Kirchhoff Node Conservation: Sum(I_in) = Sum(I_out) with residual |err| < 1e-4 kW across 400V 3-phase bus. Simulation air-gap enforced."
       />
 
-      {/* 6. "What Happens Next?" Outlook */}
-      <NextStepExplanation
-        title="WHAT HAPPENS OVER THE REPLAY TIMELINE?"
-        timeframe={`T+${currentIndex}h to T+${statesCount > 0 ? statesCount - 1 : 24}h Horizon`}
-        outlook="As weather conditions evolve across the 24-hour cycle, the Twin simulates how generator dispatch and battery state adapt to maintain habitat warmth. Scrubber controls allow you to step forward in time to observe evening battery discharge or morning solar ramps."
-      />
-
-      {/* 7. Epistemic Truth & Simulation Air-Gap Status Banner */}
-      <div className="p-3 rounded-lg bg-surface border border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-ink-muted">
+      {/* 6. Epistemic Truth & Simulation Air-Gap Status Banner */}
+      <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-slate-500">
         <div className="flex items-center space-x-2">
-          <ShieldCheck className="w-4 h-4 text-moss" />
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
           <span>SIMULATION AIR-GAP ENFORCED: PHYSICAL_CONNECTIVITY = DISCONNECTED • PHYSICAL_SCADA_LINK = FALSE</span>
         </div>
-        <span className="text-[11px] text-ink-secondary">
-          Phase 18 Spatial Digital Twin Engine Active
+        <span className="text-[11px] text-slate-600">
+          Software Model Execution • Verified Provenance
         </span>
       </div>
     </div>

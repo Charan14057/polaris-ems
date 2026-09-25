@@ -72,24 +72,25 @@ export const OptimizationView: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
-      {/* 1. Editorial Header */}
-      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+      {/* 1. Header */}
+      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
-            <Cpu className="w-4 h-4" />
-            <span>05 MULTI-HORIZON DISPATCH OPTIMIZER</span>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
+            <span className="font-semibold text-slate-800">{currentStation}</span>
+            <span className="text-slate-300">•</span>
+            <span>Dispatch Optimization</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
-            Autonomous Dispatch Optimization
-          </h2>
-          <p className="text-sm text-ink-secondary mt-1 font-sans">
-            Mathematical <JargonTooltip term="MILP Optimizer">optimizer</JargonTooltip> that automatically schedules generators, batteries, and wind power to protect life-support while minimizing diesel fuel burn.
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Dispatch Optimization & Unit Commitment
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 max-w-3xl">
+            Mathematical MILP optimizer scheduling generation assets, storage dispatch, and reserves to preserve life support while minimizing fuel consumption.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <ProvenanceTag provenance="SIMULATED" size="sm" />
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
-            STATION: {currentStation}
+          <span className="text-xs font-mono px-2 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600">
+            SOLVER: HiGHS
           </span>
         </div>
       </div>
@@ -104,17 +105,17 @@ export const OptimizationView: React.FC = () => {
       />
 
       {/* 2. Top Banner: Recommended Dispatch Headline */}
-      <div className="editorial-sheet rounded p-6 bg-surface border border-copper/40 shadow-raised">
-        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-4 border-b border-border-subtle gap-3">
+      <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 mb-3 border-b border-slate-100 gap-3">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-copper font-bold block mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-sky-700 font-bold block mb-0.5">
               RECOMMENDED DISPATCH DIRECTIVE
             </span>
-            <h3 className="text-xl sm:text-2xl font-serif font-bold text-ink-primary">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
               Optimal Fuel-Preserving Dispatch Profile
-            </h3>
-            <p className="text-xs sm:text-sm text-ink-secondary mt-1 max-w-3xl leading-relaxed font-sans">
-              Deploy dual diesel generators in asymmetric split (G1 at 65 kW high efficiency, G2 at 45 kW baseline) with 35% spinning reserve margin. Battery storage absorbs transient renewable spikes.
+            </h2>
+            <p className="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+              Asymmetric generator loading with 35% spinning reserve margin. Battery storage absorbs transient renewable spikes.
             </p>
           </div>
 
@@ -123,7 +124,7 @@ export const OptimizationView: React.FC = () => {
             <button
               onClick={runOptimizer}
               disabled={loading}
-              className="px-3 py-1.5 rounded bg-copper text-ink-inverse text-xs font-mono font-medium hover:bg-copper-dark transition-colors shadow-xs"
+              className="px-3 py-1.5 rounded-md bg-sky-600 text-white text-xs font-mono font-medium hover:bg-sky-700 transition-colors shadow-xs"
             >
               {loading ? 'Solving...' : 'Re-Solve Horizon'}
             </button>
@@ -131,34 +132,34 @@ export const OptimizationView: React.FC = () => {
         </div>
 
         {/* Critical Distinction: Proposal vs Twin Replay vs Validated Outcome */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs font-mono">
-          <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-            <span className="text-copper font-bold uppercase text-[10px] block mb-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs font-mono">
+          <div className="p-3 rounded-md bg-slate-50 border border-slate-200">
+            <span className="text-sky-700 font-bold uppercase text-[10px] block mb-1">
               01 OPTIMIZER PROPOSAL
             </span>
-            <span className="text-ink-primary font-medium block">Mathematical Variable Assignment</span>
-            <span className="text-ink-muted text-[11px] block mt-0.5">
+            <span className="text-slate-900 font-medium block">Mathematical Variable Assignment</span>
+            <span className="text-slate-500 text-[11px] block mt-0.5">
               Pyomo MILP solved via HiGHS in {optData?.solve_time_sec ? `${(optData.solve_time_sec * 1000).toFixed(1)}ms` : '42.5ms'}.
             </span>
           </div>
 
-          <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-            <span className="text-teal font-bold uppercase text-[10px] block mb-1">
+          <div className="p-3 rounded-md bg-slate-50 border border-slate-200">
+            <span className="text-teal-700 font-bold uppercase text-[10px] block mb-1">
               02 TWIN SIMULATION REPLAY
             </span>
-            <span className="text-ink-primary font-medium block">Multi-Physics Replay Conservation</span>
-            <span className="text-ink-muted text-[11px] block mt-0.5">
+            <span className="text-slate-900 font-medium block">Multi-Physics Replay Conservation</span>
+            <span className="text-slate-500 text-[11px] block mt-0.5">
               Exact electrical power conservation verified (0.00% physical deficit).
             </span>
           </div>
 
-          <div className="p-3 rounded bg-moss-soft border border-moss/30">
-            <span className="text-moss font-bold uppercase text-[10px] block mb-1">
+          <div className="p-3 rounded-md bg-emerald-50 border border-emerald-200">
+            <span className="text-emerald-700 font-bold uppercase text-[10px] block mb-1">
               03 VALIDATED CONSEQUENCE
             </span>
-            <span className="text-moss-dark font-medium block">Life-Support Core Protected</span>
-            <span className="text-ink-secondary text-[11px] block mt-0.5">
-              29.5 kW life-support load fully sustained across entire {horizonHours}h horizon.
+            <span className="text-emerald-900 font-medium block">Life-Support Core Protected</span>
+            <span className="text-slate-600 text-[11px] block mt-0.5">
+              Priority 1 life-support load fully sustained across entire {horizonHours}h horizon.
             </span>
           </div>
         </div>
@@ -270,27 +271,27 @@ export const OptimizationView: React.FC = () => {
                   const bPower = row.p_battery_discharge_kw > 0 ? row.p_battery_discharge_kw : -row.p_battery_charge_kw;
                   return (
                     <tr key={idx} className="hover:bg-canvas-subtle transition-colors">
-                      <td className="py-2 px-3 font-semibold text-ink-primary">+{row.t}h</td>
-                      <td className="py-2 px-3 text-copper font-mono-numbers">{row.p_solar_kw?.toFixed(1) || '0.0'}</td>
-                      <td className="py-2 px-3 text-ice font-medium font-mono-numbers">{row.p_wind_kw?.toFixed(1) || '45.0'}</td>
-                      <td className="py-2 px-3 text-ink-secondary font-mono-numbers">{row.p_diesel_kw ? (row.p_diesel_kw * 0.6).toFixed(1) : '55.0'}</td>
-                      <td className="py-2 px-3 text-ink-secondary font-mono-numbers">{row.p_diesel_kw ? (row.p_diesel_kw * 0.4).toFixed(1) : '35.0'}</td>
-                      <td className="py-2 px-3 text-moss font-mono-numbers">{bPower?.toFixed(1) || '0.0'}</td>
-                      <td className="py-2 px-3 font-semibold text-ink-primary font-mono-numbers">{row.p_served_load_kw?.toFixed(1) || '142.5'}</td>
+                      <td className="py-2 px-3 font-semibold text-slate-900">+{row.t}h</td>
+                      <td className="py-2 px-3 text-amber-600 font-mono-numbers">{row.p_solar_kw !== undefined ? row.p_solar_kw.toFixed(1) : '—'}</td>
+                      <td className="py-2 px-3 text-sky-600 font-medium font-mono-numbers">{row.p_wind_kw !== undefined ? row.p_wind_kw.toFixed(1) : '—'}</td>
+                      <td className="py-2 px-3 text-slate-700 font-mono-numbers">{row.p_diesel_kw !== undefined ? (row.p_diesel_kw * 0.6).toFixed(1) : '—'}</td>
+                      <td className="py-2 px-3 text-slate-700 font-mono-numbers">{row.p_diesel_kw !== undefined ? (row.p_diesel_kw * 0.4).toFixed(1) : '—'}</td>
+                      <td className="py-2 px-3 text-emerald-600 font-mono-numbers">{bPower !== undefined ? bPower.toFixed(1) : '—'}</td>
+                      <td className="py-2 px-3 font-semibold text-slate-900 font-mono-numbers">{row.p_served_load_kw !== undefined ? row.p_served_load_kw.toFixed(1) : '—'}</td>
                       <td className="py-2 px-3 text-right">
                         <button
                           onClick={() =>
                             inspectEvidence({
                               title: `Dispatch Timestep +${row.t}h`,
-                              value: `${row.p_served_load_kw?.toFixed(1) || '142.5'} kW Balanced`,
+                              value: `${row.p_served_load_kw !== undefined ? row.p_served_load_kw.toFixed(1) : '—'} kW Balanced`,
                               source: 'HiGHS MILP Rolling Solver',
                               provenance: 'SIMULATED',
                               station: currentStation,
-                              modelOrSubsystem: 'Phase 6 Constrained Optimizer',
+                              modelOrSubsystem: 'Constrained Dispatch Optimizer',
                               mathematicalBasis: 'Primal-dual optimal point satisfying reserve & battery limits',
                             })
                           }
-                          className="text-copper hover:text-copper-dark underline text-[11px]"
+                          className="text-sky-600 hover:text-sky-800 underline text-[11px]"
                         >
                           Evidence →
                         </button>

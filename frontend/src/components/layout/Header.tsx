@@ -60,7 +60,7 @@ export const Header: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-ink-muted">
-              Polar Energy Management & Autonomous Resilience • SIH26061
+              Polar Energy Management & Autonomous Resilience
             </p>
           </div>
         </div>

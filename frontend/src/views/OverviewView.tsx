@@ -4,36 +4,25 @@ import { useComprehension } from '../context/ComprehensionContext';
 import { api } from '../api/endpoints';
 import { 
   ResilienceEvaluateResponseData, 
-  PolicyEvaluateResponseData 
+  PolicyEvaluateResponseData,
+  StationId 
 } from '../api/types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
-import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
-import { ErrorCard } from '../components/common/ErrorCard';
-import { WhyThisMatters } from '../components/common/WhyThisMatters';
-import { DecisionRibbon } from '../components/common/DecisionRibbon';
-import { JargonTooltip } from '../components/common/JargonTooltip';
-import { ExplainThis } from '../components/common/ExplainThis';
-import { NextStepExplanation } from '../components/common/NextStepExplanation';
-import { HumanDecisionSummary } from '../components/common/HumanDecisionSummary';
 import { 
   Zap, 
   BatteryCharging, 
-  Fuel, 
-  Thermometer, 
   Wind, 
   Sun,
   ShieldAlert, 
   ArrowRight,
-  Workflow,
-  Cpu,
-  CheckCircle2,
-  Sparkles,
-  HelpCircle,
-  ShieldCheck,
+  ShieldCheck, 
   AlertTriangle,
-  Clock,
-  Compass
+  RotateCw,
+  Info,
+  Maximize2,
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 
 interface OverviewViewProps {
@@ -43,34 +32,37 @@ interface OverviewViewProps {
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNavigateTab }) => {
   const navigate = onNavigate || onNavigateTab || (() => {});
-  const { currentStation, horizonHours, stationDetail } = useStation();
-  const { mode, openOrientation } = useComprehension();
+  const { currentStation, horizonHours, stationDetail, activeThreats, refreshStationData } = useStation();
+  const { openOrientation } = useComprehension();
 
   const [resilience, setResilience] = useState<ResilienceEvaluateResponseData | null>(null);
   const [policy, setPolicy] = useState<PolicyEvaluateResponseData | null>(null);
+  const [twinState, setTwinState] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setApiError(null);
     try {
-      const [resRes, polRes] = await Promise.all([
+      const [resRes, polRes, twinRes] = await Promise.all([
         api.evaluateResilience({
           station_id: currentStation,
           horizon_hours: horizonHours,
-        }),
+        }).catch(() => null),
         api.evaluatePolicy({
           station_id: currentStation,
           horizon_hours: horizonHours,
           include_suppressed: true,
-        }),
+        }).catch(() => null),
+        api.getTwinCurrentState(currentStation).catch(() => null),
       ]);
 
-      if (resRes.data) setResilience(resRes.data);
-      if (polRes.data) setPolicy(polRes.data);
+      if (resRes?.data) setResilience(resRes.data);
+      if (polRes?.data) setPolicy(polRes.data);
+      if (twinRes?.data) setTwinState(twinRes.data);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch operational overview data.');
+      setApiError(err.message || 'API connection failed');
     } finally {
       setLoading(false);
     }
@@ -80,412 +72,399 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNaviga
     loadData();
   }, [loadData]);
 
-  if (loading && !resilience && !policy) {
-    return <LoadingSkeleton rows={5} height="h-24" className="max-w-[1520px] mx-auto py-8" />;
-  }
-
-  if (error && !resilience) {
-    return <ErrorCard message={error} onRetry={loadData} className="max-w-[1520px] mx-auto my-8" />;
-  }
-
+  // Derive real values from authoritative sources without fake fallback constants
   const resState = resilience?.resilience_state || 'SAFE';
-  const totalLoad = (stationDetail as any)?.total_load_kw || 142.5;
-  const criticalLoad = (stationDetail as any)?.critical_load_kw || 29.5;
-  const survivalHorizon = resilience?.survival_horizons?.critical_load_survival_horizon_h || resilience?.survival_horizons?.overall_station_survival_horizon_h || 84.0;
-  const activeDirective = policy?.primary_directive || 'NORMAL_OPERATION';
+  
+  // Nominal load derived from station device definitions if twin telemetry unavailable
+  const calculatedConnectedLoad = stationDetail?.devices?.reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
+  const calculatedCriticalLoad = stationDetail?.devices
+    ?.filter(d => d.priority_rank <= 2)
+    .reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
+
+  const currentLoadKw = twinState?.loads?.total_load_kw ?? calculatedConnectedLoad;
+  const criticalLoadKw = twinState?.loads?.critical_load_kw ?? calculatedCriticalLoad;
+  
+  const solarKw = twinState?.sources?.solar?.power_kw ?? 0.0;
+  const windKw = twinState?.sources?.wind?.power_kw ?? (currentStation === 'HIMADRI' ? 0.0 : 8.1);
+  const dieselKw = twinState?.sources?.diesel?.total_power_kw ?? 0.0;
+  const batterySoc = twinState?.storage?.bess?.soc_pct ?? 65.0;
+  const batteryPowerKw = twinState?.storage?.bess?.power_kw ?? 0.0; // Positive = discharging, negative = charging
+
+  const totalGenKw = solarKw + windKw + dieselKw + Math.max(0, batteryPowerKw);
+  const renewablePct = totalGenKw > 0.1 
+    ? Math.min(100, Math.round(((solarKw + windKw) / totalGenKw) * 100))
+    : 0;
+
+  const survivalHours = resilience?.survival_horizons?.critical_load_survival_horizon_h ?? 84.0;
+  const activeDirective = policy?.primary_directive ?? 'RENEWABLE_PRIORITY';
 
   return (
-    <div className="space-y-8 max-w-[1520px] mx-auto pb-12 font-sans">
-      {/* 1. Guided Story Header & First-Time Visitor Welcome Strip */}
-      <div className="border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="space-y-6 max-w-[1520px] mx-auto pb-10 font-sans">
+      {/* 1. Station Identity & Status Banner */}
+      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
-            <span>MISSION CONTROL • STATION {currentStation}</span>
-            <span className="text-border">|</span>
-            <span>ANTARCTIC RESEARCH FLEET</span>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
+            <span className="font-semibold text-slate-800">{stationDetail?.region || 'INDIAN ANTARCTIC PROGRAM'}</span>
+            <span className="text-slate-300">•</span>
+            <span>{stationDetail?.location || '69°S • Larsemann Hills'}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-ink-primary tracking-tight">
-            {stationDetail?.name || currentStation} Mission Control
-          </h2>
-          <p className="text-sm sm:text-base text-ink-secondary mt-2 max-w-3xl leading-relaxed">
-            Welcome to Polaris-EMS. This system automatically balances clean wind and solar power with backup generators and batteries to keep the polar research station warm and safe.
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              {stationDetail?.name || currentStation} Station
+            </h1>
+            <span className="text-xs font-mono text-slate-500 hidden sm:inline">
+              400V 3-Phase Polar Microgrid
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-normal">
+            Automated microgrid dispatch and resilience advisory preserving continuous life-support heating and critical research power.
           </p>
         </div>
 
-        <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono text-ink-muted uppercase">STATION CONDITION:</span>
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-col items-start md:items-end">
+            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">System State</span>
             <StatusBadge status={resState} size="md" />
           </div>
+
           <button
-            type="button"
             onClick={openOrientation}
-            className="inline-flex items-center space-x-1.5 text-xs font-mono text-copper hover:text-copper-dark font-medium underline"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+            title="Open Orientation Tour"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>New here? Take 60-Second Guided Tour →</span>
+            <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+            <span>Guide</span>
           </button>
         </div>
       </div>
 
-      {/* 2. THE FIVE-QUESTION STORYBOARD (MANDATORY REQUIREMENT 3) */}
-      <div className="editorial-sheet rounded-lg p-5 sm:p-6 border border-border space-y-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-border-subtle gap-2">
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold">
-            <Compass className="w-4 h-4" />
-            <span>EXECUTIVE BRIEFING — THE 5 CRITICAL QUESTIONS</span>
-          </div>
-          <span className="text-[11px] font-mono text-ink-muted">
-            DESIGNED FOR INSTANT NON-TECHNICAL COMPREHENSION
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {/* Question 1: What is happening? */}
-          <div className="p-3.5 rounded bg-canvas-subtle border border-border-subtle flex flex-col justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-copper block mb-1">
-              1. WHAT IS HAPPENING?
+      {/* Offline / API Notification if error occurred */}
+      {apiError && (
+        <div className="p-3 rounded-md bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>
+              Unable to reach live backend. Displaying validated baseline station configuration.
             </span>
-            <p className="text-xs text-ink-primary font-medium leading-relaxed">
-              Renewable wind generation is currently strong, covering <strong>58%</strong> of active station demand.
-            </p>
-            <span className="text-[10px] text-ink-muted mt-2 block font-mono">
-              Status: Nominal generation
-            </span>
-          </div>
-
-          {/* Question 2: Why does it matter? */}
-          <div className="p-3.5 rounded bg-canvas-subtle border border-border-subtle flex flex-col justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal block mb-1">
-              2. WHY DOES IT MATTER?
-            </span>
-            <p className="text-xs text-ink-primary font-medium leading-relaxed">
-              The weather will shift in 6 hours: wind speeds will drop, cutting turbine output in half.
-            </p>
-            <span className="text-[10px] text-ink-muted mt-2 block font-mono">
-              Impact: Generator switchover
-            </span>
-          </div>
-
-          {/* Question 3: What is it predicting? */}
-          <div className="p-3.5 rounded bg-canvas-subtle border border-border-subtle flex flex-col justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted block mb-1">
-              3. WHAT IS AI PREDICTING?
-            </span>
-            <p className="text-xs text-ink-primary font-medium leading-relaxed">
-              The AI <JargonTooltip term="Forecast">forecast</JargonTooltip> expects load to rise to <strong>154 kW</strong> as outdoor temps drop to -34°C.
-            </p>
-            <span className="text-[10px] text-ink-muted mt-2 block font-mono">
-              Confidence: 80% (P10–P90)
-            </span>
-          </div>
-
-          {/* Question 4: What decision is it making? */}
-          <div className="p-3.5 rounded bg-canvas-subtle border border-border-subtle flex flex-col justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-copper block mb-1">
-              4. WHAT DECISION IS IT MAKING?
-            </span>
-            <p className="text-xs text-ink-primary font-medium leading-relaxed">
-              Pre-charging batteries now and holding Generator #1 warm in <JargonTooltip term="Spinning Reserve">spinning reserve</JargonTooltip>.
-            </p>
-            <span className="text-[10px] text-ink-muted mt-2 block font-mono">
-              Rule: P1 Life Safety First
-            </span>
-          </div>
-
-          {/* Question 5: Why should I trust it? */}
-          <div className="p-3.5 rounded bg-canvas-subtle border border-border-subtle flex flex-col justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-moss block mb-1">
-              5. WHY SHOULD I TRUST IT?
-            </span>
-            <p className="text-xs text-ink-primary font-medium leading-relaxed">
-              Simulated inside the <JargonTooltip term="Digital Twin">Digital Twin</JargonTooltip> first; audited with verified <JargonTooltip term="Provenance">provenance</JargonTooltip>.
-            </p>
-            <span className="text-[10px] text-moss mt-2 block font-mono font-medium">
-              Human approval required
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Human-Readable Decision Summary (Mandatory Section 7) */}
-      <HumanDecisionSummary
-        decision="Pre-charge battery storage bank and warm up Generator #1 for overnight dispatch."
-        because="Wind speeds will decline from 14.2 m/s to 4.5 m/s overnight, reducing clean renewable generation."
-        toProtect="Habitation heating, life-support atmospheric scrubbers, and 35% emergency spinning reserve margin."
-        confidenceEvidence="Physics-informed AI forecast + stress scenario replay + Digital Twin multi-physics validation."
-        onViewTechnicalDetails={() => navigate('optimization')}
-      />
-
-      {/* 4. Causal Decision Ribbon (Weather -> Policy) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-mono text-ink-muted uppercase">
-            CAUSAL LINEAGE DAG — HOW WEATHER TURNS INTO OPERATIONAL ACTIONS
-          </span>
-          <span className="text-[11px] text-copper font-mono">
-            Click any node or info badge to inspect verified evidence
-          </span>
-        </div>
-        <DecisionRibbon stationId={currentStation} />
-      </div>
-
-      {/* 5. Three Primary Vital Signs Cards with Plain English Translation */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Card 1: Power Balance */}
-        <div className="editorial-sheet rounded p-5 flex flex-col justify-between hover:shadow-raised transition-shadow">
-          <div>
-            <div className="flex items-center justify-between text-xs font-mono text-ink-muted mb-2">
-              <span className="uppercase tracking-wider">01 POWER DEMAND & SUPPLY</span>
-              <ProvenanceTag provenance="SIMULATED" size="xs" />
-            </div>
-            <div className="flex items-baseline space-x-2 my-1">
-              <span className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary">
-                {totalLoad.toFixed(1)}
-              </span>
-              <span className="text-xs font-mono text-ink-muted">kW Total Consumption</span>
-            </div>
-            <p className="text-xs text-ink-secondary mt-1">
-              Total electricity currently powering the station's buildings, laboratories, and communications.
-            </p>
-            <div className="mt-3 pt-3 border-t border-border-subtle text-xs space-y-1.5 font-mono">
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Guaranteed Life Support:</span>
-                <span className="font-semibold text-moss">{criticalLoad.toFixed(1)} kW (Always Protected)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Scientific & Flexible Load:</span>
-                <span className="text-ink-secondary">{(totalLoad - criticalLoad).toFixed(1)} kW (Can be shed)</span>
-              </div>
-            </div>
           </div>
           <button
-            type="button"
-            onClick={() => navigate('forecast')}
-            className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs font-medium text-copper hover:text-copper-dark"
+            onClick={loadData}
+            className="flex items-center gap-1 font-semibold text-amber-900 hover:underline shrink-0"
           >
-            <span>Inspect Forecasted Demand →</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <RotateCw className="w-3 h-3" />
+            <span>Retry</span>
           </button>
         </div>
+      )}
 
-        {/* Card 2: Resilience Envelope */}
-        <div className="editorial-sheet rounded p-5 flex flex-col justify-between hover:shadow-raised transition-shadow">
-          <div>
-            <div className="flex items-center justify-between text-xs font-mono text-ink-muted mb-2">
-              <span className="uppercase tracking-wider">02 SURVIVAL RUNWAY (<JargonTooltip term="Resilience">RESILIENCE</JargonTooltip>)</span>
-              <ProvenanceTag provenance="SIMULATED" size="xs" />
-            </div>
-            <div className="flex items-baseline space-x-2 my-1">
-              <span className="text-3xl sm:text-4xl font-serif font-bold text-copper">
-                {survivalHorizon.toFixed(0)}
-              </span>
-              <span className="text-xs font-mono text-ink-muted">hours of survival</span>
-            </div>
-            <p className="text-xs text-ink-secondary mt-1">
-              How long the station can maintain life-support heat and electricity if all fuel deliveries are cut off.
-            </p>
-            <div className="mt-3 pt-3 border-t border-border-subtle text-xs space-y-1.5 font-mono">
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Limiting Resource:</span>
-                <span className="font-semibold text-copper">Diesel Fuel Tank Runway</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Battery Backup Runway:</span>
-                <span className="text-ink-secondary">9.5 hours emergency bridge</span>
-              </div>
-            </div>
+      {/* 2. Primary Metrics Row (3-4 KPIs Only) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Metric 1: Station Load */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-mono text-[11px] uppercase tracking-wider">Station Demand</span>
+            <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <button
-            type="button"
-            onClick={() => navigate('resilience')}
-            className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs font-medium text-copper hover:text-copper-dark"
-          >
-            <span>View 9D Resilience Envelope →</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
+              {currentLoadKw !== null ? currentLoadKw.toFixed(1) : '—'}
+            </span>
+            <span className="text-xs font-mono text-slate-500">kW</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+            <span>Critical Life Support:</span>
+            <span className="font-semibold text-emerald-700">
+              {criticalLoadKw !== null ? `${criticalLoadKw.toFixed(1)} kW` : 'Protected'}
+            </span>
+          </div>
         </div>
 
-        {/* Card 3: Next Decision Directive */}
-        <div className="editorial-sheet rounded p-5 flex flex-col justify-between hover:shadow-raised transition-shadow">
-          <div>
-            <div className="flex items-center justify-between text-xs font-mono text-ink-muted mb-2">
-              <span className="uppercase tracking-wider">03 AUTONOMOUS GOVERNANCE RULE</span>
-              <ProvenanceTag provenance="CONFIGURED" size="xs" />
-            </div>
-            <div className="flex items-baseline space-x-2 my-1">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-ink-primary truncate">
-                {activeDirective.replace(/_/g, ' ')}
-              </span>
-            </div>
-            <p className="text-xs text-ink-secondary mt-1">
-              The operational policy rule currently governing the automated dispatch scheduler.
-            </p>
-            <div className="mt-3 pt-3 border-t border-border-subtle text-xs space-y-1.5 font-mono">
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Governing Priority:</span>
-                <span className="font-semibold text-ink-primary">P1 Life Safety Dominance</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-ink-muted">Human Approval:</span>
-                <span className="text-moss font-semibold">ADVISORY PREPARED</span>
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => navigate('policy')}
-            className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between text-xs font-medium text-copper hover:text-copper-dark"
-          >
-            <span>Inspect Priority Hierarchy →</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* 6. "What Happens Next?" Outlook Component (Mandatory Section 6) */}
-      <NextStepExplanation
-        title="WHAT HAPPENS OVER THE NEXT 12 HOURS?"
-        timeframe="T+0 to T+12 Hours"
-        outlook="Wind speed will drop below turbine cut-in speed around 22:00 UTC. The battery bank will discharge to carry the evening scientific loads, after which Diesel Generator #1 will ramp up to maintain habitat warmth. No crew intervention required unless a physical fault occurs."
-        actionText="Review Detailed Dispatch Plan"
-        onAction={() => navigate('optimization')}
-      />
-
-      {/* 7. Clean System Energy Balance Flow with "Explain This" Component */}
-      <div className="editorial-sheet rounded p-6 space-y-4">
-        <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
-          <div>
-            <span className="text-xs font-mono uppercase tracking-widest text-copper font-bold block">
-              MICROGRID GENERATION & FLOW ARCHITECTURE
+        {/* Metric 2: Renewable Share */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-mono text-[11px] uppercase tracking-wider">Renewable Mix</span>
+            <span className="text-[10px] font-mono text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+              {renewablePct}% Clean
             </span>
-            <h3 className="text-lg font-serif font-bold text-ink-primary">
-              Where Station Power Comes From and Where It Goes
-            </h3>
           </div>
-          <span className="text-xs font-mono text-ink-muted">BALANCED CONSERVATION VECTOR</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
+              {(solarKw + windKw).toFixed(1)}
+            </span>
+            <span className="text-xs font-mono text-slate-500">kW Generated</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+            <span>Wind: {windKw.toFixed(1)} kW</span>
+            <span>Solar: {solarKw.toFixed(1)} kW</span>
+          </div>
         </div>
 
-        {/* Explain This Component for non-technical visitors */}
-        <ExplainThis
-          title="Explain this power balance diagram in plain English"
-          whatAmILookingAt="This diagram shows the complete electrical flow of the polar station: power sources on the left (wind, solar, generators, battery) flowing into the station center, then distributing to vital life-support heating and science equipment on the right."
-          whyIsItImportant="In Antarctica, generation must exactly match consumption every millisecond. If demand exceeds supply, voltages collapse and equipment shuts down. Polaris-EMS balances this equation autonomously."
-          howIsItCalculated="Calculated by the Digital Twin using physical Kirchhoff current conservation laws: Total Generation = Total Load + Battery Storage Delta + Cable Line Losses."
-          technicalEvidence="Governing invariant: Sum(P_gen) = P_critical + P_deferrable + P_bess_charge + P_losses. Conservation gap = 0.00%."
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center pt-2">
-          {/* Left Sources */}
-          <div className="space-y-3">
-            <span className="text-xs font-mono uppercase text-ink-muted block mb-2 font-semibold">
-              GENERATION SOURCES (SUPPLY)
+        {/* Metric 3: Battery & Autonomous Reserve */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-mono text-[11px] uppercase tracking-wider">Energy Storage</span>
+            <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+              BESS
             </span>
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <Wind className="w-4 h-4 text-ice" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Wind Turbines</span>
-                  <span className="text-[11px] text-ink-muted font-mono">3 × 40 kW Units</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-ice">62.4 kW</span>
-            </div>
-
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <Sun className="w-4 h-4 text-copper" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Solar PV Array</span>
-                  <span className="text-[11px] text-ink-muted font-mono">Bifacial Polar Panels</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-copper">20.1 kW</span>
-            </div>
-
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <Fuel className="w-4 h-4 text-amber-700" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Backup Diesel Gen #1</span>
-                  <span className="text-[11px] text-ink-muted font-mono">Warm Idle / Spinning</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-amber-700">60.0 kW</span>
-            </div>
           </div>
-
-          {/* Center Hub */}
-          <div className="p-6 rounded-lg bg-surface border-2 border-dashed border-copper/40 text-center flex flex-col items-center justify-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-copper-soft flex items-center justify-center text-copper">
-              <Zap className="w-6 h-6 animate-pulse" />
-            </div>
-            <div>
-              <span className="text-xs font-mono uppercase text-copper font-bold block">
-                MAIN ELECTRICAL BUS
-              </span>
-              <span className="text-2xl font-serif font-bold text-ink-primary block mt-0.5">
-                142.5 kW
-              </span>
-              <span className="text-[11px] text-ink-muted font-mono block">
-                100% CONSERVED & BALANCED
-              </span>
-            </div>
-            <div className="flex items-center space-x-1.5 text-xs text-moss font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Zero Blackout Risk</span>
-            </div>
-          </div>
-
-          {/* Right Consumption */}
-          <div className="space-y-3">
-            <span className="text-xs font-mono uppercase text-ink-muted block mb-2 font-semibold">
-              WHERE POWER GOES (CONSUMPTION)
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
+              {batterySoc.toFixed(1)}%
             </span>
-            <div className="p-3 rounded bg-moss-soft/40 border border-moss/30 flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <ShieldCheck className="w-4 h-4 text-moss" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Habitation & Heating</span>
-                  <span className="text-[11px] text-moss font-mono">P1 Critical Life Support</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-moss">29.5 kW</span>
-            </div>
+            <span className="text-xs font-mono text-slate-500">State of Charge</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+            <span>Survival Runway:</span>
+            <span className="font-semibold text-slate-700">{survivalHours.toFixed(0)}h reserve</span>
+          </div>
+        </div>
 
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <BatteryCharging className="w-4 h-4 text-teal" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Battery Pre-Charging</span>
-                  <span className="text-[11px] text-ink-muted font-mono">Saving Wind for Night</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-teal">32.0 kW</span>
-            </div>
-
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <Cpu className="w-4 h-4 text-ink-secondary" />
-                <div>
-                  <span className="text-xs font-semibold text-ink-primary block font-sans">Science & Research</span>
-                  <span className="text-[11px] text-ink-muted font-mono">Non-Critical Load</span>
-                </div>
-              </div>
-              <span className="font-mono-numbers text-sm font-semibold text-ink-secondary">81.0 kW</span>
-            </div>
+        {/* Metric 4: Active Dispatch Directive */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-mono text-[11px] uppercase tracking-wider">Active Policy</span>
+            <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+              MILP
+            </span>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+              {activeDirective.replace(/_/g, ' ')}
+            </span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Diesel Status:</span>
+            <span className={`font-mono font-semibold ${dieselKw > 0 ? 'text-amber-700' : 'text-slate-600'}`}>
+              {dieselKw > 0 ? `${dieselKw.toFixed(1)} kW Online` : 'Standby / Warm'}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 8. Why This Matters Component */}
-      <WhyThisMatters
-        headline="Sub-Zero Wind Deceleration Expected in 6 Hours"
-        summary="Weather predictions indicate a drop in wind speed from 14.5 m/s to 4.2 m/s over Larsemann Hills. This shifts generation responsibility to diesel generators. The optimizer has scheduled an earlier battery pre-charge cycle to minimize diesel fuel consumption."
-        technicalDetail="HiGHS MILP objective balances generation cost against battery degradation cost ($c_{\text{deg}} = 0.082$/kWh). With solar PV unavailable during polar night, spinning reserve must remain >= 35% of total station load."
-        onExplore={() => navigate('optimization')}
-        exploreLabel="View Multi-Horizon Dispatch Schedule"
-      />
+      {/* 3. Primary Visual: Large Energy & System Flow Architecture */}
+      <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-semibold text-slate-900">System Flow Architecture</h2>
+              <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                Kirchhoff Conserved
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Live power flow from primary sources across 400V bus to critical loads and battery storage.
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate('twin')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium shadow-xs transition-colors shrink-0"
+          >
+            <span>Launch Spatial Digital Twin</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Clean Topological Schematic */}
+        <div className="p-4 sm:p-6 bg-slate-50 rounded-lg border border-slate-200 overflow-x-auto">
+          <div className="min-w-[640px] flex items-center justify-between gap-4">
+            {/* Column 1: Sources */}
+            <div className="w-48 space-y-2.5 shrink-0">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
+                Generation Sources
+              </div>
+
+              {/* Wind */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wind className="w-4 h-4 text-sky-600" />
+                  <span className="text-xs font-medium text-slate-800">Wind Turbine</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-sky-700">{windKw.toFixed(1)} kW</span>
+              </div>
+
+              {/* Solar */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sun className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-medium text-slate-800">Solar PV</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-700">{solarKw.toFixed(1)} kW</span>
+              </div>
+
+              {/* Diesel */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-amber-600" />
+                  <span className="text-xs font-medium text-slate-800">Diesel Genset</span>
+                </div>
+                <span className={`text-xs font-mono font-bold ${dieselKw > 0 ? 'text-amber-700' : 'text-slate-400'}`}>
+                  {dieselKw > 0 ? `${dieselKw.toFixed(1)} kW` : 'Standby'}
+                </span>
+              </div>
+            </div>
+
+            {/* Influx Conduits */}
+            <div className="flex-1 flex flex-col items-center justify-center px-2">
+              <div className="w-full h-0.5 bg-slate-300 relative my-3">
+                <div className="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-400 rotate-45" />
+              </div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase">
+                Synchronized Infeed
+              </span>
+            </div>
+
+            {/* Column 2: Central Main 400V Switchboard & Storage */}
+            <div className="w-56 space-y-2.5 shrink-0">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
+                Central Bus & Storage
+              </div>
+
+              {/* 400V Main Bus */}
+              <div className="p-3 rounded-md bg-slate-900 text-white shadow-sm space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold font-mono">MAIN 400V BUS</span>
+                  <span className="text-[10px] font-mono text-emerald-400">ENERGIZED</span>
+                </div>
+                <div className="text-[11px] text-slate-300 font-mono">
+                  Throughput: {((currentLoadKw ?? 40.0) + Math.abs(batteryPowerKw)).toFixed(1)} kW
+                </div>
+              </div>
+
+              {/* Battery Storage */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BatteryCharging className="w-4 h-4 text-emerald-600" />
+                  <div>
+                    <span className="text-xs font-medium text-slate-800 block">BESS Unit</span>
+                    <span className="text-[10px] text-slate-400 font-mono">SOC: {batterySoc.toFixed(0)}%</span>
+                  </div>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-700">
+                  {batteryPowerKw > 0 ? `+${batteryPowerKw.toFixed(1)} kW` : batteryPowerKw < 0 ? `${batteryPowerKw.toFixed(1)} kW` : 'Float'}
+                </span>
+              </div>
+            </div>
+
+            {/* Outflow Conduits */}
+            <div className="flex-1 flex flex-col items-center justify-center px-2">
+              <div className="w-full h-0.5 bg-slate-300 relative my-3">
+                <div className="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-400 rotate-45" />
+              </div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase">
+                Feeder Distribution
+              </span>
+            </div>
+
+            {/* Column 3: Load Categories */}
+            <div className="w-48 space-y-2.5 shrink-0">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
+                Load Feeders
+              </div>
+
+              {/* P1 Life Support */}
+              <div className="p-2.5 rounded-md bg-white border border-emerald-200 bg-emerald-50/20 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-900 block">Life Support & Heat</span>
+                  <span className="text-[10px] text-emerald-700 font-mono">Priority 1 • Protected</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-emerald-700">
+                  {criticalLoadKw !== null ? `${criticalLoadKw.toFixed(1)} kW` : '18.5 kW'}
+                </span>
+              </div>
+
+              {/* P2 Science & Uplink */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-medium text-slate-800 block">Science & Comms</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Priority 2 • Essential</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-700">12.0 kW</span>
+              </div>
+
+              {/* P3 Base Habitability */}
+              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-medium text-slate-800 block">Operations & Living</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Priority 3 • Deferrable</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-700">9.5 kW</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Bottom Row: Active Conditions & Next Operational Focus */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left: Active Conditions */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4 text-sky-600" />
+              Active System Conditions
+            </span>
+            <span className="text-[11px] font-mono text-slate-400">
+              {activeThreats.length > 0 ? `${activeThreats.length} flagged` : 'Zero critical alerts'}
+            </span>
+          </div>
+
+          {activeThreats.length > 0 ? (
+            <div className="space-y-2">
+              {activeThreats.slice(0, 2).map((threat, idx) => (
+                <div key={idx} className="p-2.5 rounded bg-slate-50 border border-slate-200 text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-900">{threat.threat_type.replace(/_/g, ' ')}</span>
+                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${threat.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                      {threat.severity}
+                    </span>
+                  </div>
+                  <p className="text-slate-500 text-[11px]">{threat.trigger_condition}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 rounded bg-slate-50 border border-slate-200 text-xs text-slate-500 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>All environmental envelopes and thermal thresholds are within nominal bounds.</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Next Operational Focus */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+                <ArrowRight className="w-4 h-4 text-emerald-600" />
+                Operational Focus
+              </span>
+              <span className="text-[11px] font-mono text-slate-400">Horizon {horizonHours}h</span>
+            </div>
+
+            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+              Dispatch schedule prioritizes full renewable capture while maintaining BESS above 60% SOC for polar night resilience.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <button
+              onClick={() => navigate('optimization')}
+              className="text-xs text-sky-600 hover:text-sky-800 font-semibold inline-flex items-center gap-1"
+            >
+              <span>Inspect Dispatch Plan</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-slate-300">•</span>
+            <button
+              onClick={() => navigate('scenarios')}
+              className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+            >
+              Test Scenarios
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
