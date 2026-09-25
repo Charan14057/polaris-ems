@@ -16,6 +16,7 @@ from backend.api.routes.traces import router as traces_router
 from backend.api.routes.validation import router as validation_router
 from backend.api.routes.integrations import router as integrations_router
 from backend.api.routes.observability import router as observability_router
+from backend.api.routes.twin import router as twin_router
 
 __all__ = [
     "health_router",
@@ -31,4 +32,5 @@ __all__ = [
     "validation_router",
     "integrations_router",
     "observability_router",
+    "twin_router",
 ]

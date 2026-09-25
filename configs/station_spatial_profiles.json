@@ -1,0 +1,633 @@
+{
+  "BHARATI": {
+    "stationId": "BHARATI",
+    "version": "1.0",
+    "layoutStatus": "REPRESENTATIVE",
+    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "width": 1000,
+    "height": 640,
+    "zones": [
+      {
+        "id": "z_generation",
+        "name": "Power & Generation Bay",
+        "label": "ZONE 01 • POWER GENERATION & STORAGE",
+        "category": "POWER",
+        "bounds": { "x": 40, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_operations",
+        "name": "Mission Operations & Comms",
+        "label": "ZONE 02 • OPERATIONS & COMMUNICATIONS",
+        "category": "OPERATIONS",
+        "bounds": { "x": 360, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_science",
+        "name": "Science & Research Labs",
+        "label": "ZONE 03 • ENVIRONMENTAL SCIENCE LABS",
+        "category": "SCIENCE",
+        "bounds": { "x": 680, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_utilities",
+        "name": "Life Support & Water Utilities",
+        "label": "ZONE 04 • LIFE SUPPORT & WATER PLANT",
+        "category": "MECHANICAL",
+        "bounds": { "x": 40, "y": 300, "width": 280, "height": 290 }
+      },
+      {
+        "id": "z_habitation",
+        "name": "Habitation & Living Quarters",
+        "label": "ZONE 05 • LIVING QUARTERS & GALLEY",
+        "category": "HABITATION",
+        "bounds": { "x": 360, "y": 300, "width": 280, "height": 290 }
+      },
+      {
+        "id": "z_workshop",
+        "name": "Expedition Workshop & Charging",
+        "label": "ZONE 06 • MAINTENANCE & VEHICLE BAY",
+        "category": "STORAGE",
+        "bounds": { "x": 680, "y": 300, "width": 280, "height": 290 }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "node_solar",
+        "kind": "SOURCE",
+        "label": "Solar PV (30 kWp)",
+        "zoneId": "z_generation",
+        "position": { "x": 100, "y": 90 },
+        "iconKey": "Sun",
+        "selectable": true
+      },
+      {
+        "id": "node_wind",
+        "kind": "SOURCE",
+        "label": "Wind Turbines (25 kW)",
+        "zoneId": "z_generation",
+        "position": { "x": 220, "y": 90 },
+        "iconKey": "Wind",
+        "selectable": true
+      },
+      {
+        "id": "node_diesel",
+        "kind": "SOURCE",
+        "label": "Diesel Gensets (3x80 kW)",
+        "zoneId": "z_generation",
+        "position": { "x": 100, "y": 190 },
+        "iconKey": "Fuel",
+        "selectable": true
+      },
+      {
+        "id": "node_battery",
+        "kind": "STORAGE",
+        "label": "BESS Bank (120 kWh)",
+        "zoneId": "z_generation",
+        "position": { "x": 220, "y": 190 },
+        "iconKey": "Battery",
+        "selectable": true
+      },
+      {
+        "id": "node_main_bus",
+        "kind": "BUS",
+        "label": "Main 400V AC Switchboard",
+        "position": { "x": 320, "y": 270 },
+        "iconKey": "Zap",
+        "selectable": true
+      },
+      {
+        "id": "node_sub_util",
+        "kind": "BUS",
+        "label": "DB-1 Utilities Panel",
+        "zoneId": "z_utilities",
+        "position": { "x": 180, "y": 350 },
+        "iconKey": "Grid",
+        "selectable": false
+      },
+      {
+        "id": "node_sub_hab",
+        "kind": "BUS",
+        "label": "DB-2 Habitation Panel",
+        "zoneId": "z_habitation",
+        "position": { "x": 500, "y": 350 },
+        "iconKey": "Grid",
+        "selectable": false
+      },
+      {
+        "id": "node_sub_ops",
+        "kind": "BUS",
+        "label": "DB-3 Operations Panel",
+        "zoneId": "z_operations",
+        "position": { "x": 500, "y": 100 },
+        "iconKey": "Grid",
+        "selectable": false
+      },
+      {
+        "id": "node_sub_sci",
+        "kind": "BUS",
+        "label": "DB-4 Science Panel",
+        "zoneId": "z_science",
+        "position": { "x": 820, "y": 100 },
+        "iconKey": "Grid",
+        "selectable": false
+      },
+      {
+        "id": "node_sub_work",
+        "kind": "BUS",
+        "label": "DB-5 Workshop Panel",
+        "zoneId": "z_workshop",
+        "position": { "x": 820, "y": 350 },
+        "iconKey": "Grid",
+        "selectable": false
+      },
+      {
+        "id": "node_bh_life_support",
+        "kind": "DEVICE",
+        "label": "Life Support & HVAC",
+        "zoneId": "z_utilities",
+        "deviceId": "bh_life_support",
+        "circuitId": "c_bh_life_support",
+        "position": { "x": 100, "y": 420 },
+        "iconKey": "Activity",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_water_freeze_prot",
+        "kind": "DEVICE",
+        "label": "Water Freeze Prot.",
+        "zoneId": "z_utilities",
+        "deviceId": "bh_water_freeze_prot",
+        "circuitId": "c_bh_water_freeze_prot",
+        "position": { "x": 220, "y": 420 },
+        "iconKey": "Droplets",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_snow_melter",
+        "kind": "DEVICE",
+        "label": "Bulk Snow Melter Tank",
+        "zoneId": "z_utilities",
+        "deviceId": "bh_snow_melter",
+        "circuitId": "c_bh_snow_melter",
+        "position": { "x": 160, "y": 510 },
+        "iconKey": "Flame",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_satcom_net",
+        "kind": "DEVICE",
+        "label": "Satcom & Comms",
+        "zoneId": "z_operations",
+        "deviceId": "bh_satcom_net",
+        "circuitId": "c_bh_satcom_net",
+        "position": { "x": 420, "y": 170 },
+        "iconKey": "Radio",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_data_servers",
+        "kind": "DEVICE",
+        "label": "Data & Compute Servers",
+        "zoneId": "z_operations",
+        "deviceId": "bh_data_servers",
+        "circuitId": "c_bh_data_servers",
+        "position": { "x": 560, "y": 170 },
+        "iconKey": "Server",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_residential_light",
+        "kind": "DEVICE",
+        "label": "Living Quarters Light",
+        "zoneId": "z_habitation",
+        "deviceId": "bh_residential_light",
+        "circuitId": "c_bh_residential_light",
+        "position": { "x": 420, "y": 440 },
+        "iconKey": "Lightbulb",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_galley_storage",
+        "kind": "DEVICE",
+        "label": "Galley & Cold Storage",
+        "zoneId": "z_habitation",
+        "deviceId": "bh_galley_storage",
+        "circuitId": "c_bh_galley_storage",
+        "position": { "x": 560, "y": 440 },
+        "iconKey": "Refrigerator",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_science_lab",
+        "kind": "DEVICE",
+        "label": "Core Science Lab",
+        "zoneId": "z_science",
+        "deviceId": "bh_science_lab",
+        "circuitId": "c_bh_science_lab",
+        "position": { "x": 740, "y": 170 },
+        "iconKey": "Microscope",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_waste_management",
+        "kind": "DEVICE",
+        "label": "Waste Treatment Aux",
+        "zoneId": "z_science",
+        "deviceId": "bh_waste_management",
+        "circuitId": "c_bh_waste_management",
+        "position": { "x": 860, "y": 170 },
+        "iconKey": "Trash",
+        "selectable": true
+      },
+      {
+        "id": "node_bh_workshop_ev",
+        "kind": "DEVICE",
+        "label": "Vehicle / EV Charging",
+        "zoneId": "z_workshop",
+        "deviceId": "bh_workshop_ev",
+        "circuitId": "c_bh_workshop_ev",
+        "position": { "x": 820, "y": 460 },
+        "iconKey": "BatteryCharging",
+        "selectable": true
+      }
+    ],
+    "edges": [
+      {
+        "id": "e_solar_bus",
+        "fromNodeId": "node_solar",
+        "toNodeId": "node_main_bus",
+        "circuitId": "c_gen_solar",
+        "geometry": { "type": "polyline", "points": [{ "x": 100, "y": 90 }, { "x": 260, "y": 90 }, { "x": 260, "y": 270 }, { "x": 320, "y": 270 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_wind_bus",
+        "fromNodeId": "node_wind",
+        "toNodeId": "node_main_bus",
+        "circuitId": "c_gen_wind",
+        "geometry": { "type": "polyline", "points": [{ "x": 220, "y": 90 }, { "x": 260, "y": 90 }, { "x": 260, "y": 270 }, { "x": 320, "y": 270 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_diesel_bus",
+        "fromNodeId": "node_diesel",
+        "toNodeId": "node_main_bus",
+        "circuitId": "c_gen_diesel",
+        "geometry": { "type": "polyline", "points": [{ "x": 100, "y": 190 }, { "x": 280, "y": 190 }, { "x": 280, "y": 270 }, { "x": 320, "y": 270 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": false
+      },
+      {
+        "id": "e_battery_bus",
+        "fromNodeId": "node_battery",
+        "toNodeId": "node_main_bus",
+        "circuitId": "c_gen_bess",
+        "geometry": { "type": "polyline", "points": [{ "x": 220, "y": 190 }, { "x": 280, "y": 190 }, { "x": 280, "y": 270 }, { "x": 320, "y": 270 }] },
+        "direction": "NONE",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": false
+      },
+      {
+        "id": "e_bus_sub_util",
+        "fromNodeId": "node_main_bus",
+        "toNodeId": "node_sub_util",
+        "circuitId": "c_feeder_util",
+        "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 200, "y": 270 }, { "x": 200, "y": 350 }, { "x": 180, "y": 350 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_bus_sub_hab",
+        "fromNodeId": "node_main_bus",
+        "toNodeId": "node_sub_hab",
+        "circuitId": "c_feeder_hab",
+        "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 420, "y": 270 }, { "x": 420, "y": 350 }, { "x": 500, "y": 350 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_bus_sub_ops",
+        "fromNodeId": "node_main_bus",
+        "toNodeId": "node_sub_ops",
+        "circuitId": "c_feeder_ops",
+        "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 400, "y": 270 }, { "x": 400, "y": 100 }, { "x": 500, "y": 100 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_bus_sub_sci",
+        "fromNodeId": "node_main_bus",
+        "toNodeId": "node_sub_sci",
+        "circuitId": "c_feeder_sci",
+        "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 660, "y": 270 }, { "x": 660, "y": 100 }, { "x": 820, "y": 100 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_bus_sub_work",
+        "fromNodeId": "node_main_bus",
+        "toNodeId": "node_sub_work",
+        "circuitId": "c_feeder_work",
+        "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 660, "y": 270 }, { "x": 660, "y": 350 }, { "x": 820, "y": 350 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_util_life_support",
+        "fromNodeId": "node_sub_util",
+        "toNodeId": "node_bh_life_support",
+        "circuitId": "c_bh_life_support",
+        "geometry": { "type": "polyline", "points": [{ "x": 180, "y": 350 }, { "x": 100, "y": 350 }, { "x": 100, "y": 420 }] },
+        "direction": "FORWARD",
+        "powerKw": 18.5,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_util_water_freeze",
+        "fromNodeId": "node_sub_util",
+        "toNodeId": "node_bh_water_freeze_prot",
+        "circuitId": "c_bh_water_freeze_prot",
+        "geometry": { "type": "polyline", "points": [{ "x": 180, "y": 350 }, { "x": 220, "y": 350 }, { "x": 220, "y": 420 }] },
+        "direction": "FORWARD",
+        "powerKw": 6.8,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_util_snow_melt",
+        "fromNodeId": "node_sub_util",
+        "toNodeId": "node_bh_snow_melter",
+        "circuitId": "c_bh_snow_melter",
+        "geometry": { "type": "polyline", "points": [{ "x": 180, "y": 350 }, { "x": 180, "y": 470 }, { "x": 160, "y": 470 }, { "x": 160, "y": 510 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": false
+      },
+      {
+        "id": "e_ops_satcom",
+        "fromNodeId": "node_sub_ops",
+        "toNodeId": "node_bh_satcom_net",
+        "circuitId": "c_bh_satcom_net",
+        "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 100 }, { "x": 420, "y": 100 }, { "x": 420, "y": 170 }] },
+        "direction": "FORWARD",
+        "powerKw": 4.2,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_ops_servers",
+        "fromNodeId": "node_sub_ops",
+        "toNodeId": "node_bh_data_servers",
+        "circuitId": "c_bh_data_servers",
+        "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 100 }, { "x": 560, "y": 100 }, { "x": 560, "y": 170 }] },
+        "direction": "FORWARD",
+        "powerKw": 5.3,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_hab_light",
+        "fromNodeId": "node_sub_hab",
+        "toNodeId": "node_bh_residential_light",
+        "circuitId": "c_bh_residential_light",
+        "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 350 }, { "x": 420, "y": 350 }, { "x": 420, "y": 440 }] },
+        "direction": "FORWARD",
+        "powerKw": 5.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_hab_galley",
+        "fromNodeId": "node_sub_hab",
+        "toNodeId": "node_bh_galley_storage",
+        "circuitId": "c_bh_galley_storage",
+        "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 350 }, { "x": 560, "y": 350 }, { "x": 560, "y": 440 }] },
+        "direction": "FORWARD",
+        "powerKw": 6.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_sci_lab",
+        "fromNodeId": "node_sub_sci",
+        "toNodeId": "node_bh_science_lab",
+        "circuitId": "c_bh_science_lab",
+        "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 100 }, { "x": 740, "y": 100 }, { "x": 740, "y": 170 }] },
+        "direction": "FORWARD",
+        "powerKw": 7.5,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_sci_waste",
+        "fromNodeId": "node_sub_sci",
+        "toNodeId": "node_bh_waste_management",
+        "circuitId": "c_bh_waste_management",
+        "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 100 }, { "x": 860, "y": 100 }, { "x": 860, "y": 170 }] },
+        "direction": "FORWARD",
+        "powerKw": 3.8,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": true
+      },
+      {
+        "id": "e_work_ev",
+        "fromNodeId": "node_sub_work",
+        "toNodeId": "node_bh_workshop_ev",
+        "circuitId": "c_bh_workshop_ev",
+        "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 350 }, { "x": 820, "y": 460 }] },
+        "direction": "FORWARD",
+        "powerKw": 0.0,
+        "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 },
+        "active": false
+      }
+    ]
+  },
+  "MAITRI": {
+    "stationId": "MAITRI",
+    "version": "1.0",
+    "layoutStatus": "REPRESENTATIVE",
+    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "width": 1000,
+    "height": 640,
+    "zones": [
+      {
+        "id": "z_mt_gen",
+        "name": "Power House & Fuel Vault",
+        "label": "ZONE 01 • DIESEL POWER HOUSE & FUEL",
+        "category": "POWER",
+        "bounds": { "x": 40, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_mt_comms",
+        "name": "Comms & Weather Station",
+        "label": "ZONE 02 • COMMUNICATIONS & AWS METEOROLOGY",
+        "category": "OPERATIONS",
+        "bounds": { "x": 360, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_mt_sci",
+        "name": "Geomagnetism Observatory",
+        "label": "ZONE 03 • GEOMAGNETIC & SEISMIC LAB",
+        "category": "SCIENCE",
+        "bounds": { "x": 680, "y": 40, "width": 280, "height": 220 }
+      },
+      {
+        "id": "z_mt_thermal",
+        "name": "Central Boiler & Heating Loop",
+        "label": "ZONE 04 • PRIMARY HEATING & BOILER AUX",
+        "category": "MECHANICAL",
+        "bounds": { "x": 40, "y": 300, "width": 280, "height": 290 }
+      },
+      {
+        "id": "z_mt_hab",
+        "name": "Living Block & Galley",
+        "label": "ZONE 05 • CREW LIVING BLOCK & GALLEY",
+        "category": "HABITATION",
+        "bounds": { "x": 360, "y": 300, "width": 280, "height": 290 }
+      },
+      {
+        "id": "z_mt_water",
+        "name": "Priyadarshini Lake Water Plant",
+        "label": "ZONE 06 • LAKE WATER PUMP & SNOW MELT",
+        "category": "STORAGE",
+        "bounds": { "x": 680, "y": 300, "width": 280, "height": 290 }
+      }
+    ],
+    "nodes": [
+      { "id": "node_mt_solar", "kind": "SOURCE", "label": "Solar PV (18 kWp)", "zoneId": "z_mt_gen", "position": { "x": 100, "y": 90 }, "iconKey": "Sun", "selectable": true },
+      { "id": "node_mt_wind", "kind": "SOURCE", "label": "Wind Turbine (15 kW)", "zoneId": "z_mt_gen", "position": { "x": 220, "y": 90 }, "iconKey": "Wind", "selectable": true },
+      { "id": "node_mt_diesel", "kind": "SOURCE", "label": "Diesel Gensets (3x62.5 kW)", "zoneId": "z_mt_gen", "position": { "x": 100, "y": 190 }, "iconKey": "Fuel", "selectable": true },
+      { "id": "node_mt_battery", "kind": "STORAGE", "label": "BESS Bank (90 kWh)", "zoneId": "z_mt_gen", "position": { "x": 220, "y": 190 }, "iconKey": "Battery", "selectable": true },
+      { "id": "node_mt_main_bus", "kind": "BUS", "label": "Maitri Main 400V Switchboard", "position": { "x": 320, "y": 270 }, "iconKey": "Zap", "selectable": true },
+      { "id": "node_mt_sub_heat", "kind": "BUS", "label": "DB-1 Heating Sub-panel", "zoneId": "z_mt_thermal", "position": { "x": 180, "y": 350 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_mt_sub_comms", "kind": "BUS", "label": "DB-2 Comms Sub-panel", "zoneId": "z_mt_comms", "position": { "x": 500, "y": 100 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_mt_sub_sci", "kind": "BUS", "label": "DB-3 Science Sub-panel", "zoneId": "z_mt_sci", "position": { "x": 820, "y": 100 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_mt_sub_hab", "kind": "BUS", "label": "DB-4 Living Block Panel", "zoneId": "z_mt_hab", "position": { "x": 500, "y": 350 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_mt_sub_water", "kind": "BUS", "label": "DB-5 Water Plant Panel", "zoneId": "z_mt_water", "position": { "x": 820, "y": 350 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_mt_heating_primary", "kind": "DEVICE", "label": "Main Heating Loop", "zoneId": "z_mt_thermal", "deviceId": "mt_heating_primary", "circuitId": "c_mt_heating_primary", "position": { "x": 100, "y": 420 }, "iconKey": "Flame", "selectable": true },
+      { "id": "node_mt_boiler_aux", "kind": "DEVICE", "label": "Boiler Aux Pumps", "zoneId": "z_mt_thermal", "deviceId": "mt_boiler_aux", "circuitId": "c_mt_boiler_aux", "position": { "x": 220, "y": 420 }, "iconKey": "Activity", "selectable": true },
+      { "id": "node_mt_hf_comms", "kind": "DEVICE", "label": "HF/VHF & Sat Comms", "zoneId": "z_mt_comms", "deviceId": "mt_hf_comms", "circuitId": "c_mt_hf_comms", "position": { "x": 420, "y": 170 }, "iconKey": "Radio", "selectable": true },
+      { "id": "node_mt_meteorology_server", "kind": "DEVICE", "label": "AWS Met Logging", "zoneId": "z_mt_comms", "deviceId": "mt_meteorology_server", "circuitId": "c_mt_meteorology_server", "position": { "x": 560, "y": 170 }, "iconKey": "Server", "selectable": true },
+      { "id": "node_mt_geomag_lab", "kind": "DEVICE", "label": "Geomag Observatory", "zoneId": "z_mt_sci", "deviceId": "mt_geomag_lab", "circuitId": "c_mt_geomag_lab", "position": { "x": 820, "y": 170 }, "iconKey": "Compass", "selectable": true },
+      { "id": "node_mt_galley_kitchen", "kind": "DEVICE", "label": "Living Block Utilities", "zoneId": "z_mt_hab", "deviceId": "mt_galley_kitchen", "circuitId": "c_mt_galley_kitchen", "position": { "x": 500, "y": 440 }, "iconKey": "Refrigerator", "selectable": true },
+      { "id": "node_mt_pribarshini_water", "kind": "DEVICE", "label": "Priyadarshini Lake Pump", "zoneId": "z_mt_water", "deviceId": "mt_pribarshini_water", "circuitId": "c_mt_pribarshini_water", "position": { "x": 740, "y": 440 }, "iconKey": "Droplets", "selectable": true },
+      { "id": "node_mt_heavy_snow_melt", "kind": "DEVICE", "label": "Secondary Snow Melt", "zoneId": "z_mt_water", "deviceId": "mt_heavy_snow_melt", "circuitId": "c_mt_heavy_snow_melt", "position": { "x": 860, "y": 440 }, "iconKey": "Flame", "selectable": true },
+      { "id": "node_mt_workshop_tools", "kind": "DEVICE", "label": "Workshop Equipment", "zoneId": "z_mt_water", "deviceId": "mt_workshop_tools", "circuitId": "c_mt_workshop_tools", "position": { "x": 800, "y": 520 }, "iconKey": "Wrench", "selectable": true }
+    ],
+    "edges": [
+      { "id": "e_mt_solar_bus", "fromNodeId": "node_mt_solar", "toNodeId": "node_mt_main_bus", "circuitId": "c_mt_solar", "geometry": { "type": "polyline", "points": [{ "x": 100, "y": 90 }, { "x": 260, "y": 90 }, { "x": 260, "y": 270 }, { "x": 320, "y": 270 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_wind_bus", "fromNodeId": "node_mt_wind", "toNodeId": "node_mt_main_bus", "circuitId": "c_mt_wind", "geometry": { "type": "polyline", "points": [{ "x": 220, "y": 90 }, { "x": 260, "y": 90 }, { "x": 260, "y": 270 }, { "x": 320, "y": 270 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_diesel_bus", "fromNodeId": "node_mt_diesel", "toNodeId": "node_mt_main_bus", "circuitId": "c_mt_diesel", "geometry": { "type": "polyline", "points": [{ "x": 100, "y": 190 }, { "x": 280, "y": 190 }, { "x": 280, "y": 270 }, { "x": 320, "y": 270 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false },
+      { "id": "e_mt_battery_bus", "fromNodeId": "node_mt_battery", "toNodeId": "node_mt_main_bus", "circuitId": "c_mt_bess", "geometry": { "type": "polyline", "points": [{ "x": 220, "y": 190 }, { "x": 280, "y": 190 }, { "x": 280, "y": 270 }, { "x": 320, "y": 270 }] }, "direction": "NONE", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false },
+      { "id": "e_mt_bus_heat", "fromNodeId": "node_mt_main_bus", "toNodeId": "node_mt_sub_heat", "circuitId": "c_feeder_heat", "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 200, "y": 270 }, { "x": 200, "y": 350 }, { "x": 180, "y": 350 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_bus_comms", "fromNodeId": "node_mt_main_bus", "toNodeId": "node_mt_sub_comms", "circuitId": "c_feeder_comms", "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 420, "y": 270 }, { "x": 420, "y": 100 }, { "x": 500, "y": 100 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_bus_sci", "fromNodeId": "node_mt_main_bus", "toNodeId": "node_mt_sub_sci", "circuitId": "c_feeder_sci", "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 660, "y": 270 }, { "x": 660, "y": 100 }, { "x": 820, "y": 100 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_bus_hab", "fromNodeId": "node_mt_main_bus", "toNodeId": "node_mt_sub_hab", "circuitId": "c_feeder_hab", "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 420, "y": 270 }, { "x": 420, "y": 350 }, { "x": 500, "y": 350 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_bus_water", "fromNodeId": "node_mt_main_bus", "toNodeId": "node_mt_sub_water", "circuitId": "c_feeder_water", "geometry": { "type": "polyline", "points": [{ "x": 320, "y": 270 }, { "x": 660, "y": 270 }, { "x": 660, "y": 350 }, { "x": 820, "y": 350 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_heat_primary", "fromNodeId": "node_mt_sub_heat", "toNodeId": "node_mt_heating_primary", "circuitId": "c_mt_heating_primary", "geometry": { "type": "polyline", "points": [{ "x": 180, "y": 350 }, { "x": 100, "y": 350 }, { "x": 100, "y": 420 }] }, "direction": "FORWARD", "powerKw": 20.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_boiler_aux", "fromNodeId": "node_mt_sub_heat", "toNodeId": "node_mt_boiler_aux", "circuitId": "c_mt_boiler_aux", "geometry": { "type": "polyline", "points": [{ "x": 180, "y": 350 }, { "x": 220, "y": 350 }, { "x": 220, "y": 420 }] }, "direction": "FORWARD", "powerKw": 3.2, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_hf_comms", "fromNodeId": "node_mt_sub_comms", "toNodeId": "node_mt_hf_comms", "circuitId": "c_mt_hf_comms", "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 100 }, { "x": 420, "y": 100 }, { "x": 420, "y": 170 }] }, "direction": "FORWARD", "powerKw": 3.8, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_met_server", "fromNodeId": "node_mt_sub_comms", "toNodeId": "node_mt_meteorology_server", "circuitId": "c_mt_meteorology_server", "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 100 }, { "x": 560, "y": 100 }, { "x": 560, "y": 170 }] }, "direction": "FORWARD", "powerKw": 4.2, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_geomag", "fromNodeId": "node_mt_sub_sci", "toNodeId": "node_mt_geomag_lab", "circuitId": "c_mt_geomag_lab", "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 100 }, { "x": 820, "y": 170 }] }, "direction": "FORWARD", "powerKw": 5.5, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_galley", "fromNodeId": "node_mt_sub_hab", "toNodeId": "node_mt_galley_kitchen", "circuitId": "c_mt_galley_kitchen", "geometry": { "type": "polyline", "points": [{ "x": 500, "y": 350 }, { "x": 500, "y": 440 }] }, "direction": "FORWARD", "powerKw": 5.2, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_lake_water", "fromNodeId": "node_mt_sub_water", "toNodeId": "node_mt_pribarshini_water", "circuitId": "c_mt_pribarshini_water", "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 350 }, { "x": 740, "y": 350 }, { "x": 740, "y": 440 }] }, "direction": "FORWARD", "powerKw": 7.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_mt_snow_melt", "fromNodeId": "node_mt_sub_water", "toNodeId": "node_mt_heavy_snow_melt", "circuitId": "c_mt_heavy_snow_melt", "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 350 }, { "x": 860, "y": 350 }, { "x": 860, "y": 440 }] }, "direction": "FORWARD", "powerKw": 0.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false },
+      { "id": "e_mt_workshop_tools", "fromNodeId": "node_mt_sub_water", "toNodeId": "node_mt_workshop_tools", "circuitId": "c_mt_workshop_tools", "geometry": { "type": "polyline", "points": [{ "x": 820, "y": 350 }, { "x": 820, "y": 520 }, { "x": 800, "y": 520 }] }, "direction": "FORWARD", "powerKw": 0.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false }
+    ]
+  },
+  "HIMADRI": {
+    "stationId": "HIMADRI",
+    "version": "1.0",
+    "layoutStatus": "REPRESENTATIVE",
+    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "width": 1000,
+    "height": 640,
+    "zones": [
+      {
+        "id": "z_hm_gen",
+        "name": "Micro-Gen & Battery Storage",
+        "label": "ZONE 01 • HIGH ARCTIC POWER & BATTERY",
+        "category": "POWER",
+        "bounds": { "x": 60, "y": 50, "width": 260, "height": 240 }
+      },
+      {
+        "id": "z_hm_sci",
+        "name": "Atmospheric Aerosol Lab",
+        "label": "ZONE 02 • OPTICAL & AEROSOL INSTRUMENTS",
+        "category": "SCIENCE",
+        "bounds": { "x": 380, "y": 50, "width": 260, "height": 240 }
+      },
+      {
+        "id": "z_hm_comms",
+        "name": "Ny-Ålesund Satellite Link",
+        "label": "ZONE 03 • TELECOM & RADAR UPLINK",
+        "category": "OPERATIONS",
+        "bounds": { "x": 700, "y": 50, "width": 240, "height": 240 }
+      },
+      {
+        "id": "z_hm_hab",
+        "name": "Living Quarters & Climate",
+        "label": "ZONE 04 • CREW LIVING & CLIMATE HVAC",
+        "category": "HABITATION",
+        "bounds": { "x": 60, "y": 330, "width": 420, "height": 260 }
+      },
+      {
+        "id": "z_hm_expedition",
+        "name": "Glaciology & Field Staging",
+        "label": "ZONE 05 • GLACIOLOGY & EXPEDITION GEAR",
+        "category": "STORAGE",
+        "bounds": { "x": 520, "y": 330, "width": 420, "height": 260 }
+      }
+    ],
+    "nodes": [
+      { "id": "node_hm_solar", "kind": "SOURCE", "label": "Solar PV (12 kWp)", "zoneId": "z_hm_gen", "position": { "x": 120, "y": 100 }, "iconKey": "Sun", "selectable": true },
+      { "id": "node_hm_wind", "kind": "SOURCE", "label": "Wind Turbine (10 kW)", "zoneId": "z_hm_gen", "position": { "x": 240, "y": 100 }, "iconKey": "Wind", "selectable": true },
+      { "id": "node_hm_diesel", "kind": "SOURCE", "label": "Diesel Gensets (2x45 kW)", "zoneId": "z_hm_gen", "position": { "x": 120, "y": 200 }, "iconKey": "Fuel", "selectable": true },
+      { "id": "node_hm_battery", "kind": "STORAGE", "label": "BESS Bank (50 kWh)", "zoneId": "z_hm_gen", "position": { "x": 240, "y": 200 }, "iconKey": "Battery", "selectable": true },
+      { "id": "node_hm_main_bus", "kind": "BUS", "label": "Himadri 400V Microgrid Bus", "position": { "x": 340, "y": 290 }, "iconKey": "Zap", "selectable": true },
+      { "id": "node_hm_sub_hab", "kind": "BUS", "label": "DB-1 Habitation & HVAC", "zoneId": "z_hm_hab", "position": { "x": 270, "y": 380 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_hm_sub_sci", "kind": "BUS", "label": "DB-2 Research & Comms", "zoneId": "z_hm_sci", "position": { "x": 640, "y": 290 }, "iconKey": "Grid", "selectable": false },
+      { "id": "node_hm_clean_room_hvac", "kind": "DEVICE", "label": "Clean Room HVAC", "zoneId": "z_hm_hab", "deviceId": "hm_clean_room_hvac", "circuitId": "c_hm_clean_room_hvac", "position": { "x": 150, "y": 480 }, "iconKey": "Activity", "selectable": true },
+      { "id": "node_hm_living_quarters", "kind": "DEVICE", "label": "Living Quarters HVAC", "zoneId": "z_hm_hab", "deviceId": "hm_living_quarters", "circuitId": "c_hm_living_quarters", "position": { "x": 360, "y": 480 }, "iconKey": "Lightbulb", "selectable": true },
+      { "id": "node_hm_satellite_uplink", "kind": "DEVICE", "label": "Satellite Uplink", "zoneId": "z_hm_comms", "deviceId": "hm_satellite_uplink", "circuitId": "c_hm_satellite_uplink", "position": { "x": 820, "y": 140 }, "iconKey": "Radio", "selectable": true },
+      { "id": "node_hm_aerosol_spectrometer", "kind": "DEVICE", "label": "Aerosol Spectrometer", "zoneId": "z_hm_sci", "deviceId": "hm_aerosol_spectrometer", "circuitId": "c_hm_aerosol_spectrometer", "position": { "x": 510, "y": 140 }, "iconKey": "Microscope", "selectable": true },
+      { "id": "node_hm_glacier_monitoring", "kind": "DEVICE", "label": "Glaciology Radar", "zoneId": "z_hm_expedition", "deviceId": "hm_glacier_monitoring", "circuitId": "c_hm_glacier_monitoring", "position": { "x": 630, "y": 480 }, "iconKey": "Activity", "selectable": true },
+      { "id": "node_hm_field_gear_dryer", "kind": "DEVICE", "label": "Field Gear Dryer", "zoneId": "z_hm_expedition", "deviceId": "hm_field_gear_dryer", "circuitId": "c_hm_field_gear_dryer", "position": { "x": 820, "y": 480 }, "iconKey": "Flame", "selectable": true }
+    ],
+    "edges": [
+      { "id": "e_hm_solar_bus", "fromNodeId": "node_hm_solar", "toNodeId": "node_hm_main_bus", "circuitId": "c_hm_solar", "geometry": { "type": "polyline", "points": [{ "x": 120, "y": 100 }, { "x": 280, "y": 100 }, { "x": 280, "y": 290 }, { "x": 340, "y": 290 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_wind_bus", "fromNodeId": "node_hm_wind", "toNodeId": "node_hm_main_bus", "circuitId": "c_hm_wind", "geometry": { "type": "polyline", "points": [{ "x": 240, "y": 100 }, { "x": 280, "y": 100 }, { "x": 280, "y": 290 }, { "x": 340, "y": 290 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_diesel_bus", "fromNodeId": "node_hm_diesel", "toNodeId": "node_hm_main_bus", "circuitId": "c_hm_diesel", "geometry": { "type": "polyline", "points": [{ "x": 120, "y": 200 }, { "x": 300, "y": 200 }, { "x": 300, "y": 290 }, { "x": 340, "y": 290 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false },
+      { "id": "e_hm_battery_bus", "fromNodeId": "node_hm_battery", "toNodeId": "node_hm_main_bus", "circuitId": "c_hm_bess", "geometry": { "type": "polyline", "points": [{ "x": 240, "y": 200 }, { "x": 300, "y": 200 }, { "x": 300, "y": 290 }, { "x": 340, "y": 290 }] }, "direction": "NONE", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false },
+      { "id": "e_hm_bus_hab", "fromNodeId": "node_hm_main_bus", "toNodeId": "node_hm_sub_hab", "circuitId": "c_feeder_hab", "geometry": { "type": "polyline", "points": [{ "x": 340, "y": 290 }, { "x": 270, "y": 290 }, { "x": 270, "y": 380 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_bus_sci", "fromNodeId": "node_hm_main_bus", "toNodeId": "node_hm_sub_sci", "circuitId": "c_feeder_sci", "geometry": { "type": "polyline", "points": [{ "x": 340, "y": 290 }, { "x": 640, "y": 290 }] }, "direction": "FORWARD", "powerKw": 0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_clean_room", "fromNodeId": "node_hm_sub_hab", "toNodeId": "node_hm_clean_room_hvac", "circuitId": "c_hm_clean_room_hvac", "geometry": { "type": "polyline", "points": [{ "x": 270, "y": 380 }, { "x": 150, "y": 380 }, { "x": 150, "y": 480 }] }, "direction": "FORWARD", "powerKw": 8.5, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_living_q", "fromNodeId": "node_hm_sub_hab", "toNodeId": "node_hm_living_quarters", "circuitId": "c_hm_living_quarters", "geometry": { "type": "polyline", "points": [{ "x": 270, "y": 380 }, { "x": 360, "y": 380 }, { "x": 360, "y": 480 }] }, "direction": "FORWARD", "powerKw": 3.5, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_sat_uplink", "fromNodeId": "node_hm_sub_sci", "toNodeId": "node_hm_satellite_uplink", "circuitId": "c_hm_satellite_uplink", "geometry": { "type": "polyline", "points": [{ "x": 640, "y": 290 }, { "x": 820, "y": 290 }, { "x": 820, "y": 140 }] }, "direction": "FORWARD", "powerKw": 3.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_aerosol", "fromNodeId": "node_hm_sub_sci", "toNodeId": "node_hm_aerosol_spectrometer", "circuitId": "c_hm_aerosol_spectrometer", "geometry": { "type": "polyline", "points": [{ "x": 640, "y": 290 }, { "x": 510, "y": 290 }, { "x": 510, "y": 140 }] }, "direction": "FORWARD", "powerKw": 4.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_glacier", "fromNodeId": "node_hm_sub_sci", "toNodeId": "node_hm_glacier_monitoring", "circuitId": "c_hm_glacier_monitoring", "geometry": { "type": "polyline", "points": [{ "x": 640, "y": 290 }, { "x": 630, "y": 290 }, { "x": 630, "y": 480 }] }, "direction": "FORWARD", "powerKw": 2.8, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": true },
+      { "id": "e_hm_dryer", "fromNodeId": "node_hm_sub_sci", "toNodeId": "node_hm_field_gear_dryer", "circuitId": "c_hm_field_gear_dryer", "geometry": { "type": "polyline", "points": [{ "x": 640, "y": 290 }, { "x": 820, "y": 290 }, { "x": 820, "y": 480 }] }, "direction": "FORWARD", "powerKw": 0.0, "sourceMix": { "solarKw": 0, "windKw": 0, "dieselKw": 0, "batteryKw": 0 }, "active": false }
+    ]
+  }
+}

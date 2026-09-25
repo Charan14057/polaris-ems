@@ -154,4 +154,19 @@ export const api = {
 
   exportTrace: (traceId: string, format: 'json' | 'csv' = 'json') =>
     fetch(`/api/v1/traces/${traceId}/export?format=${format}`).then(r => r.text()),
+
+  // Phase 18 — Digital Twin Spatial & Simulation Endpoints
+  getTwinSpatialProfile: (stationId: StationId | string) =>
+    apiRequest<import('./types').TwinSpatialProfile>(`/api/v1/twin/spatial/${stationId.toUpperCase()}`),
+
+  getTwinCurrentState: (stationId: StationId | string, timestamp?: string) => {
+    const qs = timestamp ? `?timestamp=${encodeURIComponent(timestamp)}` : '';
+    return apiRequest<Record<string, any>>(`/api/v1/twin/state/${stationId.toUpperCase()}${qs}`);
+  },
+
+  simulateTwinTrajectory: (params: import('./types').TwinTrajectoryRequest) =>
+    apiRequest<import('./types').TwinTrajectoryResponseData>('/api/v1/twin/trajectory', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
 };

@@ -697,3 +697,94 @@ export interface EdgeEvaluateResponseData {
   diagnostics: string[];
 }
 
+// -----------------------------------------------------------------------------
+// Digital Twin Spatial & Simulation Types (Phase 18)
+// -----------------------------------------------------------------------------
+
+export interface TwinZoneBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface TwinZone {
+  id: string;
+  name: string;
+  label: string;
+  category: 'HABITATION' | 'SCIENCE' | 'OPERATIONS' | 'POWER' | 'MECHANICAL' | 'STORAGE' | 'COMMUNICATIONS' | 'OTHER' | string;
+  bounds: TwinZoneBounds;
+}
+
+export interface TwinSpatialNodePosition {
+  x: number;
+  y: number;
+}
+
+export interface TwinSpatialNode {
+  id: string;
+  kind: 'SOURCE' | 'BUS' | 'STORAGE' | 'LOAD' | 'THERMAL' | 'DEVICE' | string;
+  label: string;
+  zoneId?: string;
+  deviceId?: string;
+  circuitId?: string;
+  position: TwinSpatialNodePosition;
+  iconKey?: string;
+  selectable: boolean;
+}
+
+export interface TwinFlowGeometry {
+  type: 'polyline' | 'path';
+  points?: TwinSpatialNodePosition[];
+  d?: string;
+}
+
+export interface TwinSourceMix {
+  solarKw: number;
+  windKw: number;
+  dieselKw: number;
+  batteryKw: number;
+}
+
+export interface TwinFlowEdge {
+  id: string;
+  fromNodeId: string;
+  toNodeId: string;
+  circuitId?: string;
+  geometry: TwinFlowGeometry;
+  direction: 'FORWARD' | 'REVERSE' | 'NONE';
+  powerKw: number;
+  sourceMix: TwinSourceMix;
+  active: boolean;
+}
+
+export interface TwinSpatialProfile {
+  stationId: string;
+  version: string;
+  layoutStatus: 'REPRESENTATIVE' | 'CONFIGURED';
+  geometryBasis: string;
+  width: number;
+  height: number;
+  zones: TwinZone[];
+  nodes: TwinSpatialNode[];
+  edges: TwinFlowEdge[];
+}
+
+export interface TwinTrajectoryRequest {
+  station_id: StationId | string;
+  horizon_hours?: number;
+  mode?: 'EXPECTED' | 'CONSERVATIVE' | 'OPTIMISTIC';
+  scenario_id?: string;
+  start_timestamp?: string;
+}
+
+export interface TwinTrajectoryResponseData {
+  station_id: string;
+  mode: string;
+  steps_count: number;
+  duration_hours: number;
+  states: Record<string, any>[];
+  summary: Record<string, any>;
+  provenance: ProvenanceTier;
+}
+

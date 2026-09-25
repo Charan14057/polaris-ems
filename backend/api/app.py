@@ -45,7 +45,8 @@ from backend.api.routes import (
     traces_router,
     validation_router,
     integrations_router,
-    observability_router
+    observability_router,
+    twin_router
 )
 
 logger = logging.getLogger("polaris.app")
@@ -110,6 +111,7 @@ def create_app(config: Optional[APIConfig] = None) -> FastAPI:
     app.include_router(validation_router, prefix=v1_prefix)
     app.include_router(integrations_router, prefix=v1_prefix)
     app.include_router(observability_router, prefix=v1_prefix)
+    app.include_router(twin_router, prefix=v1_prefix)
 
     # 5. Optional Production Static Frontend Mounting
     if cfg.settings.deployment.serve_frontend and os.path.isdir(cfg.settings.deployment.frontend_dist_dir):
