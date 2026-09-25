@@ -788,3 +788,7 @@ export interface TwinTrajectoryResponseData {
   provenance: ProvenanceTier;
 }
 
+export type TwinState = Record<string, any>;
+export type StationProfileDetail = StationDetail;
+
+

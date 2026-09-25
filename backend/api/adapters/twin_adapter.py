@@ -166,3 +166,7 @@ class TwinAPIAdapter:
             summary=trajectory.summary,
             provenance="SIMULATED"
         )
+
+
+twin_adapter = TwinAPIAdapter()
+
