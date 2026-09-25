@@ -143,7 +143,7 @@ class TwinEngine:
             wind_speed_ms=wind_spd,
             irradiance_wm2=ghi,
             solar_elevation_deg=15.0 if ghi > 0 else 0.0,
-            provenance="OBSERVED" if initial_telemetry else "CONFIGURED"
+            provenance="REAL" if initial_telemetry else "CONFIGURED"
         )
 
         # Operational

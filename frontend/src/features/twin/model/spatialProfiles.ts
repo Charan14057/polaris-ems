@@ -13,7 +13,7 @@ export const STATIC_SPATIAL_PROFILES: Record<string, TwinSpatialProfile> = {
     stationId: "BHARATI",
     version: "1.0",
     layoutStatus: "REPRESENTATIVE",
-    geometryBasis: "REPRESENTATIVE / CONFIGURED",
+    geometryBasis: "CONFIG_ASSUMED",
     width: 1000,
     height: 640,
     zones: [
@@ -72,7 +72,7 @@ export const STATIC_SPATIAL_PROFILES: Record<string, TwinSpatialProfile> = {
     stationId: "MAITRI",
     version: "1.0",
     layoutStatus: "REPRESENTATIVE",
-    geometryBasis: "REPRESENTATIVE / CONFIGURED",
+    geometryBasis: "CONFIG_ASSUMED",
     width: 1000,
     height: 640,
     zones: [
@@ -129,7 +129,7 @@ export const STATIC_SPATIAL_PROFILES: Record<string, TwinSpatialProfile> = {
     stationId: "HIMADRI",
     version: "1.0",
     layoutStatus: "REPRESENTATIVE",
-    geometryBasis: "REPRESENTATIVE / CONFIGURED",
+    geometryBasis: "CONFIG_ASSUMED",
     width: 1000,
     height: 640,
     zones: [

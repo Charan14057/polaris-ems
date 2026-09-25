@@ -367,7 +367,7 @@ export function buildTwinViewModel(params: BuildTwinViewModelParams): TwinViewMo
     timestamp,
     viewMode,
     layoutStatus: spatialProfile.layoutStatus || 'REPRESENTATIVE',
-    geometryBasis: spatialProfile.geometryBasis || 'REPRESENTATIVE / CONFIGURED',
+    geometryBasis: spatialProfile.geometryBasis || 'CONFIG_ASSUMED',
     dimensions: {
       width: spatialProfile.width || 1000,
       height: spatialProfile.height || 640

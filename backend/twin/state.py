@@ -12,7 +12,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
 
-ProvenanceTier = Literal["OBSERVED", "FORECAST", "CONFIGURED", "ASSUMED", "SIMULATED"]
+ProvenanceTier = Literal["REAL", "CONFIGURED", "ASSUMED", "SYNTHETIC", "FORECAST", "SIMULATED"]
 
 
 @dataclass

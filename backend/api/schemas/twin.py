@@ -71,7 +71,7 @@ class TwinSpatialProfileSchema(BaseModel):
     stationId: str
     version: str = "1.0"
     layoutStatus: Literal["REPRESENTATIVE", "CONFIGURED"] = "REPRESENTATIVE"
-    geometryBasis: str = "REPRESENTATIVE / CONFIGURED"
+    geometryBasis: str = "CONFIG_ASSUMED"
     width: float = 1000
     height: float = 640
     zones: List[TwinZoneSchema]

@@ -3,7 +3,7 @@
     "stationId": "BHARATI",
     "version": "1.0",
     "layoutStatus": "REPRESENTATIVE",
-    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "geometryBasis": "CONFIG_ASSUMED",
     "width": 1000,
     "height": 640,
     "zones": [
@@ -467,7 +467,7 @@
     "stationId": "MAITRI",
     "version": "1.0",
     "layoutStatus": "REPRESENTATIVE",
-    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "geometryBasis": "CONFIG_ASSUMED",
     "width": 1000,
     "height": 640,
     "zones": [
@@ -560,7 +560,7 @@
     "stationId": "HIMADRI",
     "version": "1.0",
     "layoutStatus": "REPRESENTATIVE",
-    "geometryBasis": "REPRESENTATIVE / CONFIGURED",
+    "geometryBasis": "CONFIG_ASSUMED",
     "width": 1000,
     "height": 640,
     "zones": [
