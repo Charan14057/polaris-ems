@@ -1,6 +1,6 @@
 # Polaris-EMS: Master System Walkthrough & Current Operational Stage
 
-**System Status**: 🟢 **PHASE 15 FROZEN (`PHASE_15_FROZEN`) | PHASES 1–15 COMPLETE & FROZEN (`PHASES_1_15_COMPLETE`) | REAL-WORLD INTEGRATION, CALIBRATION & OPERATIONAL VALIDATION COMPLETE**
+**System Status**: 🟢 **PHASES 1–16 COMPLETE & FROZEN (`PHASES_1_16_FROZEN`) | PHASE 17 COMPLETE (`PHASE_17_COMPLETE`) | PHASE 17 RELEASE READY (`PHASE_17_RELEASE_READY`) | POLARIS_EMS_FINAL_RELEASE_READY | NEXT_ENGINEERING_STAGE = NONE**
 **Target Fleet**: Bharati Station (69°S, Antarctic), Maitri Station (70°S, Antarctic), Himadri Station (79°N, Arctic)
 **Verification Environment**: Local Integrated Production Runtime (Vite Proxy on `http://127.0.0.1:3000` $\to$ FastAPI on `http://127.0.0.1:8000`)
 **Containerized Deployment**: Multi-Stage Docker (`deployment/Dockerfile`) + Compose (`deployment/docker-compose.yml`) + Nginx Reverse Proxy
@@ -13,20 +13,22 @@
 
 ## 1. Exact Stage of the Project
 
-Polaris-EMS has completed **Phase 15: Real-World Integration, Calibration & Operational Validation**. All 15 computational phases remain permanently complete, frozen, and immutable (`PHASE_15_FROZEN`). Phase 15 connects external reality feeds directly to the frozen pipeline without altering frozen authorities. Following complete independent validation and test execution, the system is in the **Phase 15 Frozen** stage (**`PHASE_15_FROZEN`**).
+Polaris-EMS has completed **Phase 17: Final Release, Demonstration & Submission Hardening**. All 17 computational, field, and release phases are complete (`PHASES_1_16_FROZEN`, `PHASE_17_RELEASE_READY`, `POLARIS_EMS_FINAL_RELEASE_READY`). Phase 16 established concrete device adapters (Simulator, Emulator, HIL, Lab), actuation safety boundaries, disconnect/reconnect state transitions, buffer reconciliation stress testing, fault injection schedules, long-duration operational reliability, and end-to-end trace linkage. Phase 17 verified full-system integration via the automated 14-stage master demonstration (`scripts/final_demo.py`), certified strict epistemic boundaries, ratified the immutable 6-tier provenance schema, hardened container deployment, and finalized project governance. The system is formally in the **Final Release Ready** stage (**`POLARIS_EMS_FINAL_RELEASE_READY`**).
 
-**Phase 1–14 Frozen Authorities**: All computational forecasting (Phase 3), physical equations (Phase 4), scenarios (Phase 5), Pyomo/HiGHS optimization (Phase 6), resilience state machine (Phase 7), policy governance (Phase 8), edge autonomy (Phase 11), decision trace DAG (Phase 12), scientific validation benchmarks (Phase 13), and deployment packaging (Phase 14) remain **permanently frozen and immutable**. Phase 15 strictly adheres to the governing law: *"Connect reality to the existing brain. Do not build another brain."*
+**Phase 1–16 Frozen Authorities**: All computational forecasting (Phase 3), physical equations (Phase 4), scenarios (Phase 5), Pyomo/HiGHS optimization (Phase 6), resilience state machine (Phase 7), policy governance (Phase 8), edge autonomy (Phase 11), decision trace DAG (Phase 12), scientific validation benchmarks (Phase 13), deployment packaging (Phase 14), reality drift monitoring (Phase 15), and field/HIL device adapters (Phase 16) remain **permanently frozen and immutable**. Phase 17 strictly adheres to the governing law: *"Validate field boundaries truthfully. Never fake physical reality."*
 
 ### Overall Verification Scorecard
 
 | Verification Suite | Tool / Command | Scope | Passing / Total | Pass Rate | Status |
 | :--- | :--- | :--- | :---: | :---: | :---: |
-| **Backend Test Suite** | `pytest tests/` | Phases 1–15 full regression suite | **288 / 288** | **100%** | 🟢 **PASS** |
+| **Backend Test Suite** | `pytest tests/` | Phases 1–16 full regression suite | **366 / 366** | **100%** | 🟢 **PASS** |
+| **Phase 16 Field Validation** | `pytest tests/test_phase16_field_validation.py` | Workstreams A–K comprehensive suite | **78 / 78** | **100%** | 🟢 **PASS** |
+| **Phase 16 Deterministic Demo** | `python scripts/phase16_demo.py` | 20-step complete lifecycle validation | **20 / 20 steps** | **100%** | 🟢 **PASS** |
 | **Phase 15 Operational Validation** | `pytest tests/test_phase15_operational_validation.py` | Quality, causality, quarantine, drift, replay, epistemic safeguards | **22 / 22** | **100%** | 🟢 **PASS** |
 | **Phase 15 Master Operational Demo** | `python scripts/run_phase15_operational_demo.py` | 9-step operational reality workflow | **9 / 9 steps** | **100%** | 🟢 **PASS** |
 | **Phase 14 Deployment Suite** | `pytest tests/test_phase14_deployment.py` | Config, providers, bounds, security, health | **20 / 20** | **100%** | 🟢 **PASS** |
 | **Frontend Test Suite** | `npm test -- --run` | API client & React UI components | **12 / 12** | **100%** | 🟢 **PASS** |
-| **Frontend Production Build** | `npm run build` | `tsc` strict check + Vite production bundle | **0 errors (11.21s)** | **100%** | 🟢 **PASS** |
+| **Frontend Production Build** | `npm run build` | `tsc` strict check + Vite production bundle | **0 errors (11.57s)** | **100%** | 🟢 **PASS** |
 | **Phase 14 Production Demo** | `python scripts/run_phase14_production_demo.py` | 6-step deterministic end-to-end demo | **6 / 6 steps** | **100%** | 🟢 **PASS** |
 | **Production Readiness Gate** | `python scripts/verify_production_readiness.py` | 26 static & architectural checks | **26 / 26** | **100%** | 🟢 **PASS** |
 | **Phase 13 Final Consistency Gate** | `python scripts/verify_phase13_consistency.py` | 12 mathematical & taxonomic checks | **12 / 12** | **100%** | 🟢 **PASS** |
@@ -40,12 +42,13 @@ Polaris-EMS has completed **Phase 15: Real-World Integration, Calibration & Oper
 
 ### Test Count Reconciliation
 
-$$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 13} + \text{Phase 14} + \text{Phase 15} = 227 + 19 + 20 + 22 = \mathbf{288}$$
+$$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 13} + \text{Phase 14} + \text{Phase 15} + \text{Phase 16} = 227 + 19 + 20 + 22 + 78 = \mathbf{366}$$
 
 - **Baseline Core Engine (227 tests)**: Foundation (11), Synthetic Environment (10), ML Forecasting (9), Digital Twin (11), Scenario Engine (17), Final Audit (45), Optimizer Core (23), Resilience Engine (34), Policy Engine (25), REST API (21), Edge Intelligence (11), Decision Trace (10).
 - **Phase 13 Scientific Validation Suite (19 tests)**: Out-of-sample pinball loss, horizon evaluations, conformal calibration, baseline benchmarks, causality audit, Tree SHAP additivity, optimizer fair comparisons, 5/5 resilience invariants, offline safety proof, closed-loop reproducibility replay, cold archive lifecycle, latency profile, evidence table, boundary invariants, quantile taxonomy integrity, resilience vocabulary lock, twin physical tolerances, sample denominator proofs.
 - **Phase 14 Deployment & Integration Suite (20 tests)**: Hierarchical settings resolution, sensitive credential masking, Open-Meteo adapter ingest, NCPOR format transformation, polar physical domain bounds enforcement ($-90^\circ\text{C}$ to $+30^\circ\text{C}$, wind $\le 85\text{ m/s}$, solar $\le 1400\text{ W/m}^2$, non-finite rejection), temporal causality checks, strict 6-tier provenance lock (rejection of `LIVE`, `API`, `REAL-TIME`), provider failure graceful fallback, data freshness degradation, disaggregated health endpoints (`/health`, `/ready`, `/health/providers`, `/health/physical`, `/health/engines`), security headers injection (HSTS, CSP, nosniff, X-Frame-Options), payload limit protection (HTTP 413 on $>10\text{MB}$), operator approval boundary enforcement.
 - **Phase 15 Operational Validation Suite (22 tests)**: Multi-horizon external weather series validation, non-finite/NaN rejection, freshness degradation scoring, future timestamp temporal causality leakage guards, physical boundary violation with quarantine circuit breaker, provider outage/recovery fallback, feed completeness and gap tracking, strict 6-tier provenance preservation, physical connectivity truth enforcement (`PHYSICAL_CONNECTIVITY = DISCONNECTED`), model-vs-observed residual metric computation (MBE, MAE, RMSE, sMAPE, 80% conformal coverage), digital twin reality check with controlled calibration candidate registration, 4-way operational drift categorization (Data, Model, Plant, Provider), edge offline-reconnect state reconciliation cycle, operational decision replay through the frozen pipeline, observability API validation endpoints, and 6 epistemic & provenance reconciliation safeguard tests.
+- **Phase 16 Field / HIL Validation Suite (78 tests)**: Concrete adapter discovery/reads/writes (Simulator, Emulator, HIL, Lab), adapter registry singleton and class validation, actuation boundary authorization and whitelisting, non-connected actuation suppression, telemetry ingestion multi-tier classification and future timestamp rejection, 4-state disconnect/reconnect state machine, bounded FIFO buffer eviction under comms blackout, state reconciliation with duplicate rejection, deterministic fault injection harness (stale, out-of-range, malformed, dropouts, sensor failures), 24h & 72h long-duration reliability stress profiles, Phase 12 decision trace lineage continuity, and 20-step deterministic lifecycle demo verification.
 
 
 ---
@@ -384,22 +387,59 @@ EXTERNAL WEATHER (Open-Meteo)
 
 ---
 
-## 10. Final Freeze Governance & Current Operational Stage
+## 10. Phase 16: Field / Hardware-in-the-Loop Validation & Reliability
 
-- **CURRENT_STAGE**: `PHASE_15_FROZEN`
-- **PROJECT_STATUS**: `PHASES_1_15_COMPLETE`
-- **NEXT_AUTHORIZED_STAGE**: `PHASE_16_NOT_STARTED`
-- **Phases 1–14 Operational Baseline**: Permanently Complete & Frozen (`PHASE_14_FROZEN`).
-- **Phase 15 Freeze Status**: 🟢 **`PHASE_15_FROZEN`** (Real-World Integration, Calibration & Operational Validation)
-- **Project Canonical State**: **`PHASES_1_15_COMPLETE`**
-- **Phase 15 Test Verification**: **22/22 Phase 15 tests PASS** | **288/288 Total Pytest tests PASS (100%)** | **12/12 Frontend tests PASS** | **Production build clean (0 errors)** | **Phase 15 Demo 9/9 PASS**
-- **Physical Hardware Validation Status**: `PHYSICAL_VALIDATION = NOT_AVAILABLE` *(Zero physical polar microgrid SCADA telemetry connected; system operates strictly in calibrated Digital Twin advisory mode)*
+Phase 16 bridges Polaris-EMS with physical polar field deployment requirements through robust, truthful Hardware-in-the-Loop (HIL) and adapter layers:
+
+1. **Concrete Device Adapters & Adapter Registry**:
+   - `SimulatorAdapter` (`SIMULATOR`): Pure software deterministic generator.
+   - `EmulatorAdapter` (`EMULATOR`): Protocol emulation (Modbus/OPC-UA mock).
+   - `HILAdapter` (`HIL`): Hardware-in-the-Loop loopback interface.
+   - `LabAdapter` (`LAB`): Benchtop power supply and load bank interface.
+   - All adapters inherit from `DeviceAdapter` and are resolved deterministically via `AdapterRegistry`.
+2. **Actuation Boundary & Safety Protocols**:
+   - `ActuationBoundary` validates authorization before any dispatch command.
+   - Non-connected states (`OFFLINE_EDGE`, `SAFE_HOLD`) immediately block physical dispatch.
+   - Actuation outcomes strictly evaluate to `SIMULATED` or `UNAVAILABLE`.
+3. **Telemetry Ingestion & Quality Classification**:
+   - Validates channel configurations, measurement units, and timestamp causality.
+   - Rejects future timestamps ($> 60\text{s}$) and malformed values.
+   - Preserves the locked 6-tier provenance system.
+4. **Disconnect / Reconnect State Machine & Reconciliation**:
+   - 4-state finite state machine: `CONNECTED` $\rightleftharpoons$ `DEGRADED` $\rightleftharpoons$ `OFFLINE` $\rightleftharpoons$ `RECONNECTING` $\to$ `CONNECTED`.
+   - Local FIFO telemetry buffer strictly bounded to 5,000 items with automatic deterministic eviction of oldest entries upon overflow.
+   - Deterministic reconciliation resolving burst packets, deduplication, and sequence gaps.
+5. **Deterministic Fault Injection Harness**:
+   - Simulates telemetry faults (`STALE`, `OUT_OF_RANGE`, `MALFORMED`), device faults (`SENSOR_FAILURE`), and connectivity flaps with deterministic seeds.
+6. **Long-Duration Field Reliability**:
+   - Proven bounded memory footprints and 0% memory growth over simulated 24-hour and 72-hour operational horizons.
+7. **Trace Continuity**:
+   - Phase 16 edge events, fault schedules, reconciliations, and actuation attempts are recorded into Phase 12 `DecisionTraceRepository`.
+8. **Frontend Field & HIL Dashboard**:
+   - `FieldHILValidationView.tsx` with dedicated navigation tab (`Field & HIL`, icon: Radio).
+   - Real-time adapter cards, connectivity FSM status, buffer depth monitors, and interactive fault simulation controls with prominent SCADA simulation disclaimers.
+
+---
+
+## 11. Final Freeze Governance & Current Operational Stage
+
+- **CURRENT_STAGE**: `PHASE_17_RELEASE_READY`
+- **PROJECT_STATUS**: `POLARIS_EMS_FINAL_RELEASE_READY`
+- **Phases 1–16 Operational Baseline**: Permanently Complete & Frozen (`PHASES_1_16_FROZEN`).
+- **Phase 17 Release Status**: 🟢 **`PHASE_17_COMPLETE`** (Final Release, Demonstration & Submission Hardening)
+- **Project Canonical State**: **`POLARIS_EMS_FINAL_RELEASE_READY`**
+- **Next Phase**: 🛑 **`NONE` (Project Engineering Complete)**
+- **Backend Test Verification**: **366/366 Total Pytest tests PASS (100%)**
+- **Frontend Test & Build**: **12/12 Frontend tests PASS** | **Production build clean (0 errors)**
+- **Authoritative Master Demo**: **14/14 Stages PASS (1.96s)** (`scripts/final_demo.py`)
+- **Phase 16 Deterministic Demo**: **20/20 Stages PASS** (`scripts/phase16_demo.py`)
+- **Physical Hardware Validation Status**: `PHYSICAL_VALIDATION = NOT_AVAILABLE` *(Zero physical polar microgrid SCADA telemetry connected; system operates strictly in calibrated Digital Twin and HIL advisory mode)*
 - **Physical Connectivity Status**: `PHYSICAL_CONNECTIVITY = DISCONNECTED` | `PHYSICAL_SCADA_LINK = FALSE`
 - **Reference Data Provenance**: `SYNTHETIC`
 - **Open-Meteo Provenance**: `FORECAST`
-- **Calibration Candidate Status**: `CALIB-BHA-THE-001` remains `PENDING_CONTROLLED_REVIEW` (baseline preserved)
+- **Adapter & Actuation Provenance**: `SIMULATED`
 - **Remaining Documented Limitations (Preserved Truthfully)**:
-  1. **Zero Connected Physical Polar SCADA Telemetry**: The system operates with physics-calibrated synthetic weather/load inputs, external Open-Meteo forecast feeds, and simulated digital twin responses; no live hardware connection to Bharati, Maitri, or Himadri is established. The physical health status truthfully returns `DISCONNECTED` with `PHYSICAL_SCADA_LINK = FALSE`.
+  1. **Zero Connected Physical Polar SCADA Telemetry**: The system operates with physics-calibrated synthetic weather/load inputs, external Open-Meteo forecast feeds, and simulated digital twin / HIL responses; no live hardware connection to Bharati, Maitri, or Himadri is established. The physical health status truthfully returns `DISCONNECTED` with `PHYSICAL_SCADA_LINK = FALSE`.
   2. **Advisory / Supervised Physical Actuation**: Downstream physical actuator dispatch requires human supervisor review or local edge policy approval. The product enforces an explicit operator approval boundary.
   3. **Controlled Recalibration Policy**: Systematic model or digital twin discrepancies are quarantined and registered as `CALIBRATION_CANDIDATE` records. Zero models are silently retrained or replaced without human governance review.
   4. **External Data Feeds are Optional & Resilient**: When external reality providers (Open-Meteo, NCPOR) are unavailable, rate-limited, or stale, Polaris-EMS safely quarantines them and falls back to configured baselines without interruption.
@@ -408,45 +448,43 @@ EXTERNAL WEATHER (Open-Meteo)
 ```text
 ============================================================
 
-                     PHASE_15_FROZEN
+                  PHASE_17_RELEASE_READY
+             POLARIS_EMS_FINAL_RELEASE_READY
 
 ============================================================
 
-Polaris-EMS Phases 1–15 are complete and frozen.
-
-Phase 15:
-Real-World Integration, Calibration & Operational Validation
+Polaris-EMS Phases 1–16 are FROZEN.
+Phase 17 is COMPLETE.
+Next Phase: NONE (Project Engineering Finished).
 
 Physical Connectivity:
 DISCONNECTED
 
+Physical SCADA Link:
+FALSE
+
 Physical Validation:
 NOT_AVAILABLE
 
-Reference Data Provenance:
-SYNTHETIC
+Provenance Tiers:
+LOCKED (6 tiers: REAL, CONFIGURED, ASSUMED, SYNTHETIC, FORECAST, SIMULATED)
 
-Open-Meteo Provenance:
-FORECAST
-
-Phase 15 Tests:
-22 / 22 PASS
-
-Total Backend Tests:
-288 / 288 PASS
+Full Backend Tests:
+366 / 366 PASS (100%)
 
 Frontend Tests:
-12 / 12 PASS
+12 / 12 PASS (100%)
 
-Frontend Build:
-CLEAN
+Frontend Production Build:
+CLEAN (0 errors, 10.57s)
 
-Operational Demo:
-9 / 9 PASS
+Authoritative Master Demo:
+14 / 14 STAGES PASS (1.96s)
 
-No Phase 16 work has been initiated.
-
-Execution stopped at the freeze boundary.
+Phase 16 Deterministic Demo:
+20 / 20 STAGES PASS
 
 ============================================================
 ```
+
+

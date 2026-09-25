@@ -1,0 +1,144 @@
+{
+  "title": "POLARIS-EMS Phase 17 Final Demonstration",
+  "timestamp": "2026-09-25T04:14:14.899965+00:00",
+  "epistemic_boundary": {
+    "physical_connectivity": "DISCONNECTED",
+    "physical_scada_link": false,
+    "physical_validation": "NOT_AVAILABLE",
+    "provenance_tiers": [
+      "FORECAST",
+      "SYNTHETIC",
+      "CONFIGURED",
+      "SIMULATED",
+      "REAL",
+      "ASSUMED"
+    ]
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "Station Profile Resolution",
+      "status": "PASS",
+      "latency_ms": 2.42,
+      "details": {
+        "fleet_size": 3,
+        "selected_station": "BHARATI",
+        "location": "-69.4064\u00b0S, 76.195\u00b0E",
+        "critical_life_support_kw": 29.5,
+        "provenance": "CONFIGURED"
+      }
+    },
+    {
+      "stage": 2,
+      "name": "Adapter Resolution & Telemetry Ingestion",
+      "status": "PASS",
+      "latency_ms": 0.1,
+      "details": {
+        "registered_adapters": [
+          "SIMULATOR",
+          "EMULATOR",
+          "HIL",
+          "LAB"
+        ],
+        "discovered_devices": 1,
+        "sample_telemetry": [
+          "power=2500.0kW"
+        ],
+        "provenance": "SIMULATED"
+      }
+    },
+    {
+      "stage": "3-8",
+      "name": "Computational Pipeline (ML, Twin, Scenario, Optimizer, Resilience, Policy)",
+      "status": "PASS",
+      "latency_ms": 1960.78,
+      "details": {
+        "forecast_quantiles": [
+          "P10",
+          "P50",
+          "P90",
+          "P95"
+        ],
+        "scenario": "BLIZZARD",
+        "solver_status": "OPTIMAL",
+        "resilience_state": "AT_RISK",
+        "policy_directive": "MITIGATE",
+        "trace_id": "DT-20260925-BHARATI-F61E72"
+      }
+    },
+    {
+      "stage": 9,
+      "name": "Edge Field Intelligence & State Tracking",
+      "status": "PASS",
+      "latency_ms": 0.48,
+      "details": {
+        "station_id": "BHARATI",
+        "edge_mode": "CONNECTED_OPERATION",
+        "fallback_posture": "WAIT_FOR_BACKEND_DECISION",
+        "buffer_depth": 0,
+        "provenance": "CONFIGURED"
+      }
+    },
+    {
+      "stage": 10,
+      "name": "Fault Injection & Connectivity Loss",
+      "status": "PASS",
+      "latency_ms": 0.47,
+      "details": {
+        "fault_injected": "STALE on gen-001::power_output_kw",
+        "edge_mode_after_fault": "OFFLINE_EDGE",
+        "fallback_posture": "PROTECT_CRITICAL_SYSTEMS",
+        "central_optimizer_bypassed": true,
+        "provenance": "SYNTHETIC"
+      }
+    },
+    {
+      "stage": 11,
+      "name": "Recovery & State Reconciliation",
+      "status": "PASS",
+      "latency_ms": 4.36,
+      "details": {
+        "reconciled_items": 10,
+        "duplicate_items": 0,
+        "remaining_buffer": 0,
+        "restored_mode": "CONNECTED_OPERATION"
+      }
+    },
+    {
+      "stage": 12,
+      "name": "Actuation Safety Boundary & Verification",
+      "status": "PASS",
+      "latency_ms": 0.14,
+      "details": {
+        "action": "SET_OUTPUT_KW",
+        "authorized": true,
+        "outcome": "SIMULATED",
+        "provenance": "SIMULATED",
+        "physical_scada_connected": false
+      }
+    },
+    {
+      "stage": 13,
+      "name": "Decision Trace Lineage & Explainability",
+      "status": "PASS",
+      "latency_ms": 0.01,
+      "details": {
+        "trace_id": "DT-20260925-BHARATI-F61E72",
+        "event_count": 7,
+        "explainer_headline": "Decision Trace for BHARATI: Policy directed 'NORMAL_OPERATION' under AT_RISK resilience posture (FAILED)."
+      }
+    },
+    {
+      "stage": 14,
+      "name": "Final Verification & Epistemic Signoff",
+      "status": "PASS",
+      "details": {
+        "all_stages_passed": true,
+        "zero_false_real_provenance": true,
+        "physical_boundary_truth": true
+      }
+    }
+  ],
+  "overall_status": "PASS",
+  "total_duration_sec": 1.97
+}

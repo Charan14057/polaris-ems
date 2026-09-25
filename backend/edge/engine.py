@@ -39,7 +39,12 @@ from backend.edge.connectivity import ConnectivityTracker
 from backend.edge.buffer import LocalTelemetryBuffer
 from backend.edge.state import EdgeStateManager
 from backend.edge.reconciliation import StateReconciler
-from backend.edge.adapters import EdgeDecisionBridge
+from backend.edge.adapters import (
+    get_global_adapter_registry,
+    DeviceAdapter,
+    EdgeDecisionBridge,
+    EdgeToTwinAdapter,
+)
 
 
 class EdgeEngine:

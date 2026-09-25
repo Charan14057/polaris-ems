@@ -13,6 +13,7 @@ import { PolicyView } from './views/PolicyView';
 import { DecisionTraceView } from './views/DecisionTraceView';
 import { EdgeView } from './views/EdgeView';
 import { ValidationView } from './views/ValidationView';
+import { FieldHILValidationView } from './views/FieldHILValidationView';
 import { OperatorApprovalBanner } from './components/common/OperatorApprovalBanner';
 import { ShieldAlert, Server, Info } from 'lucide-react';
 
@@ -49,6 +50,7 @@ const AppContent: React.FC = () => {
         {activeTab === 'trace' && <DecisionTraceView />}
         {activeTab === 'edge' && <EdgeView />}
         {activeTab === 'validation' && <ValidationView />}
+        {activeTab === 'field_hil' && <FieldHILValidationView />}
       </main>
 
       {/* Polar Station Telemetry & Compliance Footer */}

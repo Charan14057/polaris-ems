@@ -1,5 +1,5 @@
 """
-POLARIS-EMS — Edge Adapters & Decision Pathways
+POLARIS-EMS — Edge Adapters & Decision Pathways (Legacy Phase 11 bridge)
 SIH26061: Polar Energy Management & Resilience System
 
 Bridges edge domain telemetry and operational states to the frozen Polaris-EMS backend:

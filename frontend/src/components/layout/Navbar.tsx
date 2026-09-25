@@ -22,7 +22,8 @@ export type TabType =
   | 'policy' 
   | 'trace'
   | 'edge'
-  | 'validation';
+  | 'validation'
+  | 'field_hil';
 
 export type ActiveTab = TabType;
 
@@ -49,6 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onSelec
     { id: 'trace', label: 'Decision Trace', icon: <GitCommit className="w-4 h-4" />, phase: 'Audit Lineage' },
     { id: 'edge', label: 'Edge & Devices', icon: <Radio className="w-4 h-4" />, phase: 'Field Nodes' },
     { id: 'validation', label: 'Validation', icon: <ShieldCheck className="w-4 h-4" />, phase: 'Benchmarks' },
+    { id: 'field_hil', label: 'Field & HIL', icon: <Radio className="w-4 h-4" />, phase: 'Phase 16' },
   ];
 
   return (
