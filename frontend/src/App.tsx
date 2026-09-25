@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { StationProvider, useStation } from './context/StationContext';
+import { EvidenceProvider } from './context/EvidenceContext';
+import { ComprehensionProvider, useComprehension } from './context/ComprehensionContext';
+import { QuickOrientationModal } from './components/common/QuickOrientationModal';
 import { Header } from './components/layout/Header';
+import { GlobalStatusBar } from './components/layout/GlobalStatusBar';
 import { Navbar, TabType } from './components/layout/Navbar';
 import { AlertRibbon } from './components/layout/AlertRibbon';
+import { OperatorApprovalBanner } from './components/common/OperatorApprovalBanner';
+import { EvidenceDrawer } from './components/common/EvidenceDrawer';
 import { OverviewView } from './views/OverviewView';
 import { EnergyTwinView } from './views/EnergyTwinView';
 import { ForecastView } from './views/ForecastView';
@@ -14,32 +20,42 @@ import { DecisionTraceView } from './views/DecisionTraceView';
 import { EdgeView } from './views/EdgeView';
 import { ValidationView } from './views/ValidationView';
 import { FieldHILValidationView } from './views/FieldHILValidationView';
-import { OperatorApprovalBanner } from './components/common/OperatorApprovalBanner';
-import { ShieldAlert, Server, Info } from 'lucide-react';
+import { DesignLabView } from './views/DesignLabView';
+import { ShieldCheck, WifiOff, FileCheck } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const { stationId, stationDetail, activeThreats } = useStation();
+  const { activeThreats } = useStation();
+  const { isOrientationOpen, closeOrientation } = useComprehension();
 
   return (
-    <div className="min-h-screen bg-polar-950 text-polar-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
-      {/* Global Header */}
+    <div className="min-h-screen bg-canvas text-ink-primary flex flex-col font-sans selection:bg-copper-soft selection:text-copper-dark">
+      {/* 1. Global Header & Masthead */}
       <Header />
 
-      {/* Primary Navigation */}
+      {/* 2. Calm Global Status Orientation Strip */}
+      <GlobalStatusBar />
+
+      {/* 3. Primary Mission-Control Navigation Index */}
       <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
 
-      {/* Active Threat / Policy Ribbon */}
+      {/* 4. Active Threat / Policy Alert Ribbon */}
       <AlertRibbon threats={activeThreats} onNavigateToPolicy={() => setActiveTab('policy')} />
 
-      {/* Operator Dispatch Approval Boundary (Workstream G) */}
+      {/* 5. Operator Supervisory Boundary Banner */}
       <OperatorApprovalBanner
         onNavigateToOptimization={() => setActiveTab('optimization')}
         onNavigateToTwin={() => setActiveTab('twin')}
       />
 
-      {/* Main Operational Stage */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+      {/* 6. Scientific Evidence & Provenance Inspection Drawer */}
+      <EvidenceDrawer />
+
+      {/* 6.1 Non-Technical Visitor 60-Second Orientation Modal */}
+      <QuickOrientationModal isOpen={isOrientationOpen} onClose={closeOrientation} />
+
+      {/* 7. Main Operational Stage */}
+      <main className="flex-1 max-w-[1520px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'overview' && <OverviewView onNavigate={setActiveTab} />}
         {activeTab === 'twin' && <EnergyTwinView />}
         {activeTab === 'forecast' && <ForecastView />}
@@ -51,53 +67,34 @@ const AppContent: React.FC = () => {
         {activeTab === 'edge' && <EdgeView />}
         {activeTab === 'validation' && <ValidationView />}
         {activeTab === 'field_hil' && <FieldHILValidationView />}
+        {activeTab === 'design_lab' && <DesignLabView />}
       </main>
 
-      {/* Polar Station Telemetry & Compliance Footer */}
-      <footer className="border-t border-polar-800 bg-polar-900/60 backdrop-blur text-polar-500 text-xs py-5 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 8. Mission Control & Epistemic Boundary Footer */}
+      <footer className="border-t border-border bg-canvas-subtle text-ink-muted text-xs py-5 mt-auto">
+        <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
           <div className="flex items-center space-x-3">
             <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-copper opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-copper"></span>
             </span>
-            <span className="font-mono text-polar-400 font-semibold tracking-wider">
-              POLARIS-EMS // POLAR MISSION CONTROL
+            <span className="text-ink-secondary font-medium">
+              POLARIS-EMS • MISSION CONTROL CORE
             </span>
-            <span className="text-polar-700">|</span>
-            <span>Station ID: <strong className="text-polar-300">{stationId}</strong></span>
-            {stationDetail && (
-              <>
-                <span className="text-polar-700">|</span>
-                <span>Type: <strong className="text-polar-300">{stationDetail.classification}</strong></span>
-                <span className="text-polar-700">|</span>
-                <span>Bus: <strong className="text-polar-300 font-mono">{stationDetail.electrical.nominal_voltage_v}V @ {stationDetail.electrical.grid_frequency_hz}Hz</strong></span>
-              </>
-            )}
+            <span className="text-border">|</span>
+            <span className="text-ink-muted">SIH26061</span>
           </div>
 
-          <div className="flex items-center space-x-4 text-polar-400">
-            <div className="flex items-center space-x-1" title="Phase 9 FastAPI Boundary">
-              <Server className="w-3.5 h-3.5 text-cyan-400" />
-              <span>FastAPI Gateway: <span className="font-mono text-cyan-300">:8000</span></span>
+          <div className="flex items-center space-x-4 text-[11px]">
+            <div className="flex items-center space-x-1 text-teal">
+              <FileCheck className="w-3.5 h-3.5" />
+              <span>PROVENANCE: 6 LOCKED TIERS</span>
             </div>
-            <span className="text-polar-700">|</span>
-            <div className="flex items-center space-x-1" title="Read-only Twin Protocol">
-              <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-              <span>Advisory Telemetry Only</span>
+            <span className="text-border">|</span>
+            <div className="flex items-center space-x-1 text-copper font-medium">
+              <WifiOff className="w-3.5 h-3.5" />
+              <span>SCADA: SIMULATION ONLY (ZERO PHYSICAL TELEMETRY)</span>
             </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2.5 pt-2 border-t border-polar-800/40 text-[11px] text-polar-600 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <Info className="w-3 h-3 text-polar-500" />
-            <span>
-              All power values, forecasts, optimization dispatches, and policy directives are snapshot-evaluated by frozen server-side physical and mathematical engines.
-            </span>
-          </div>
-          <div className="font-mono tracking-tight text-polar-400">
-            DATA CLASSIFICATION: SNAPSHOT TELEMETRY • STATION SPEC • PHYSICAL DIGITAL TWIN
           </div>
         </div>
       </footer>
@@ -108,7 +105,11 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <StationProvider>
-      <AppContent />
+      <EvidenceProvider>
+        <ComprehensionProvider>
+          <AppContent />
+        </ComprehensionProvider>
+      </EvidenceProvider>
     </StationProvider>
   );
 };

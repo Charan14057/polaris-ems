@@ -3,51 +3,108 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --color-canvas: #FBF9F5;
+  --color-canvas-subtle: #F6F3EC;
+  --color-surface: #FFFFFF;
+  --color-surface-inset: #F4F1EA;
+  --color-ink-primary: #1C1917;
+  --color-ink-secondary: #44403C;
+  --color-ink-muted: #78716C;
+  --color-copper: #B45309;
+  --color-copper-soft: #FEF3C7;
+  --color-ice: #0284C7;
+  --color-ice-soft: #E0F2FE;
+  --color-teal: #0F766E;
+  --color-moss: #15803D;
+  --color-border-subtle: #E7E2D6;
+  --color-border: #DDD6C6;
+  --color-border-strong: #BCB39E;
 }
 
 body {
   margin: 0;
-  background-color: #070b14;
-  color: #f1f5f9;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink-primary);
+  font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Tabular Numbers for rock-solid numeric KPIs */
 .font-mono-numbers {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-  font-variant-numeric: tabular-nums;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.01em;
 }
 
-/* Subtle, sleek mission-control scrollbar */
+/* Editorial Serif Header Utility */
+.font-serif-display {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Subtle, architectural mission-control scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0f1d;
+  background: #F4F1EA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+  background: #DDD6C6;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #BCB39E;
 }
 
-/* Glass panel utility */
-.polar-card {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.5rem;
+/* Architectural Sheet Utilities */
+.editorial-sheet {
+  background: #FFFFFF;
+  border: 1px solid #E7E2D6;
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04), 0 1px 2px rgba(28, 25, 23, 0.02);
 }
 
-.polar-card-glow {
-  background: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  box-shadow: 0 0 15px -3px rgba(6, 182, 212, 0.1);
-  border-radius: 0.5rem;
+.editorial-sheet-raised {
+  background: #FFFFFF;
+  border: 1px solid #DDD6C6;
+  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.06), 0 2px 4px -1px rgba(28, 25, 23, 0.03);
+}
+
+.technical-inset {
+  background: #F6F3EC;
+  border: 1px solid #E7E2D6;
+}
+
+/* Subtle architectural tactile background grids */
+.texture-subtle-grid {
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(221, 214, 198, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(221, 214, 198, 0.25) 1px, transparent 1px);
+}
+
+.texture-dots {
+  background-image: radial-gradient(rgba(180, 83, 9, 0.12) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Custom focus ring for WCAG 2.1 AA keyboard accessibility */
+*:focus-visible {
+  outline: 2px solid #B45309;
+  outline-offset: 2px;
+}
+
+/* Respect user's reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

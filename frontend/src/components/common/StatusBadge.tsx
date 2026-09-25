@@ -8,7 +8,8 @@ import {
   Info, 
   Slash,
   CheckCircle2,
-  Clock
+  Clock,
+  Activity
 } from 'lucide-react';
 import { ResilienceState, PolicyState } from '../../api/types';
 
@@ -36,77 +37,70 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       case 'COMPLETED':
       case 'SUCCESS':
         return {
-          bg: 'bg-emerald-950/80 border-emerald-500/40 text-emerald-400',
-          dot: 'bg-emerald-400',
-          icon: <ShieldCheck className="w-3.5 h-3.5" />,
+          bg: 'bg-moss-soft border-moss/30 text-moss-dark',
+          dot: 'bg-moss',
+          icon: <ShieldCheck className="w-3.5 h-3.5 shrink-0" />,
           label: norm,
         };
       case 'WATCH':
       case 'MONITOR':
         return {
-          bg: 'bg-blue-950/80 border-blue-500/40 text-blue-400',
-          dot: 'bg-blue-400',
-          icon: <Info className="w-3.5 h-3.5" />,
+          bg: 'bg-ice-soft border-ice/30 text-ice-dark',
+          dot: 'bg-ice',
+          icon: <Info className="w-3.5 h-3.5 shrink-0" />,
           label: norm,
         };
       case 'AT_RISK':
       case 'PREPARE':
       case 'WARNING':
         return {
-          bg: 'bg-amber-950/80 border-amber-500/40 text-amber-400',
-          dot: 'bg-amber-400',
-          icon: <AlertTriangle className="w-3.5 h-3.5" />,
+          bg: 'bg-copper-soft border-copper/30 text-copper-dark',
+          dot: 'bg-copper',
+          icon: <AlertTriangle className="w-3.5 h-3.5 shrink-0" />,
           label: norm.replace('_', ' '),
         };
       case 'THREATENED':
       case 'MITIGATE':
-      case 'PROTECT':
         return {
-          bg: 'bg-orange-950/80 border-orange-500/40 text-orange-400',
-          dot: 'bg-orange-400',
-          icon: <Flame className="w-3.5 h-3.5" />,
-          label: norm,
+          bg: 'bg-orange-50 border-orange-200 text-orange-800',
+          dot: 'bg-orange-600',
+          icon: <Flame className="w-3.5 h-3.5 shrink-0" />,
+          label: norm.replace('_', ' '),
         };
       case 'CRITICAL':
-      case 'ESCALATE':
+      case 'EMERGENCY':
+      case 'DEFICIT':
       case 'FAILED':
       case 'ERROR':
         return {
-          bg: 'bg-red-950/80 border-red-500/40 text-red-400',
-          dot: 'bg-red-400',
-          icon: <AlertOctagon className="w-3.5 h-3.5" />,
+          bg: 'bg-red-50 border-red-200 text-red-800',
+          dot: 'bg-red-600',
+          icon: <AlertOctagon className="w-3.5 h-3.5 shrink-0" />,
           label: norm,
         };
       case 'RECOVERY':
-      case 'RECOVER':
+      case 'RECONCILING':
         return {
-          bg: 'bg-purple-950/80 border-purple-500/40 text-purple-400',
-          dot: 'bg-purple-400',
-          icon: <RefreshCw className="w-3.5 h-3.5" />,
+          bg: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+          dot: 'bg-indigo-600',
+          icon: <RefreshCw className="w-3.5 h-3.5 shrink-0" />,
           label: norm,
         };
       case 'BLOCKED':
-      case 'INFEASIBLE':
-        return {
-          bg: 'bg-slate-900 border-slate-600 text-slate-400',
-          dot: 'bg-slate-400',
-          icon: <Slash className="w-3.5 h-3.5" />,
-          label: norm,
-        };
       case 'FALLBACK':
-      case 'PARTIAL':
+      case 'OVERRIDDEN':
         return {
-          bg: 'bg-amber-950/60 border-amber-600/40 text-amber-300',
-          dot: 'bg-amber-300',
-          icon: <Clock className="w-3.5 h-3.5" />,
+          bg: 'bg-stone-100 border-stone-200 text-stone-700',
+          dot: 'bg-stone-500',
+          icon: <Slash className="w-3.5 h-3.5 shrink-0" />,
           label: norm,
         };
       default:
         return {
-          bg: 'bg-slate-900 border-slate-700 text-slate-300',
-          dot: 'bg-slate-400',
-          icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-          label: norm,
+          bg: 'bg-canvas-subtle border-border text-ink-secondary',
+          dot: 'bg-ink-muted',
+          icon: <Clock className="w-3.5 h-3.5 shrink-0" />,
+          label: norm.replace('_', ' '),
         };
     }
   };
@@ -114,18 +108,21 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const style = getStyle();
 
   const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5 space-x-1',
+    sm: 'text-[10px] px-1.5 py-0.5 space-x-1',
     md: 'text-xs px-2.5 py-1 space-x-1.5',
-    lg: 'text-sm px-3.5 py-1.5 space-x-2 font-medium',
+    lg: 'text-sm px-3 py-1.5 space-x-2',
   }[size];
 
   return (
     <span 
-      className={`inline-flex items-center font-mono-numbers font-semibold border rounded-full uppercase tracking-wider ${style.bg} ${sizeClasses} ${className}`}
+      className={`inline-flex items-center font-mono font-medium rounded border shadow-xs tracking-wider transition-colors ${style.bg} ${sizeClasses} ${className}`}
       role="status"
-      aria-label={`Status: ${style.label}`}
     >
-      {showIcon && style.icon}
+      {showIcon && (
+        <span className="flex items-center">
+          {style.icon}
+        </span>
+      )}
       <span>{style.label}</span>
     </span>
   );

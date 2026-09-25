@@ -19,46 +19,46 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
     switch (norm) {
       case 'REAL':
         return {
-          bg: 'bg-emerald-950/60 border-emerald-500/30 text-emerald-400',
-          icon: <Database className="w-3 h-3" />,
+          bg: 'bg-moss-soft border-moss/30 text-moss-dark',
+          icon: <Database className="w-3 h-3 text-moss" />,
           label: 'REAL',
-          title: 'Direct sensor measurement / validated weather station record',
+          title: 'Direct sensor measurement / validated weather station record (provenance: REAL)',
         };
       case 'CONFIGURED':
         return {
-          bg: 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400',
-          icon: <FileText className="w-3 h-3" />,
+          bg: 'bg-ice-soft border-ice/30 text-ice-dark',
+          icon: <FileText className="w-3 h-3 text-ice" />,
           label: 'CONFIGURED',
-          title: 'Authoritative station engineering specification & asset limits',
+          title: 'Authoritative station engineering specification & asset limits (provenance: CONFIGURED)',
         };
       case 'ASSUMED':
         return {
-          bg: 'bg-indigo-950/60 border-indigo-500/30 text-indigo-400',
-          icon: <Cpu className="w-3 h-3" />,
+          bg: 'bg-stone-100 border-stone-200 text-stone-700',
+          icon: <Cpu className="w-3 h-3 text-stone-600" />,
           label: 'ASSUMED',
-          title: 'Stated engineering approximation / baseline heuristic',
+          title: 'Stated engineering approximation / baseline heuristic (provenance: ASSUMED)',
         };
       case 'SYNTHETIC':
         return {
-          bg: 'bg-teal-950/60 border-teal-500/30 text-teal-400',
-          icon: <Sparkles className="w-3 h-3" />,
-          label: 'CALIBRATED MODEL',
-          title: 'Physics-informed calibrated environment model (provenance: SYNTHETIC)',
+          bg: 'bg-teal-50 border-teal-200 text-teal-800',
+          icon: <Sparkles className="w-3 h-3 text-teal" />,
+          label: 'SYNTHETIC',
+          title: 'Physics-informed synthetic environment model (provenance: SYNTHETIC)',
         };
       case 'FORECAST':
         return {
-          bg: 'bg-amber-950/60 border-amber-500/30 text-amber-400',
-          icon: <TrendingUp className="w-3 h-3" />,
+          bg: 'bg-copper-soft border-copper/30 text-copper-dark',
+          icon: <TrendingUp className="w-3 h-3 text-copper" />,
           label: 'FORECAST',
-          title: 'Machine learning prediction with calibrated conformal uncertainty',
+          title: 'Machine learning prediction with calibrated conformal uncertainty (provenance: FORECAST)',
         };
       case 'SIMULATED':
       default:
         return {
-          bg: 'bg-purple-950/60 border-purple-500/30 text-purple-400',
-          icon: <Activity className="w-3 h-3" />,
+          bg: 'bg-purple-50 border-purple-200 text-purple-800',
+          icon: <Activity className="w-3 h-3 text-purple-700" />,
           label: 'DIGITAL TWIN',
-          title: 'Digital Twin simulation / MILP optimization schedule (provenance: SIMULATED)',
+          title: 'Computed dynamic physics trajectory (provenance: SIMULATED)',
         };
     }
   };
@@ -67,17 +67,16 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
 
   const sizeClasses = {
     xs: 'text-[10px] px-1.5 py-0.5 space-x-1',
-    sm: 'text-xs px-2 py-0.5 space-x-1',
-    md: 'text-xs px-2.5 py-1 space-x-1.5 font-medium',
+    sm: 'text-xs px-2 py-0.5 space-x-1.5',
+    md: 'text-xs px-2.5 py-1 space-x-1.5',
   }[size];
 
   return (
-    <span 
-      className={`inline-flex items-center border rounded font-mono font-medium uppercase tracking-wider ${meta.bg} ${sizeClasses} ${className}`}
+    <span
+      className={`inline-flex items-center font-mono font-medium rounded border tracking-wider transition-colors select-none ${meta.bg} ${sizeClasses} ${className}`}
       title={meta.title}
-      aria-label={`Provenance: ${meta.label}`}
     >
-      {meta.icon}
+      <span className="shrink-0">{meta.icon}</span>
       <span>{meta.label}</span>
     </span>
   );

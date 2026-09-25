@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
 import { ProvenanceTier } from '../../api/types';
 import { ProvenanceTag } from './ProvenanceTag';
+import { useEvidence } from '../../context/EvidenceContext';
+import { Info } from 'lucide-react';
 
 interface MetricCardProps {
   title: string;
@@ -17,6 +19,9 @@ interface MetricCardProps {
   };
   highlight?: boolean;
   className?: string;
+  inspectable?: boolean;
+  source?: string;
+  station?: string;
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({
@@ -31,50 +36,78 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   trend,
   highlight = false,
   className = '',
+  inspectable = true,
+  source = 'Polaris Station Instrumentation Subsystem',
+  station,
 }) => {
+  const { inspectEvidence } = useEvidence();
+
+  const handleInspect = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    inspectEvidence({
+      title,
+      value,
+      unit,
+      source,
+      provenance: (provenance as any) || 'CONFIGURED',
+      timestamp: timestamp || new Date().toISOString(),
+      station,
+      mathematicalBasis: 'Physical measurement or computational model state',
+    });
+  };
+
   return (
     <div 
-      className={`p-4 rounded-lg transition-all duration-200 ${
+      className={`p-4 sm:p-5 rounded transition-all duration-200 ${
         highlight 
-          ? 'bg-polar-900/90 border border-cyan-500/40 shadow-lg shadow-cyan-950/20' 
-          : 'bg-polar-900/60 border border-polar-750/60 hover:border-polar-600/60'
+          ? 'bg-surface border border-copper shadow-raised' 
+          : 'editorial-sheet hover:border-border hover:shadow-raised'
       } ${className}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2">
-        <div className="flex items-center space-x-2 text-polar-400 text-xs font-medium uppercase tracking-wider">
-          {icon && <span className="text-polar-300">{icon}</span>}
+        <div className="flex items-center space-x-2 text-ink-muted text-xs font-mono uppercase tracking-wider">
+          {icon && <span className="text-copper">{icon}</span>}
           <span>{title}</span>
         </div>
         <div className="flex items-center space-x-1.5">
           {statusBadge}
           {provenance && <ProvenanceTag provenance={provenance} size="xs" />}
+          {inspectable && (
+            <button
+              type="button"
+              onClick={handleInspect}
+              className="text-ink-muted hover:text-copper p-0.5 rounded transition-colors"
+              title={`Inspect evidence for ${title}`}
+              aria-label={`Inspect evidence for ${title}`}
+            >
+              <Info className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
       <div className="flex items-baseline space-x-1.5 my-1">
-        <span className="text-2xl font-bold font-mono-numbers text-polar-50 tracking-tight">
+        <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-ink-primary tracking-tight">
           {value}
         </span>
         {unit && (
-          <span className="text-xs font-mono text-polar-400 font-normal">
+          <span className="text-xs font-mono text-ink-muted font-normal">
             {unit}
           </span>
         )}
       </div>
 
       {(subtitle || trend || timestamp) && (
-        <div className="flex items-center justify-between text-[11px] text-polar-400 mt-2 pt-2 border-t border-polar-800/80">
-          <div>
-            {trend && (
-              <span className={`font-mono mr-1.5 ${trend.isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-                {trend.value}
-              </span>
-            )}
-            {subtitle && <span>{subtitle}</span>}
-          </div>
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-border-subtle text-[11px] text-ink-muted">
+          <span>{subtitle}</span>
+          {trend && (
+            <span className={`font-mono font-medium ${trend.isPositive ? 'text-moss' : 'text-copper'}`}>
+              {trend.value}
+            </span>
+          )}
           {timestamp && (
-            <span className="text-[10px] font-mono text-polar-500" title={`Timestamp: ${timestamp}`}>
-              Snapshot: {timestamp.includes('T') ? timestamp.split('T')[1].substring(0, 5) : timestamp}
+            <span className="font-mono text-[10px] text-ink-muted">
+              Snapshot: {new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
         </div>

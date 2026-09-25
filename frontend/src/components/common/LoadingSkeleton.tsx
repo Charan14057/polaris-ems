@@ -8,7 +8,7 @@ export const LoadingSkeleton: React.FC<{ rows?: number; height?: string; classNa
   return (
     <div className={`space-y-3 animate-pulse ${className}`} role="status" aria-label="Loading data">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className={`bg-polar-850/60 border border-polar-800 rounded-lg ${height} w-full`} />
+        <div key={i} className={`bg-canvas-subtle border border-border-subtle rounded ${height} w-full`} />
       ))}
       <span className="sr-only">Loading operational telemetry...</span>
     </div>

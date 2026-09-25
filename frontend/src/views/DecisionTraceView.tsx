@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStation } from '../context/StationContext';
+import { useEvidence } from '../context/EvidenceContext';
 import { api } from '../api/endpoints';
 import { 
   PipelineAnalyzeResponseData, 
@@ -15,13 +16,14 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorCard } from '../components/common/ErrorCard';
+import { WhyThisMatters } from '../components/common/WhyThisMatters';
+import { ExplainThis } from '../components/common/ExplainThis';
+import { NextStepExplanation } from '../components/common/NextStepExplanation';
+import { JargonTooltip } from '../components/common/JargonTooltip';
 import { 
-  GitCommit, 
-  CheckCircle2, 
+  ShieldCheck, 
   Clock, 
   Play, 
-  ChevronDown, 
-  ChevronRight, 
   HelpCircle,
   AlertTriangle,
   ArrowRight,
@@ -29,10 +31,8 @@ import {
   GitCompare,
   Network,
   Cpu,
-  ShieldCheck,
   FileText,
   RefreshCw,
-  Search,
   Activity,
   Layers,
   Database
@@ -40,6 +40,7 @@ import {
 
 export const DecisionTraceView: React.FC = () => {
   const { currentStation, horizonHours } = useStation();
+  const { inspectEvidence } = useEvidence();
 
   // Active trace and pipeline state
   const [pipelineData, setPipelineData] = useState<PipelineAnalyzeResponseData | null>(null);
@@ -199,47 +200,48 @@ export const DecisionTraceView: React.FC = () => {
   // Epistemic validation badge renderer
   const renderValidationBadge = (tier: ValidationTier) => {
     const colorMap: Record<ValidationTier, string> = {
-      VALIDATED: 'bg-emerald-950 text-emerald-300 border-emerald-500/40',
-      COMPUTED: 'bg-cyan-950 text-cyan-300 border-cyan-500/40',
-      SIMULATED: 'bg-blue-950 text-blue-300 border-blue-500/40',
-      ESTIMATED: 'bg-amber-950 text-amber-300 border-amber-500/40',
-      ADVISORY: 'bg-purple-950 text-purple-300 border-purple-500/40',
-      REQUESTED: 'bg-polar-900 text-polar-300 border-polar-700',
+      VALIDATED: 'bg-[#EBF7F0] text-[#166534] border-[#BBF7D0]',
+      COMPUTED: 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]',
+      SIMULATED: 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]',
+      ESTIMATED: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
+      ADVISORY: 'bg-[#F3E8FF] text-[#6B21A8] border-[#E9D5FF]',
+      REQUESTED: 'bg-[#F6F3EC] text-[#78716C] border-[#DDD6C6]',
     };
     return (
-      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${colorMap[tier] || 'bg-polar-800 text-polar-300 border-polar-700'}`}>
+      <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${colorMap[tier] || 'bg-[#F6F3EC] text-[#78716C] border-[#DDD6C6]'}`}>
         {tier}
       </span>
     );
   };
 
-  // Stage color mapper
+  // Stage color mapper in warm tones
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'EDGE': return 'text-amber-400 border-amber-500/40 bg-amber-950/40';
-      case 'FORECAST': return 'text-blue-400 border-blue-500/40 bg-blue-950/40';
-      case 'SCENARIO': return 'text-indigo-400 border-indigo-500/40 bg-indigo-950/40';
-      case 'OPTIMIZER': return 'text-cyan-400 border-cyan-500/40 bg-cyan-950/40';
-      case 'TWIN_REPLAY': return 'text-emerald-400 border-emerald-500/40 bg-emerald-950/40';
-      case 'RESILIENCE': return 'text-orange-400 border-orange-500/40 bg-orange-950/40';
-      case 'POLICY': return 'text-purple-400 border-purple-500/40 bg-purple-950/40';
-      default: return 'text-polar-300 border-polar-700 bg-polar-900/40';
+      case 'EDGE': return 'text-[#B45309] border-[#FDE68A] bg-[#FEF3C7]';
+      case 'FORECAST': return 'text-[#0284C7] border-[#BAE6FD] bg-[#E0F2FE]';
+      case 'SCENARIO': return 'text-[#4338CA] border-[#C7D2FE] bg-[#EEF2FF]';
+      case 'OPTIMIZER': return 'text-[#0F766E] border-[#99F6E4] bg-[#CCFBF1]';
+      case 'TWIN_REPLAY': return 'text-[#15803D] border-[#BBF7D0] bg-[#DCFCE7]';
+      case 'RESILIENCE': return 'text-[#C2410C] border-[#FFEDD5] bg-[#FFF7ED]';
+      case 'POLICY': return 'text-[#7E22CE] border-[#E9D5FF] bg-[#FAF5FF]';
+      default: return 'text-[#57534E] border-[#DDD6C6] bg-[#F6F3EC]';
     }
   };
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* 1. Header Bar with Station Context & Execution Trigger */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-polar-900/60 border border-polar-800 backdrop-blur-md">
+      <div className="border-b border-[#DDD6C6] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-cyan-400" />
-              Decision Trace & Auditability Workspace
-            </h2>
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#78716C] mb-2">
+            <span>09 Decision Trace &amp; Auditability</span>
+            <span>•</span>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <p className="text-xs text-polar-400 mt-1">
+          <h1 className="font-serif text-3xl lg:text-4xl text-[#1C1917] tracking-tight">
+            Decision Trace &amp; Auditability
+          </h1>
+          <p className="text-sm text-[#57534E] font-sans mt-2 max-w-2xl">
             End-to-end observational audit layer proving how Polaris-EMS reached its operational posture from evidence to policy.
           </p>
         </div>
@@ -248,15 +250,15 @@ export const DecisionTraceView: React.FC = () => {
           <button
             onClick={() => loadTraceHistory()}
             title="Refresh Trace History"
-            className="p-2 bg-polar-800 hover:bg-polar-700 text-polar-200 rounded-lg border border-polar-700 text-xs"
+            className="p-2 bg-white hover:bg-[#F6F3EC] text-[#1C1917] rounded border border-[#DDD6C6] text-xs shadow-sm transition"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4 text-[#78716C]" />
           </button>
 
           <button
             onClick={runPipeline}
             disabled={loading}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold rounded-lg transition-all shadow-md shadow-cyan-950/30"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#B45309] hover:bg-[#92400E] text-white text-xs font-mono font-bold rounded transition shadow-sm"
           >
             <Play className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Auditing Pipeline...' : 'Run Pipeline Audit'}</span>
@@ -271,14 +273,14 @@ export const DecisionTraceView: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* 2. Trace Selector Bar & Metadata Overview */}
-          <div className="p-4 rounded-xl bg-polar-900/80 border border-polar-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs font-mono">
+          <div className="p-4 rounded bg-white border border-[#DDD6C6] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs font-mono shadow-sm">
             {/* Trace History Dropdown */}
             <div className="flex items-center space-x-3 w-full md:w-auto">
-              <span className="text-polar-400 uppercase tracking-wider font-bold">Active Trace:</span>
+              <span className="text-[#78716C] uppercase tracking-wider font-bold">Active Trace:</span>
               <select
                 value={selectedTraceId || ''}
                 onChange={(e) => setSelectedTraceId(e.target.value)}
-                className="bg-polar-950 border border-polar-700 text-cyan-300 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-cyan-500 text-xs"
+                className="bg-[#F6F3EC] border border-[#DDD6C6] text-[#B45309] font-bold px-3 py-1.5 rounded focus:outline-none focus:border-[#B45309] text-xs"
               >
                 {traceHistory.map((tr) => (
                   <option key={tr.decision_trace_id} value={tr.decision_trace_id}>
@@ -291,10 +293,10 @@ export const DecisionTraceView: React.FC = () => {
             {/* Quick Badge Summary */}
             {traceDetail && (
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-polar-400">Station: <strong className="text-polar-100">{traceDetail.station_id}</strong></span>
-                <span className="text-polar-400">Mode: <strong className="text-cyan-300">{traceDetail.optimization_mode}</strong></span>
-                <span className="text-polar-400">Policy: <strong className="text-purple-300">{traceDetail.policy_state || 'NOMINAL'}</strong></span>
-                <span className="text-polar-400">Resilience: <strong className="text-emerald-300">{traceDetail.resilience_state || 'SAFE'}</strong></span>
+                <span className="text-[#78716C]">Station: <strong className="text-[#1C1917]">{traceDetail.station_id}</strong></span>
+                <span className="text-[#78716C]">Mode: <strong className="text-[#0284C7]">{traceDetail.optimization_mode}</strong></span>
+                <span className="text-[#78716C]">Policy: <strong className="text-[#7E22CE]">{traceDetail.policy_state || 'NOMINAL'}</strong></span>
+                <span className="text-[#78716C]">Resilience: <strong className="text-[#15803D]">{traceDetail.resilience_state || 'SAFE'}</strong></span>
                 <StatusBadge status={traceDetail.execution_status} size="sm" />
               </div>
             )}
@@ -303,42 +305,64 @@ export const DecisionTraceView: React.FC = () => {
             <div className="flex items-center space-x-2 w-full md:w-auto justify-end">
               <button
                 onClick={() => setShowCompareModal(true)}
-                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-polar-800 hover:bg-polar-700 text-polar-200 border border-polar-700 rounded-lg text-xs"
+                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-white hover:bg-[#F6F3EC] text-[#1C1917] border border-[#DDD6C6] rounded text-xs transition"
               >
-                <GitCompare className="w-3.5 h-3.5 text-cyan-400" />
+                <GitCompare className="w-3.5 h-3.5 text-[#B45309]" />
                 <span>Compare</span>
               </button>
 
               <button
                 onClick={() => handleExport('json')}
                 disabled={exporting}
-                className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-polar-800 hover:bg-polar-700 text-polar-200 border border-polar-700 rounded-lg text-xs"
+                className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-white hover:bg-[#F6F3EC] text-[#1C1917] border border-[#DDD6C6] rounded text-xs transition"
                 title="Export Trace JSON"
               >
-                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <Download className="w-3.5 h-3.5 text-[#166534]" />
                 <span>JSON</span>
               </button>
 
               <button
                 onClick={() => handleExport('csv')}
                 disabled={exporting}
-                className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-polar-800 hover:bg-polar-700 text-polar-200 border border-polar-700 rounded-lg text-xs"
+                className="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-white hover:bg-[#F6F3EC] text-[#1C1917] border border-[#DDD6C6] rounded text-xs transition"
                 title="Export Trace CSV"
               >
-                <Download className="w-3.5 h-3.5 text-blue-400" />
+                <Download className="w-3.5 h-3.5 text-[#0284C7]" />
                 <span>CSV</span>
               </button>
             </div>
           </div>
 
+          {/* Non-Technical Comprehension: Explain This */}
+          <ExplainThis
+            title="What is a Decision Trace in Polaris-EMS?"
+            whatAmILookingAt="This workspace is the 'black box flight recorder' of the energy management system. It logs every single calculation, decision, and safety check made by the software in chronological order."
+            whyIsItImportant="If a generator turns on or a scientific heater turns off, human operators need to know exactly WHY. Was it a forecasted storm? A tripped sensor? A policy rule? The decision trace eliminates 'black box AI' mysteries."
+            howIsItCalculated="Every calculation step creates an immutable cryptographically linked record connecting inputs to outputs."
+          />
+
+          <NextStepExplanation
+            title="AUDIT TRAIL VERIFICATION"
+            timeframe="Observational Pipeline Trace"
+            outlook="All 7 pipeline stages (Edge Telemetry → ML Forecast → Stress Scenario → HiGHS Optimizer → Twin Replay → Resilience Calculus → Policy Governance) have completed with zero validation violations."
+          />
+
+          {/* Why This Matters */}
+          <WhyThisMatters
+            summary="Autonomous polar energy systems must produce tamper-evident proof for every dispatch decision. The Decision Trace captures the causal dependency DAG from sensor inputs through optimizer solve to policy enforcement."
+            technicalDetail="Every execution step generates an immutable event record with cryptographic parent linkage, elapsed execution wall time, validation tier, and reason codes. Invariants ensure optimizer proposals are distinguished from physically validated twin outcomes."
+            invariant="Audit Invariant: Every dispatch recommendation has a deterministic causal lineage tracing back to validated weather observations, non-confidential physical constraints, and active policy rules."
+            stage="Decision Trace & Observability"
+          />
+
           {/* Navigation View Tabs */}
-          <div className="flex border-b border-polar-800 text-xs font-mono">
+          <div className="flex border-b border-[#DDD6C6] text-xs font-mono">
             <button
               onClick={() => setActiveTab('timeline')}
               className={`px-4 py-2.5 font-bold uppercase tracking-wider transition-colors border-b-2 flex items-center space-x-2 ${
                 activeTab === 'timeline'
-                  ? 'border-cyan-500 text-cyan-400 bg-polar-800/40'
-                  : 'border-transparent text-polar-400 hover:text-polar-200'
+                  ? 'border-[#B45309] text-[#B45309] bg-white'
+                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
               }`}
             >
               <Clock className="w-4 h-4" />
@@ -349,8 +373,8 @@ export const DecisionTraceView: React.FC = () => {
               onClick={() => setActiveTab('graph')}
               className={`px-4 py-2.5 font-bold uppercase tracking-wider transition-colors border-b-2 flex items-center space-x-2 ${
                 activeTab === 'graph'
-                  ? 'border-cyan-500 text-cyan-400 bg-polar-800/40'
-                  : 'border-transparent text-polar-400 hover:text-polar-200'
+                  ? 'border-[#B45309] text-[#B45309] bg-white'
+                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
               }`}
             >
               <Network className="w-4 h-4" />
@@ -361,8 +385,8 @@ export const DecisionTraceView: React.FC = () => {
               onClick={() => setActiveTab('explanation')}
               className={`px-4 py-2.5 font-bold uppercase tracking-wider transition-colors border-b-2 flex items-center space-x-2 ${
                 activeTab === 'explanation'
-                  ? 'border-cyan-500 text-cyan-400 bg-polar-800/40'
-                  : 'border-transparent text-polar-400 hover:text-polar-200'
+                  ? 'border-[#B45309] text-[#B45309] bg-white'
+                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
               }`}
             >
               <HelpCircle className="w-4 h-4" />
@@ -373,8 +397,8 @@ export const DecisionTraceView: React.FC = () => {
               onClick={() => setActiveTab('comparison')}
               className={`px-4 py-2.5 font-bold uppercase tracking-wider transition-colors border-b-2 flex items-center space-x-2 ${
                 activeTab === 'comparison'
-                  ? 'border-cyan-500 text-cyan-400 bg-polar-800/40'
-                  : 'border-transparent text-polar-400 hover:text-polar-200'
+                  ? 'border-[#B45309] text-[#B45309] bg-white'
+                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
               }`}
             >
               <GitCompare className="w-4 h-4" />
@@ -385,8 +409,8 @@ export const DecisionTraceView: React.FC = () => {
               onClick={() => setActiveTab('raw')}
               className={`px-4 py-2.5 font-bold uppercase tracking-wider transition-colors border-b-2 flex items-center space-x-2 ${
                 activeTab === 'raw'
-                  ? 'border-cyan-500 text-cyan-400 bg-polar-800/40'
-                  : 'border-transparent text-polar-400 hover:text-polar-200'
+                  ? 'border-[#B45309] text-[#B45309] bg-white'
+                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -399,8 +423,8 @@ export const DecisionTraceView: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column: Sequential Stage Timeline Cards */}
               <div className="lg:col-span-7 space-y-3">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-polar-300 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#B45309]" />
                   Sequential Pipeline Execution Stages ({traceDetail.events.length} Events)
                 </h3>
 
@@ -412,19 +436,19 @@ export const DecisionTraceView: React.FC = () => {
                       <div
                         key={ev.event_id}
                         onClick={() => setSelectedEventId(ev.event_id)}
-                        className={`p-3.5 rounded-xl border transition-all cursor-pointer font-mono text-xs ${
+                        className={`p-3.5 rounded border transition-all cursor-pointer font-mono text-xs ${
                           isSelected
-                            ? 'bg-polar-850 border-cyan-500 shadow-md shadow-cyan-950/30 ring-1 ring-cyan-500/50'
-                            : 'bg-polar-900/70 border-polar-800 hover:border-polar-700'
+                            ? 'bg-white border-[#B45309] shadow-md ring-1 ring-[#B45309]/30'
+                            : 'bg-white border-[#DDD6C6] hover:border-[#B45309]/50'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center space-x-2">
-                            <span className="text-[10px] font-bold text-polar-500">#{idx + 1}</span>
+                            <span className="text-[10px] font-bold text-[#A8A29E]">#{idx + 1}</span>
                             <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${stageColor}`}>
                               {ev.stage}
                             </span>
-                            <span className="font-bold text-polar-100 truncate">{ev.event_type}</span>
+                            <span className="font-bold text-[#1C1917] truncate">{ev.event_type}</span>
                           </div>
 
                           <div className="flex items-center space-x-2">
@@ -433,14 +457,14 @@ export const DecisionTraceView: React.FC = () => {
                           </div>
                         </div>
 
-                        <p className="mt-2 text-polar-300 text-xs line-clamp-2 font-sans">
+                        <p className="mt-2 text-[#57534E] text-xs line-clamp-2 font-sans">
                           {ev.summary}
                         </p>
 
-                        <div className="mt-2.5 flex items-center justify-between text-[10px] text-polar-400 pt-2 border-t border-polar-800/60">
-                          <span className="text-cyan-400/90 font-bold">{ev.reason_code}</span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-polar-500" />
+                        <div className="mt-2.5 flex items-center justify-between text-[10px] text-[#78716C] pt-2 border-t border-[#F6F3EC]">
+                          <span className="text-[#B45309] font-bold">{ev.reason_code}</span>
+                          <span className="flex items-center gap-1 font-mono-numbers">
+                            <Clock className="w-3 h-3 text-[#A8A29E]" />
                             {ev.duration_ms.toFixed(1)} ms
                           </span>
                         </div>
@@ -452,27 +476,27 @@ export const DecisionTraceView: React.FC = () => {
 
               {/* Right Column: Detailed Evidence & Validation Inspector */}
               <div className="lg:col-span-5 space-y-4">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-polar-300 flex items-center gap-2">
-                  <Database className="w-4 h-4 text-cyan-400" />
-                  Stage Evidence & Validation Details
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center gap-2">
+                  <Database className="w-4 h-4 text-[#B45309]" />
+                  Stage Evidence &amp; Validation Details
                 </h3>
 
                 {selectedEvent ? (
-                  <div className="p-5 rounded-xl bg-polar-900/90 border border-polar-750 font-mono text-xs space-y-4 backdrop-blur-sm">
-                    <div className="flex items-center justify-between pb-3 border-b border-polar-800">
+                  <div className="p-5 rounded bg-white border border-[#DDD6C6] font-mono text-xs space-y-4 shadow-sm">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#DDD6C6]">
                       <div>
-                        <span className="text-[10px] text-polar-400 uppercase">Selected Event ID:</span>
-                        <div className="font-bold text-cyan-300 text-xs">{selectedEvent.event_id}</div>
+                        <span className="text-[10px] text-[#78716C] uppercase">Selected Event ID:</span>
+                        <div className="font-bold text-[#B45309] text-xs">{selectedEvent.event_id}</div>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-[10px] text-polar-400 uppercase">Validation Tier:</span>
+                        <span className="text-[10px] text-[#78716C] uppercase">Validation Tier:</span>
                         {renderValidationBadge(selectedEvent.validation_tier)}
                       </div>
                     </div>
 
                     {/* Summary Card */}
-                    <div className="p-3 rounded-lg bg-polar-950/80 border border-polar-800 text-xs font-sans text-polar-200">
-                      <strong className="text-polar-100 block font-mono text-[11px] mb-1 uppercase tracking-wider text-cyan-400">
+                    <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6] text-xs font-sans text-[#1C1917]">
+                      <strong className="text-[#B45309] block font-mono text-[11px] mb-1 uppercase tracking-wider">
                         Factual Finding:
                       </strong>
                       {selectedEvent.summary}
@@ -480,36 +504,54 @@ export const DecisionTraceView: React.FC = () => {
 
                     {/* Invariant Distinction Alert */}
                     {selectedEvent.stage === 'OPTIMIZER' && (
-                      <div className="p-3 rounded-lg bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs font-sans">
-                        <strong className="font-mono text-blue-300 block mb-1">PROPOSED DISPATCH:</strong>
+                      <div className="p-3 rounded bg-[#E0F2FE] border border-[#BAE6FD] text-[#0369A1] text-xs font-sans">
+                        <strong className="font-mono text-[#0284C7] block mb-1">PROPOSED DISPATCH:</strong>
                         This schedule represents optimizer-proposed dispatch under mathematical constraints. Physical validity is proven in the downstream Digital Twin stage.
                       </div>
                     )}
 
                     {selectedEvent.stage === 'TWIN_REPLAY' && (
-                      <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs font-sans">
-                        <strong className="font-mono text-emerald-300 block mb-1">PHYSICALLY VALIDATED:</strong>
+                      <div className="p-3 rounded bg-[#EBF7F0] border border-[#BBF7D0] text-[#166534] text-xs font-sans">
+                        <strong className="font-mono text-[#15803D] block mb-1">PHYSICALLY VALIDATED:</strong>
                         Replayed through high-fidelity polar battery, diesel, and thermal physics equations to verify zero thermal or capacity breaches.
                       </div>
                     )}
 
                     {selectedEvent.stage === 'RESILIENCE' && (
-                      <div className="p-3 rounded-lg bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs font-sans">
-                        <strong className="font-mono text-amber-300 block mb-1">ESTIMATED RECOVERY HORIZON:</strong>
+                      <div className="p-3 rounded bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-xs font-sans">
+                        <strong className="font-mono text-[#B45309] block mb-1">ESTIMATED RECOVERY HORIZON:</strong>
                         Assessed 5 survival dimensions. Projected recovery pathways carry ESTIMATED validation tier pending real-world confirmation.
                       </div>
                     )}
 
                     {/* Observed Outputs */}
                     <div>
-                      <span className="text-[11px] font-bold text-polar-300 uppercase tracking-wider block mb-2">
-                        Observed Stage Outputs:
-                      </span>
-                      <div className="p-3 rounded-lg bg-polar-950/90 border border-polar-800/80 space-y-1.5 text-[11px]">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-bold text-[#1C1917] uppercase tracking-wider">
+                          Observed Stage Outputs:
+                        </span>
+                        <button
+                          onClick={() => inspectEvidence({
+                            value: JSON.stringify(selectedEvent.outputs),
+                            source: `${selectedEvent.stage}::${selectedEvent.event_type}`,
+                            provenance: selectedEvent.provenance,
+                            timestamp: selectedEvent.timestamp,
+                            station: traceDetail.station_id,
+                            model: selectedEvent.engine_version,
+                            validationState: selectedEvent.validation_tier,
+                            uncertaintyInterval: 'Exact Computed Event',
+                            governingInvariant: `Reason Code: ${selectedEvent.reason_code}. Stage verified under non-confidential telemetry protocol.`
+                          })}
+                          className="text-[10px] font-mono text-[#0284C7] hover:underline"
+                        >
+                          Inspect Full Evidence →
+                        </button>
+                      </div>
+                      <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6] space-y-1.5 text-[11px]">
                         {Object.entries(selectedEvent.outputs).map(([k, v]) => (
-                          <div key={k} className="flex justify-between items-center py-0.5 border-b border-polar-900/60 last:border-0">
-                            <span className="text-polar-400">{k}:</span>
-                            <span className="text-polar-100 font-bold max-w-[240px] truncate text-right">
+                          <div key={k} className="flex justify-between items-center py-0.5 border-b border-[#DDD6C6]/50 last:border-0">
+                            <span className="text-[#78716C]">{k}:</span>
+                            <span className="text-[#1C1917] font-bold max-w-[240px] truncate text-right font-mono-numbers">
                               {typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v)}
                             </span>
                           </div>
@@ -518,15 +560,15 @@ export const DecisionTraceView: React.FC = () => {
                     </div>
 
                     {/* Inputs & Lineage Metadata */}
-                    <div className="pt-2 border-t border-polar-800 text-[10px] text-polar-400 space-y-1">
-                      <div>Parent Event: <span className="text-polar-200">{selectedEvent.parent_event_id || 'NONE (ROOT NODE)'}</span></div>
-                      <div>Engine Version: <span className="text-polar-200">{selectedEvent.engine_version}</span></div>
-                      <div>Timestamp: <span className="text-polar-200">{selectedEvent.timestamp}</span></div>
-                      <div>Reason Code: <span className="text-cyan-400 font-bold">{selectedEvent.reason_code}</span></div>
+                    <div className="pt-2 border-t border-[#DDD6C6] text-[10px] text-[#78716C] space-y-1">
+                      <div>Parent Event: <span className="text-[#1C1917]">{selectedEvent.parent_event_id || 'NONE (ROOT NODE)'}</span></div>
+                      <div>Engine Version: <span className="text-[#1C1917]">{selectedEvent.engine_version}</span></div>
+                      <div>Timestamp: <span className="text-[#1C1917] font-mono-numbers">{selectedEvent.timestamp}</span></div>
+                      <div>Reason Code: <span className="text-[#B45309] font-bold">{selectedEvent.reason_code}</span></div>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-polar-500 font-mono text-xs border border-dashed border-polar-800 rounded-xl">
+                  <div className="p-8 text-center text-[#A8A29E] font-mono text-xs border border-dashed border-[#DDD6C6] rounded bg-white">
                     Select an event to inspect its inputs, outputs, and validation tier.
                   </div>
                 )}
@@ -536,23 +578,23 @@ export const DecisionTraceView: React.FC = () => {
 
           {/* TAB 2: DAG Lineage Visualization */}
           {activeTab === 'graph' && traceDetail && (
-            <div className="p-6 rounded-xl bg-polar-900/70 border border-polar-800 space-y-6">
+            <div className="editorial-sheet p-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-polar-100">
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-[#1C1917]">
                     Decision Lineage Dependency DAG
                   </h3>
-                  <p className="text-xs text-polar-400 mt-0.5">
+                  <p className="text-xs text-[#57534E] mt-0.5">
                     Parent-to-child sequential validation graph showing exact execution order and terminal state.
                   </p>
                 </div>
-                <div className="text-xs font-mono text-polar-400">
-                  Terminal Status: <strong className="text-emerald-400">{traceDetail.execution_status}</strong>
+                <div className="text-xs font-mono text-[#78716C]">
+                  Terminal Status: <strong className="text-[#166534]">{traceDetail.execution_status}</strong>
                 </div>
               </div>
 
               {/* Graphical Lineage Sequence */}
-              <div className="flex flex-col md:flex-row items-center justify-between gap-3 p-6 bg-polar-950/80 rounded-xl border border-polar-800 overflow-x-auto">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-3 p-6 bg-white rounded border border-[#DDD6C6] overflow-x-auto shadow-sm">
                 {traceDetail.events.map((ev, idx) => (
                   <React.Fragment key={ev.event_id}>
                     <div 
@@ -560,30 +602,30 @@ export const DecisionTraceView: React.FC = () => {
                         setSelectedEventId(ev.event_id);
                         setActiveTab('timeline');
                       }}
-                      className={`p-3.5 rounded-lg border text-center font-mono cursor-pointer transition-all min-w-[130px] shrink-0 ${
+                      className={`p-3.5 rounded border text-center font-mono cursor-pointer transition-all min-w-[130px] shrink-0 ${
                         getStageColor(ev.stage)
                       }`}
                     >
-                      <div className="text-[10px] text-polar-400 font-bold">NODE #{idx + 1}</div>
+                      <div className="text-[10px] text-[#78716C] font-bold">NODE #{idx + 1}</div>
                       <div className="text-xs font-bold uppercase mt-1">{ev.stage}</div>
-                      <div className="text-[9px] text-polar-300 mt-1 truncate">{ev.event_type}</div>
-                      <div className="mt-2 text-[10px] font-bold text-polar-100">
+                      <div className="text-[9px] text-[#57534E] mt-1 truncate">{ev.event_type}</div>
+                      <div className="mt-2 text-[10px] font-bold text-[#1C1917]">
                         {ev.status}
                       </div>
                     </div>
 
                     {idx < traceDetail.events.length - 1 && (
-                      <div className="text-polar-600 hidden md:block">
-                        <ArrowRight className="w-5 h-5 text-cyan-500/70" />
+                      <div className="text-[#A8A29E] hidden md:block">
+                        <ArrowRight className="w-5 h-5 text-[#B45309]" />
                       </div>
                     )}
                   </React.Fragment>
                 ))}
               </div>
 
-              <div className="p-4 rounded-lg bg-polar-950/60 border border-polar-800/80 font-mono text-xs text-polar-400 space-y-2">
-                <span className="font-bold text-polar-200 block uppercase">DAG Adjacency Map:</span>
-                <pre className="text-[11px] text-cyan-300/80 overflow-x-auto p-2 bg-polar-900 rounded">
+              <div className="p-4 rounded bg-white border border-[#DDD6C6] font-mono text-xs text-[#78716C] space-y-2">
+                <span className="font-bold text-[#1C1917] block uppercase">DAG Adjacency Map:</span>
+                <pre className="text-[11px] text-[#57534E] overflow-x-auto p-2 bg-[#F6F3EC] rounded border border-[#DDD6C6]">
                   {JSON.stringify(traceDetail.lineage_graph, null, 2)}
                 </pre>
               </div>
@@ -592,79 +634,79 @@ export const DecisionTraceView: React.FC = () => {
 
           {/* TAB 3: "Why?" Explanation Panel */}
           {activeTab === 'explanation' && explanation && (
-            <div className="p-6 rounded-xl bg-polar-900/70 border border-polar-800 space-y-6">
+            <div className="editorial-sheet p-6 space-y-6">
               {/* Headline Banner */}
-              <div className="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/30">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-cyan-400 font-bold block mb-1">
+              <div className="p-5 rounded bg-[#FEF3C7] border border-[#FDE68A]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#B45309] font-bold block mb-1">
                   Executive Decision Summary:
                 </span>
-                <p className="text-sm font-sans font-medium text-cyan-100">
+                <p className="text-base font-serif font-medium text-[#1C1917] leading-relaxed">
                   {explanation.headline}
                 </p>
               </div>
 
               {/* Core "Why?" Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <div className="text-orange-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <div className="text-[#C2410C] font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5" />
                     Why This State?
                   </div>
-                  <p className="text-polar-300 font-sans text-xs leading-relaxed">
+                  <p className="text-[#57534E] font-sans text-xs leading-relaxed">
                     {explanation.why_this_state}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <div className="text-purple-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <div className="text-[#7E22CE] font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     Why This Policy?
                   </div>
-                  <p className="text-polar-300 font-sans text-xs leading-relaxed">
+                  <p className="text-[#57534E] font-sans text-xs leading-relaxed">
                     {explanation.why_this_policy}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <div className="text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <div className="text-[#0F766E] font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5" />
                     Why This Schedule?
                   </div>
-                  <p className="text-polar-300 font-sans text-xs leading-relaxed">
+                  <p className="text-[#57534E] font-sans text-xs leading-relaxed">
                     {explanation.why_this_schedule}
                   </p>
                 </div>
               </div>
 
-              {/* Epistemic Breakdown (Validated vs Estimated vs Data Used) */}
+              {/* Epistemic Breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <span className="text-polar-400 uppercase font-bold block text-[11px]">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <span className="text-[#78716C] uppercase font-bold block text-[11px]">
                     What Data Was Used?
                   </span>
-                  <ul className="space-y-1 text-polar-300 list-disc list-inside font-sans text-xs">
+                  <ul className="space-y-1 text-[#57534E] list-disc list-inside font-sans text-xs">
                     {explanation.what_data_used.map((d, i) => (
                       <li key={i}>{d}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <span className="text-emerald-400 uppercase font-bold block text-[11px]">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <span className="text-[#166534] uppercase font-bold block text-[11px]">
                     What Was Physically Validated?
                   </span>
-                  <ul className="space-y-1 text-polar-300 list-disc list-inside font-sans text-xs">
+                  <ul className="space-y-1 text-[#57534E] list-disc list-inside font-sans text-xs">
                     {explanation.what_was_validated.map((v, i) => (
                       <li key={i}>{v}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 space-y-2">
-                  <span className="text-amber-400 uppercase font-bold block text-[11px]">
+                <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
+                  <span className="text-[#92400E] uppercase font-bold block text-[11px]">
                     What Remains Estimated?
                   </span>
-                  <ul className="space-y-1 text-polar-300 list-disc list-inside font-sans text-xs">
+                  <ul className="space-y-1 text-[#57534E] list-disc list-inside font-sans text-xs">
                     {explanation.what_remains_estimated.map((e, i) => (
                       <li key={i}>{e}</li>
                     ))}
@@ -673,11 +715,11 @@ export const DecisionTraceView: React.FC = () => {
               </div>
 
               {/* Recommended Next Action */}
-              <div className="p-4 rounded-xl bg-polar-950/90 border border-polar-750 font-mono text-xs">
-                <span className="text-purple-400 uppercase font-bold block text-[11px] mb-1">
+              <div className="p-4 rounded bg-white border border-[#DDD6C6] font-mono text-xs shadow-sm">
+                <span className="text-[#7E22CE] uppercase font-bold block text-[11px] mb-1">
                   What Happens Next? (Operational Handoff)
                 </span>
-                <p className="text-polar-200 font-sans text-xs">
+                <p className="text-[#1C1917] font-sans text-xs leading-relaxed">
                   {explanation.what_is_next}
                 </p>
               </div>
@@ -686,24 +728,24 @@ export const DecisionTraceView: React.FC = () => {
 
           {/* TAB 4: Decision Delta / Comparison */}
           {activeTab === 'comparison' && (
-            <div className="p-6 rounded-xl bg-polar-900/70 border border-polar-800 space-y-6">
+            <div className="editorial-sheet p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-polar-100 flex items-center gap-2">
-                    <GitCompare className="w-4 h-4 text-cyan-400" />
+                  <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center gap-2">
+                    <GitCompare className="w-4 h-4 text-[#B45309]" />
                     Factual Decision Delta (Before vs After)
                   </h3>
-                  <p className="text-xs text-polar-400 mt-0.5">
+                  <p className="text-xs text-[#57534E] mt-0.5">
                     Compares current trace against a baseline or previous decision without evaluative bias.
                   </p>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-mono text-polar-400">Compare With:</span>
+                  <span className="text-xs font-mono text-[#78716C]">Compare With:</span>
                   <select
                     value={compareTraceId || ''}
                     onChange={(e) => handleCompare(e.target.value)}
-                    className="bg-polar-950 border border-polar-700 text-polar-200 text-xs px-3 py-1 rounded"
+                    className="bg-white border border-[#DDD6C6] text-[#1C1917] text-xs px-3 py-1 rounded"
                   >
                     <option value="">Select Trace...</option>
                     {traceHistory.filter(t => t.decision_trace_id !== selectedTraceId).map(t => (
@@ -718,26 +760,26 @@ export const DecisionTraceView: React.FC = () => {
               {comparisonDelta ? (
                 <div className="space-y-4">
                   {/* Delta Narrative */}
-                  <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 text-xs font-sans text-polar-200">
-                    <strong className="text-cyan-400 font-mono text-[11px] block uppercase mb-1">
+                  <div className="p-4 rounded bg-white border border-[#DDD6C6] text-xs font-sans text-[#1C1917] shadow-sm">
+                    <strong className="text-[#B45309] font-mono text-[11px] block uppercase mb-1">
                       Comparative Narrative:
                     </strong>
                     {comparisonDelta.summary_narrative}
                   </div>
 
                   {/* State Transitions Table */}
-                  <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 font-mono text-xs space-y-3">
-                    <span className="font-bold text-polar-200 uppercase block text-[11px]">
+                  <div className="p-4 rounded bg-white border border-[#DDD6C6] font-mono text-xs space-y-3 shadow-sm">
+                    <span className="font-bold text-[#1C1917] uppercase block text-[11px]">
                       Categorical State Transitions:
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {Object.entries(comparisonDelta.state_transitions).map(([key, [prev, curr]]) => (
-                        <div key={key} className="p-3 rounded bg-polar-900 border border-polar-800">
-                          <span className="text-[10px] text-polar-400 uppercase block">{key}:</span>
+                        <div key={key} className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6]">
+                          <span className="text-[10px] text-[#78716C] uppercase block">{key}:</span>
                           <div className="mt-1 flex items-center space-x-2">
-                            <span className="text-polar-400 line-through">{prev}</span>
-                            <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
-                            <span className="text-polar-100 font-bold">{curr}</span>
+                            <span className="text-[#A8A29E] line-through">{prev}</span>
+                            <ArrowRight className="w-3.5 h-3.5 text-[#B45309]" />
+                            <span className="text-[#1C1917] font-bold">{curr}</span>
                           </div>
                         </div>
                       ))}
@@ -745,15 +787,15 @@ export const DecisionTraceView: React.FC = () => {
                   </div>
 
                   {/* Numerical Deltas */}
-                  <div className="p-4 rounded-xl bg-polar-950/80 border border-polar-800 font-mono text-xs space-y-3">
-                    <span className="font-bold text-polar-200 uppercase block text-[11px]">
+                  <div className="p-4 rounded bg-white border border-[#DDD6C6] font-mono text-xs space-y-3 shadow-sm">
+                    <span className="font-bold text-[#1C1917] uppercase block text-[11px]">
                       Numerical Metric Shifts:
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {Object.entries(comparisonDelta.numerical_deltas).map(([k, val]) => (
-                        <div key={k} className="p-3 rounded bg-polar-900 border border-polar-800 flex justify-between items-center">
-                          <span className="text-polar-400 text-[11px]">{k}:</span>
-                          <span className={`font-bold ${val > 0 ? 'text-amber-400' : val < 0 ? 'text-emerald-400' : 'text-polar-200'}`}>
+                        <div key={k} className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex justify-between items-center">
+                          <span className="text-[#78716C] text-[11px]">{k}:</span>
+                          <span className={`font-bold font-mono-numbers ${val > 0 ? 'text-[#B45309]' : val < 0 ? 'text-[#166534]' : 'text-[#1C1917]'}`}>
                             {val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}
                           </span>
                         </div>
@@ -762,7 +804,7 @@ export const DecisionTraceView: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center text-polar-500 font-mono text-xs border border-dashed border-polar-800 rounded-xl">
+                <div className="p-8 text-center text-[#A8A29E] font-mono text-xs border border-dashed border-[#DDD6C6] rounded bg-white">
                   Select a comparison trace from the dropdown above to compute the factual decision delta.
                 </div>
               )}
@@ -771,19 +813,19 @@ export const DecisionTraceView: React.FC = () => {
 
           {/* TAB 5: Raw JSON Record */}
           {activeTab === 'raw' && traceDetail && (
-            <div className="p-4 rounded-xl bg-polar-900/80 border border-polar-800 font-mono text-xs">
-              <div className="flex justify-between items-center pb-2 border-b border-polar-800 mb-3">
-                <span className="text-polar-300 font-bold uppercase">
+            <div className="editorial-sheet p-6 font-mono text-xs">
+              <div className="flex justify-between items-center pb-2 border-b border-[#DDD6C6] mb-3">
+                <span className="text-[#1C1917] font-bold uppercase">
                   Canonical Machine Trace JSON Record ({traceDetail.decision_trace_id})
                 </span>
                 <button
                   onClick={() => navigator.clipboard.writeText(JSON.stringify(traceDetail, null, 2))}
-                  className="px-2.5 py-1 bg-polar-800 hover:bg-polar-700 text-polar-200 rounded text-[11px]"
+                  className="px-2.5 py-1 bg-white hover:bg-[#F6F3EC] text-[#1C1917] rounded text-[11px] border border-[#DDD6C6] shadow-sm"
                 >
                   Copy JSON
                 </button>
               </div>
-              <pre className="p-4 bg-polar-950 rounded-lg border border-polar-850 overflow-x-auto text-polar-300 text-[11px] max-h-[500px]">
+              <pre className="p-4 bg-white rounded border border-[#DDD6C6] overflow-x-auto text-[#1C1917] text-[11px] max-h-[500px]">
                 {JSON.stringify(traceDetail, null, 2)}
               </pre>
             </div>
@@ -793,19 +835,19 @@ export const DecisionTraceView: React.FC = () => {
 
       {/* Modal: Compare Trace Selector */}
       {showCompareModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-polar-900 border border-polar-700 rounded-xl max-w-md w-full p-5 space-y-4 font-mono text-xs">
-            <div className="flex justify-between items-center pb-2 border-b border-polar-800">
-              <h4 className="font-bold text-polar-100 uppercase">Select Trace to Compare</h4>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white border border-[#DDD6C6] rounded-xl max-w-md w-full p-5 space-y-4 font-mono text-xs shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-[#DDD6C6]">
+              <h4 className="font-bold text-[#1C1917] uppercase">Select Trace to Compare</h4>
               <button
                 onClick={() => setShowCompareModal(false)}
-                className="text-polar-400 hover:text-polar-200"
+                className="text-[#78716C] hover:text-[#1C1917]"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-polar-400 text-[11px] font-sans">
+            <p className="text-[#57534E] text-[11px] font-sans">
               Choose an earlier or baseline decision trace to evaluate state transitions, schedule variations, and metric shifts.
             </p>
 
@@ -820,13 +862,13 @@ export const DecisionTraceView: React.FC = () => {
                   disabled={tr.decision_trace_id === selectedTraceId}
                   className={`w-full p-2.5 rounded text-left border flex items-center justify-between transition-colors ${
                     tr.decision_trace_id === selectedTraceId
-                      ? 'bg-polar-950 text-polar-600 border-polar-900 cursor-not-allowed'
-                      : 'bg-polar-950/70 hover:bg-polar-800 text-polar-200 border-polar-800'
+                      ? 'bg-[#F6F3EC] text-[#A8A29E] border-[#DDD6C6] cursor-not-allowed'
+                      : 'bg-white hover:bg-[#F6F3EC] text-[#1C1917] border-[#DDD6C6]'
                   }`}
                 >
                   <div>
-                    <div className="font-bold text-cyan-300">{tr.decision_trace_id}</div>
-                    <div className="text-[10px] text-polar-500">{new Date(tr.creation_timestamp).toLocaleString()}</div>
+                    <div className="font-bold text-[#B45309]">{tr.decision_trace_id}</div>
+                    <div className="text-[10px] text-[#78716C] font-mono-numbers">{new Date(tr.creation_timestamp).toLocaleString()}</div>
                   </div>
                   <StatusBadge status={tr.execution_status} size="sm" />
                 </button>

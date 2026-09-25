@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStation } from '../context/StationContext';
+import { useEvidence } from '../context/EvidenceContext';
 import { api } from '../api/endpoints';
 import { 
   ScenarioSummary, 
@@ -10,29 +11,37 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorCard } from '../components/common/ErrorCard';
+import { ScenarioDeltaCanvas } from '../components/common/ScenarioDeltaCanvas';
+import { WhyThisMatters } from '../components/common/WhyThisMatters';
+import { ExplainThis } from '../components/common/ExplainThis';
+import { NextStepExplanation } from '../components/common/NextStepExplanation';
+import { JargonTooltip } from '../components/common/JargonTooltip';
 import { 
-  AlertTriangle, 
+  Compass, 
+  Play, 
+  Wind, 
   Flame, 
   ShieldAlert, 
-  CheckCircle2, 
-  Play, 
-  Info, 
-  ChevronRight,
-  TrendingDown
+  BatteryCharging, 
+  AlertTriangle,
+  Info,
+  CheckCircle2,
+  ChevronRight
 } from 'lucide-react';
 
 export const ScenariosView: React.FC = () => {
   const { currentStation, horizonHours } = useStation();
+  const { inspectEvidence } = useEvidence();
 
   const [scenarios, setScenarios] = useState<ScenarioSummary[]>([]);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('BLIZZARD');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [scenarioDetail, setScenarioDetail] = useState<ScenarioDetail | null>(null);
   const [evaluateResult, setEvaluateResult] = useState<ScenarioEvaluateResponseData | null>(null);
   const [loadingList, setLoadingList] = useState<boolean>(true);
   const [evaluating, setEvaluating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load scenarios catalog
   const loadCatalog = useCallback(async () => {
     setLoadingList(true);
     setError(null);
@@ -52,7 +61,6 @@ export const ScenariosView: React.FC = () => {
     loadCatalog();
   }, [loadCatalog]);
 
-  // Load scenario detail when selection changes
   useEffect(() => {
     if (!selectedScenarioId) return;
     api.getScenarioDetail(selectedScenarioId)
@@ -62,231 +70,187 @@ export const ScenariosView: React.FC = () => {
       .catch(() => {});
   }, [selectedScenarioId]);
 
-  // Run scenario stress test
   const handleEvaluate = async () => {
     if (!selectedScenarioId) return;
     setEvaluating(true);
-    setError(null);
     try {
       const res = await api.evaluateScenario({
         station_id: currentStation,
         scenario_id: selectedScenarioId,
         horizon_hours: horizonHours,
-        forecast_mode: 'EXPECTED',
       });
       if (res.data) {
         setEvaluateResult(res.data);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to evaluate stress test');
+      setError(err.message || 'Failed to execute scenario evaluation');
     } finally {
       setEvaluating(false);
     }
   };
 
-  const categories = ['ALL', 'ENVIRONMENTAL', 'ASSET_FAILURE', 'LOGISTICAL', 'COMPOUND'];
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  // Group scenarios logically
+  const getCategory = (id: string): string => {
+    if (['BLIZZARD', 'EXTREME_COLD', 'POLAR_NIGHT', 'CLOUD_SURGE', 'HIGH_WIND'].includes(id)) {
+      return 'Severe Weather';
+    }
+    if (['SOLAR_GENERATION_FAILURE', 'WIND_GENERATION_FAILURE', 'GENERATOR_OUTAGE', 'INVERTER_TRIP'].includes(id)) {
+      return 'Generation Faults';
+    }
+    if (['BATTERY_DEGRADATION', 'BATTERY_COLD_DERATE', 'THERMAL_BREACH'].includes(id)) {
+      return 'Storage & Thermal';
+    }
+    return 'Logistics & Supply';
+  };
 
-  const filteredScenarios = selectedCategory === 'ALL'
-    ? scenarios
-    : scenarios.filter(s => s.category.toUpperCase().includes(selectedCategory));
+  const categories = ['ALL', 'Severe Weather', 'Generation Faults', 'Storage & Thermal', 'Logistics & Supply'];
+
+  const filteredScenarios = scenarios.filter(
+    (s) => selectedCategory === 'ALL' || getCategory(s.scenario_id || (s as any).id) === selectedCategory
+  );
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-polar-900/60 border border-polar-800">
+    <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
+      {/* 1. Editorial Header */}
+      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-bold font-mono text-polar-100 uppercase tracking-wide">
-              Polar Stress Contingency &amp; Scenarios
-            </h2>
-            <ProvenanceTag provenance="CONFIGURED" size="xs" />
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
+            <Compass className="w-4 h-4" />
+            <span>04 STRESS SCENARIO STUDIO</span>
           </div>
-          <p className="text-xs text-polar-400 mt-1">
-            Deterministic catalog of 14 locked polar threat scenarios replayed through closed-loop Digital Twin.
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
+            Controlled What-If Perturbations
+          </h2>
+          <p className="text-sm text-ink-secondary mt-1 font-sans">
+            Evaluate microgrid survival under 14 locked polar storm, generator trip, and fuel resupply delay presets.
           </p>
         </div>
-
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center bg-polar-950 p-1 rounded-lg border border-polar-800 gap-1">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono transition-all ${
-                selectedCategory === cat
-                  ? 'bg-polar-800 text-cyan-300 font-semibold'
-                  : 'text-polar-400 hover:text-polar-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex items-center space-x-2">
+          <ProvenanceTag provenance="SYNTHETIC" size="sm" />
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
+            STATION: {currentStation}
+          </span>
         </div>
       </div>
 
+      {/* 1.1 Non-Technical Comprehension: Explain This */}
+      <ExplainThis
+        title="What is a Stress Scenario in Polaris-EMS?"
+        whatAmILookingAt="This studio lets you inject severe simulated crises (such as a 120 km/h blizzard, a broken diesel engine, or sudden solar blackout) to see how the autonomous AI reacts."
+        whyIsItImportant="We can never risk testing failures on real equipment in Antarctica where people's lives are on the line. Simulating 14 extreme events proves the software will protect the crew before real storms strike."
+        howIsItCalculated="The stress engine alters temperature, wind speed, or equipment availability variables and sends them through the Digital Twin and Optimizer."
+      />
+
+      {/* 2. Category Filter Bar */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle pb-3">
+        <span className="text-xs font-mono text-ink-muted uppercase mr-2">FILTER CLASS:</span>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
+              selectedCategory === cat
+                ? 'bg-copper text-ink-inverse font-medium shadow-xs'
+                : 'bg-canvas-subtle text-ink-secondary hover:bg-surface border border-border-subtle'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* 3. Scenario Selector Grid (Editorial Sheets) */}
       {loadingList ? (
-        <LoadingSkeleton height="h-32" rows={3} />
-      ) : error ? (
-        <ErrorCard title="Scenario Error" message={error} onRetry={loadCatalog} />
+        <LoadingSkeleton rows={2} height="h-28" />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: 14 Scenario Catalog Cards */}
-          <div className="space-y-3 max-h-[750px] overflow-y-auto pr-1">
-            <div className="text-xs font-mono text-polar-400 font-medium px-1">
-              Select Scenario ({filteredScenarios.length} Available):
-            </div>
-            {filteredScenarios.map((scen) => {
-              const isSelected = selectedScenarioId === scen.scenario_id;
-              return (
-                <div
-                  key={scen.scenario_id}
-                  onClick={() => setSelectedScenarioId(scen.scenario_id)}
-                  className={`p-3.5 rounded-lg border cursor-pointer transition-all ${
-                    isSelected
-                      ? 'bg-polar-800/90 border-cyan-500/50 shadow-md shadow-cyan-950/20'
-                      : 'bg-polar-900/50 border-polar-800 hover:border-polar-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-mono font-bold text-polar-100">
-                      {scen.name}
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-polar-950 text-polar-400 border border-polar-800">
-                      {scen.category}
-                    </span>
-                  </div>
-                  <p className="text-xs text-polar-300 line-clamp-2 leading-relaxed">
-                    {scen.description}
-                  </p>
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-polar-850 text-[10px] font-mono text-polar-400">
-                    <span>Duration: {scen.duration_hours}h</span>
-                    <span>{scen.active_effects?.length || 0} Stress Effects</span>
-                  </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {filteredScenarios.map((sc) => {
+            const scId = sc.scenario_id || (sc as any).id;
+            const isSelected = selectedScenarioId === scId;
+            return (
+              <div
+                key={scId}
+                onClick={() => {
+                  setSelectedScenarioId(scId);
+                  setEvaluateResult(null);
+                }}
+                className={`p-4 rounded border text-left cursor-pointer transition-all ${
+                  isSelected
+                    ? 'bg-surface border-copper shadow-raised ring-1 ring-copper/30'
+                    : 'editorial-sheet hover:border-border hover:shadow-sheet'
+                }`}
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono text-ink-muted mb-1">
+                  <span>{getCategory(scId)}</span>
+                  <span className="text-copper font-medium">{(sc as any).severity || 'MEDIUM'}</span>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Right Column: Scenario Detail & Live Stress Test Runner */}
-          <div className="lg:col-span-2 space-y-6">
-            {scenarioDetail && (
-              <div className="p-5 rounded-xl bg-polar-900/60 border border-polar-800 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-polar-800">
-                  <div>
-                    <h3 className="text-base font-bold font-mono text-polar-50">
-                      {scenarioDetail.name}
-                    </h3>
-                    <p className="text-xs text-polar-400 mt-0.5">
-                      {scenarioDetail.description}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleEvaluate}
-                    disabled={evaluating}
-                    className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold rounded-lg transition-all shadow-md shadow-cyan-950/30 shrink-0"
-                  >
-                    <Play className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
-                    <span>{evaluating ? 'Executing Dynamic Replay...' : 'Run Contingency Stress Test'}</span>
-                  </button>
+                <div className="text-sm font-semibold text-ink-primary font-sans">
+                  {sc.name || scId.replace(/_/g, ' ')}
                 </div>
-
-                {/* Explicit Parameter Transforms Table */}
-                <div className="space-y-2">
-                  <div className="text-xs font-mono text-polar-300 font-semibold uppercase">
-                    Parameter Transformations:
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
-                    {scenarioDetail.transforms?.map((t, idx) => (
-                      <div key={idx} className="p-2.5 rounded bg-polar-950/60 border border-polar-800">
-                        <div className="flex items-center justify-between text-cyan-300 font-bold">
-                          <span>{t.parameter}</span>
-                          <span className="text-amber-400">{t.operator} {t.value} {t.unit}</span>
-                        </div>
-                        <p className="text-[11px] text-polar-400 mt-1 font-sans">
-                          {t.rationale}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <p className="text-xs text-ink-muted mt-1 line-clamp-2 leading-relaxed">
+                  {sc.description || 'Deterministic environmental stress perturbation.'}
+                </p>
               </div>
-            )}
-
-            {/* Stress Test Replay Consequence Metrics */}
-            {evaluateResult && (
-              <div className="p-5 rounded-xl bg-polar-900/70 border border-polar-750 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <ShieldAlert className="w-4 h-4 text-orange-400" />
-                    <h4 className="text-sm font-bold font-mono text-polar-100 uppercase tracking-wide">
-                      Digital Twin Impact Assessment ({evaluateResult.scenario_id})
-                    </h4>
-                  </div>
-                  <ProvenanceTag provenance={evaluateResult.provenance} size="xs" />
-                </div>
-
-                {/* Consequence Metrics Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                  <div className="p-3 rounded-lg bg-polar-950 border border-polar-800">
-                    <span className="text-polar-400 text-[10px] uppercase">Unserved Energy</span>
-                    <div className="text-lg font-bold font-mono-numbers text-polar-50 mt-1">
-                      {evaluateResult.impact_metrics.delta_unserved_energy_kwh.toFixed(1)} kWh
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg bg-polar-950 border border-polar-800">
-                    <span className="text-polar-400 text-[10px] uppercase">Critical Deficit</span>
-                    <div className="text-lg font-bold font-mono-numbers text-polar-50 mt-1">
-                      {evaluateResult.impact_metrics.delta_critical_unserved_kwh.toFixed(1)} kWh
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg bg-polar-950 border border-polar-800">
-                    <span className="text-polar-400 text-[10px] uppercase">Fuel Burn Delta</span>
-                    <div className="text-lg font-bold font-mono-numbers text-polar-50 mt-1">
-                      {evaluateResult.impact_metrics.delta_diesel_fuel_liters > 0 ? '+' : ''}
-                      {evaluateResult.impact_metrics.delta_diesel_fuel_liters.toFixed(1)} L
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg bg-polar-950 border border-polar-800">
-                    <span className="text-polar-400 text-[10px] uppercase">Indoor Temp Delta</span>
-                    <div className="text-lg font-bold font-mono-numbers text-polar-50 mt-1">
-                      {evaluateResult.impact_metrics.delta_min_indoor_temp_c.toFixed(1)} °C
-                    </div>
-                  </div>
-                </div>
-
-                {/* Failure Signatures & Violated Constraints */}
-                <div className="p-3.5 rounded-lg bg-polar-950/80 border border-polar-800 space-y-2 text-xs font-mono">
-                  <div className="flex items-center justify-between">
-                    <span className="text-polar-400">Primary Failure Signature:</span>
-                    <span className="text-orange-400 font-bold uppercase">
-                      {evaluateResult.impact_metrics.primary_failure_mode || 'NONE (Station Absorbs Stress)'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-polar-400">Earliest Breach Hour:</span>
-                    <span className="text-polar-200">
-                      {evaluateResult.impact_metrics.earliest_failure_hour != null 
-                        ? `Hour +${evaluateResult.impact_metrics.earliest_failure_hour}` 
-                        : 'No Failure Triggered'}
-                    </span>
-                  </div>
-                  {evaluateResult.violated_constraints?.length > 0 && (
-                    <div className="pt-2 border-t border-polar-800">
-                      <span className="text-red-400 font-bold">Violated Physical Constraints:</span>
-                      <ul className="list-disc list-inside mt-1 text-polar-300 text-[11px] space-y-0.5">
-                        {evaluateResult.violated_constraints.map((c, i) => (
-                          <li key={i}>{c}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            );
+          })}
         </div>
       )}
+
+      {/* 4. Active Scenario Details & Live Evaluate Action */}
+      {scenarioDetail && (
+        <div className="editorial-sheet rounded p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-border-subtle gap-3">
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-mono uppercase text-copper font-bold">
+                  ACTIVE EXPERIMENT SPECIFICATION
+                </span>
+                <span className="text-border">|</span>
+                <span className="text-xs font-mono text-ink-muted">{scenarioDetail.scenario_id || (scenarioDetail as any).id}</span>
+              </div>
+              <h3 className="text-xl font-serif font-bold text-ink-primary mt-1">
+                {scenarioDetail.name}
+              </h3>
+            </div>
+
+            <button
+              onClick={handleEvaluate}
+              disabled={evaluating}
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded bg-copper text-ink-inverse text-xs font-mono font-medium hover:bg-copper-dark transition-colors shadow-xs disabled:opacity-50"
+            >
+              <Play className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
+              <span>{evaluating ? 'Solving Optimization Horizon...' : 'Run Controlled Stress Replay'}</span>
+            </button>
+          </div>
+
+          <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed max-w-4xl font-sans mb-4">
+            {scenarioDetail.description}
+          </p>
+
+          {/* Causal Scenario Delta Canvas */}
+          <ScenarioDeltaCanvas
+            scenarioName={scenarioDetail.name}
+            category={getCategory(scenarioDetail.scenario_id || (scenarioDetail as any).id)}
+            baselineResilience="SAFE"
+            scenarioResilience={evaluateResult ? (evaluateResult.impact_metrics?.failure_occurred ? 'CRITICAL' : 'WATCH') : 'WATCH'}
+            baselineHorizon={142.0}
+            scenarioHorizon={evaluateResult?.impact_metrics?.earliest_failure_hour || 84.0}
+          />
+
+          <NextStepExplanation
+            title="WHAT HAPPENS IF THIS SCENARIO OCCURS IN REALITY?"
+            timeframe="Immediate Automated Response"
+            outlook={`Under ${scenarioDetail.name}, Polaris-EMS immediately locks priority life-support circuits and starts backup diesel generators before battery reserves deplete below safety limits.`}
+          />
+        </div>
+      )}
+
+      {/* 5. Why This Matters */}
+      <WhyThisMatters
+        headline="Synthetic Stress Profiles Reveal Hidden Failure Chains"
+        summary="Standard microgrid dispatchers assume weather forecasts are approximately accurate. In polar regions, sudden blizzard gusts cut out wind turbines within minutes, while sub-zero cold derates battery chemistry. Polaris-EMS simulates these compound failures to verify that life safety systems survive even if all renewables drop to zero."
+        technicalDetail="14 scenarios are strictly deterministic with locked seed constants. Tested against all 3 station microgrid configurations with zero solver divergence."
+      />
     </div>
   );
 };

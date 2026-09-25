@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { MetricCard } from '../components/common/MetricCard';
@@ -8,6 +8,14 @@ import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorCard } from '../components/common/ErrorCard';
 import { Navbar, TabType } from '../components/layout/Navbar';
 import { AlertRibbon } from '../components/layout/AlertRibbon';
+import { WhyThisMatters } from '../components/common/WhyThisMatters';
+import { OperatorApprovalBanner } from '../components/common/OperatorApprovalBanner';
+import { ExplainThis } from '../components/common/ExplainThis';
+import { NextStepExplanation } from '../components/common/NextStepExplanation';
+import { HumanDecisionSummary } from '../components/common/HumanDecisionSummary';
+import { JargonTooltip } from '../components/common/JargonTooltip';
+import { QuickOrientationModal } from '../components/common/QuickOrientationModal';
+import { EvidenceProvider } from '../context/EvidenceContext';
 
 describe('Common Polaris Components', () => {
   it('StatusBadge renders icons and accessible text labels (never color alone)', () => {
@@ -149,4 +157,143 @@ describe('Common Polaris Components', () => {
     btn.click();
     expect(navigated).toBe(true);
   });
+
+  it('WhyThisMatters component renders headline, summary, and progressive disclosure toggle', () => {
+    render(
+      <WhyThisMatters
+        headline="Turbine De-rating Active"
+        summary="Wind speed exceeds normal operating envelope, forcing generation curtailment."
+        technicalDetail="Betz limit calculation adjusted for air density at -35C."
+        invariant="Conservation of momentum in aerodynamic boundary layer."
+      />
+    );
+
+    expect(screen.getByText('Turbine De-rating Active')).toBeInTheDocument();
+    expect(screen.getByText(/Wind speed exceeds normal operating envelope/)).toBeInTheDocument();
+    expect(screen.getByText(/WHY THIS MATTERS/)).toBeInTheDocument();
+
+    // Verify toggle expands technical detail
+    const toggleBtn = screen.getByRole('button', { name: /toggle technical explanation/i });
+    expect(screen.queryByText(/Betz limit calculation/)).toBeNull();
+    fireEvent.click(toggleBtn);
+    expect(screen.getByText(/Betz limit calculation/)).toBeInTheDocument();
+    expect(screen.getByText(/Conservation of momentum/)).toBeInTheDocument();
+  });
+
+  it('OperatorApprovalBanner renders supervisory controls and boundary notice', () => {
+    let optNavigated = false;
+    render(
+      <OperatorApprovalBanner
+        onNavigateToOptimization={() => { optNavigated = true; }}
+      />
+    );
+
+    expect(screen.getByText(/OPERATOR BOUNDARY:/)).toBeInTheDocument();
+    expect(screen.getByText(/SUPERVISOR REVIEW REQUIRED/)).toBeInTheDocument();
+    const reviewBtn = screen.getByRole('button', { name: /Review Dispatch/i });
+    fireEvent.click(reviewBtn);
+    expect(optNavigated).toBe(true);
+  });
+
+  it('ExplainThis renders non-technical questions and toggles open/close', () => {
+    render(
+      <EvidenceProvider>
+        <ExplainThis
+          title="Explain this power balance diagram in plain English"
+          whatAmILookingAt="This diagram shows the complete electrical flow of the station."
+          whyIsItImportant="Generation must match consumption in Antarctica."
+          howIsItCalculated="Calculated by Kirchhoff laws."
+        />
+      </EvidenceProvider>
+    );
+
+    expect(screen.getByText('Explain this power balance diagram in plain English')).toBeInTheDocument();
+    expect(screen.getByText('Explain This')).toBeInTheDocument();
+
+    // Toggle open
+    const toggleBtn = screen.getByRole('button', { name: /explain this/i });
+    fireEvent.click(toggleBtn);
+
+    expect(screen.getByText(/1. WHAT AM I LOOKING AT\?/)).toBeInTheDocument();
+    expect(screen.getByText(/This diagram shows the complete electrical flow/)).toBeInTheDocument();
+    expect(screen.getByText(/2. WHY IS IT IMPORTANT\?/)).toBeInTheDocument();
+    expect(screen.getByText(/3. HOW IS IT CALCULATED\?/)).toBeInTheDocument();
+  });
+
+  it('NextStepExplanation renders proactive outlook and action trigger', () => {
+    let triggered = false;
+    render(
+      <NextStepExplanation
+        title="WHAT HAPPENS OVER THE NEXT 12 HOURS?"
+        timeframe="Next 12 Hours"
+        outlook="Wind speed will decline tonight; diesel will take over."
+        actionText="Review Plan"
+        onAction={() => { triggered = true; }}
+      />
+    );
+
+    expect(screen.getByText('WHAT HAPPENS OVER THE NEXT 12 HOURS?')).toBeInTheDocument();
+    expect(screen.getByText('Next 12 Hours')).toBeInTheDocument();
+    expect(screen.getByText(/Wind speed will decline tonight/)).toBeInTheDocument();
+
+    const actionBtn = screen.getByRole('button', { name: /Review Plan/i });
+    fireEvent.click(actionBtn);
+    expect(triggered).toBe(true);
+  });
+
+  it('HumanDecisionSummary renders 4-part operational explanation', () => {
+    render(
+      <EvidenceProvider>
+        <HumanDecisionSummary
+          decision="Deploy dual diesel generators in asymmetric split."
+          because="Wind drop expected overnight."
+          toProtect="Habitation heating and life support."
+          confidenceEvidence="HiGHS solver certified with zero gap."
+        />
+      </EvidenceProvider>
+    );
+
+    expect(screen.getByText(/HUMAN-READABLE DECISION SUMMARY/)).toBeInTheDocument();
+    expect(screen.getByText('Deploy dual diesel generators in asymmetric split.')).toBeInTheDocument();
+    expect(screen.getByText('Wind drop expected overnight.')).toBeInTheDocument();
+    expect(screen.getByText('Habitation heating and life support.')).toBeInTheDocument();
+    expect(screen.getByText('HiGHS solver certified with zero gap.')).toBeInTheDocument();
+  });
+
+  it('JargonTooltip displays plain-language definition on interaction', () => {
+    render(
+      <JargonTooltip term="Digital Twin">Digital Twin</JargonTooltip>
+    );
+
+    expect(screen.getByText('Digital Twin')).toBeInTheDocument();
+    // Hover/click to open tooltip
+    const trigger = screen.getByLabelText(/Plain language explanation for Digital Twin/);
+    fireEvent.mouseEnter(trigger);
+
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    expect(screen.getByText(/A computer simulation that mimics how the polar station/)).toBeInTheDocument();
+  });
+
+  it('QuickOrientationModal renders 60-second tour when open and can advance', () => {
+    let closed = false;
+    const { rerender } = render(
+      <QuickOrientationModal isOpen={false} onClose={() => { closed = true; }} />
+    );
+
+    expect(screen.queryByText(/60-SECOND ORIENTATION GUIDE/)).toBeNull();
+
+    rerender(
+      <QuickOrientationModal isOpen={true} onClose={() => { closed = true; }} />
+    );
+
+    expect(screen.getByText(/60-SECOND ORIENTATION GUIDE/)).toBeInTheDocument();
+    expect(screen.getByText(/Why do polar research stations need an autonomous energy system\?/)).toBeInTheDocument();
+
+    // Click next point
+    const nextBtn = screen.getByRole('button', { name: /Next Point/i });
+    fireEvent.click(nextBtn);
+
+    expect(screen.getByText(/What actually is this application\?/)).toBeInTheDocument();
+  });
 });
+
