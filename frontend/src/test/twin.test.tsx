@@ -9,6 +9,11 @@ import { TwinInspector } from '../features/twin/components/TwinInspector';
 import { TwinTimeline } from '../features/twin/components/TwinTimeline';
 import { TwinLegend } from '../features/twin/components/TwinLegend';
 import { TwinCanvas } from '../features/twin/components/TwinCanvas';
+import { STATION_SPATIAL_3D_PROFILES } from '../features/twin/model/spatialProfiles3D';
+import { TwinAccessibleTable } from '../features/twin/components/TwinAccessibleTable';
+import { TwinWeatherInfluence } from '../features/twin/components/TwinWeatherInfluence';
+import { TwinOperatingModeControl } from '../features/twin/components/TwinOperatingModeControl';
+import { TwinLoadGroups } from '../features/twin/components/TwinLoadGroups';
 import { EvidenceProvider } from '../context/EvidenceContext';
 import { TwinState, StationProfileDetail } from '../api/types';
 
@@ -418,4 +423,103 @@ describe('Phase 18 Spatial Digital Twin Engine - Components Rendering', () => {
     // Check flow paths rendered
     expect(container.querySelectorAll('.twin-flow-path').length).toBeGreaterThan(0);
   });
+
+  it('validates 3D spatial profiles for Bharati, Maitri, and Himadri', () => {
+    expect(STATION_SPATIAL_3D_PROFILES.BHARATI).toBeDefined();
+    expect(STATION_SPATIAL_3D_PROFILES.MAITRI).toBeDefined();
+    expect(STATION_SPATIAL_3D_PROFILES.HIMADRI).toBeDefined();
+
+    const bh = STATION_SPATIAL_3D_PROFILES.BHARATI;
+    expect(bh.geometryBasis).toBe('CONFIGURED / REPRESENTATIVE');
+    expect(bh.decks.length).toBeGreaterThanOrEqual(3);
+    expect(bh.objects.length).toBeGreaterThanOrEqual(10);
+    expect(bh.powerFlowPaths.length).toBeGreaterThanOrEqual(8);
+
+    // Verify critical devices bound
+    expect(bh.objects.some(o => o.deviceId === 'bh_life_support')).toBe(true);
+    expect(bh.objects.some(o => o.deviceId === 'bh_water_freeze_prot')).toBe(true);
+
+    const mt = STATION_SPATIAL_3D_PROFILES.MAITRI;
+    expect(mt.objects.some(o => o.deviceId === 'mt_heating_primary')).toBe(true);
+    expect(mt.objects.some(o => o.deviceId === 'mt_lake_water_pump')).toBe(true);
+
+    const hm = STATION_SPATIAL_3D_PROFILES.HIMADRI;
+    expect(hm.objects.some(o => o.deviceId === 'hm_environmental_heat')).toBe(true);
+    expect(hm.objects.some(o => o.deviceId === 'hm_ult_freezer')).toBe(true);
+  });
+
+  it('renders TwinAccessibleTable fallback with structured devices', () => {
+    render(
+      <TwinAccessibleTable
+        viewModel={vm}
+        onSelectDevice={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('Station Microgrid Circuit & Asset Inventory')).toBeInTheDocument();
+    expect(screen.getByText('WCAG 2.1 AA COMPLIANT')).toBeInTheDocument();
+    expect(screen.getByText('1. Energy Sources & Primary Storage')).toBeInTheDocument();
+    expect(screen.getByText('2. Operational & Life-Support Loads')).toBeInTheDocument();
+  });
+
+  it('renders TwinWeatherInfluence with forward forecast drivers', () => {
+    render(
+      <TwinWeatherInfluence
+        stationId="BHARATI"
+        selectedHorizon={24}
+        onSelectHorizon={vi.fn()}
+        windSpeedMs={12.4}
+        solarGhiWm2={185}
+        ambientTempC={-22.0}
+        currentDemandKw={48.0}
+      />
+    );
+
+    expect(screen.getByText('NEXT 12 HOURS • WEATHER DRIVERS')).toBeInTheDocument();
+    expect(screen.getByText('WIND')).toBeInTheDocument();
+    expect(screen.getByText('SOLAR')).toBeInTheDocument();
+    expect(screen.getByText('TEMP')).toBeInTheDocument();
+    expect(screen.getByText('DEMAND')).toBeInTheDocument();
+  });
+
+  it('renders TwinOperatingModeControl in MANUAL and AUTO modes', () => {
+    const { rerender } = render(
+      <TwinOperatingModeControl
+        mode="AUTO"
+        onModeChange={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('OPERATING MODE:')).toBeInTheDocument();
+    expect(screen.getByText('SIMULATION ONLY')).toBeInTheDocument();
+    expect(screen.getByText('AUTO: RECOMMENDED DISPATCH ACTION')).toBeInTheDocument();
+    expect(screen.getByText('APPROVAL REQUIRED')).toBeInTheDocument();
+
+    rerender(
+      <TwinOperatingModeControl
+        mode="MANUAL"
+        onModeChange={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('OPERATOR SIMULATION DISPATCH')).toBeInTheDocument();
+    expect(screen.getByText('Start Backup Diesel Generator (DG1)')).toBeInTheDocument();
+  });
+
+  it('renders TwinLoadGroups with functional categories', () => {
+    render(
+      <TwinLoadGroups
+        viewModel={vm}
+        onSelectDevice={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('AGGREGATED LOAD GROUPS & POLICY IMPORTANCE')).toBeInTheDocument();
+    expect(screen.getByText('LIFE SUPPORT')).toBeInTheDocument();
+    expect(screen.getByText('COMMUNICATIONS')).toBeInTheDocument();
+    expect(screen.getByText('HABITATION')).toBeInTheDocument();
+    expect(screen.getByText('SCIENCE')).toBeInTheDocument();
+    expect(screen.getByText('WORKSHOP')).toBeInTheDocument();
+  });
 });
+

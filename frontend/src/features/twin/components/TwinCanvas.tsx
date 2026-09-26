@@ -109,10 +109,21 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           ))}
         </div>
 
-        {/* View Mode (Architectural vs Schematic) */}
+        {/* View Mode (3D Spatial vs 2D Architectural vs Schematic vs Table) */}
         <div className="flex items-center space-x-2">
           <span className="text-slate-500 text-[11px] hidden sm:inline">VIEW:</span>
           <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
+            <button
+              type="button"
+              onClick={() => onViewModeChange('3D_SPATIAL')}
+              className={`px-2.5 py-0.5 rounded text-[11px] transition-colors ${
+                viewMode === '3D_SPATIAL'
+                  ? 'bg-sky-600 text-white font-bold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              3D Spatial
+            </button>
             <button
               type="button"
               onClick={() => onViewModeChange('ARCHITECTURAL')}
@@ -134,6 +145,17 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
               }`}
             >
               Schematic Bus
+            </button>
+            <button
+              type="button"
+              onClick={() => onViewModeChange('ACCESSIBLE_TABLE')}
+              className={`px-2.5 py-0.5 rounded text-[11px] transition-colors ${
+                viewMode === 'ACCESSIBLE_TABLE'
+                  ? 'bg-white text-slate-900 font-bold shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              Table
             </button>
           </div>
         </div>

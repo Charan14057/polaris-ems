@@ -12,6 +12,7 @@ import {
   Pause,
   SkipBack,
   SkipForward,
+  RotateCcw,
   Clock,
   Zap,
   Sparkles,
@@ -30,14 +31,17 @@ interface TwinTimelineProps {
   speed: number;
   selectedHorizon: 24 | 48 | 168;
   timelineMarkers: TimelineMarker[];
+  simulationMode?: 'SIMULATION' | 'REAL-TIME SIMULATION';
   onPlay: () => void;
   onPause: () => void;
   onTogglePlay: () => void;
   onStepForward: () => void;
   onStepBackward: () => void;
   onSeek: (index: number) => void;
+  onReset?: () => void;
   onSetSpeed: (speed: number) => void;
   onSetHorizon: (horizon: 24 | 48 | 168) => void;
+  onToggleSimulationMode?: () => void;
 }
 
 export const TwinTimeline: React.FC<TwinTimelineProps> = ({
@@ -48,14 +52,17 @@ export const TwinTimeline: React.FC<TwinTimelineProps> = ({
   speed,
   selectedHorizon,
   timelineMarkers = [],
+  simulationMode = 'REAL-TIME SIMULATION',
   onPlay,
   onPause,
   onTogglePlay,
   onStepForward,
   onStepBackward,
   onSeek,
+  onReset,
   onSetSpeed,
-  onSetHorizon
+  onSetHorizon,
+  onToggleSimulationMode
 }) => {
   const formatTime = (ts: string) => {
     try {
@@ -99,6 +106,17 @@ export const TwinTimeline: React.FC<TwinTimelineProps> = ({
           >
             <SkipForward className="w-3.5 h-3.5" />
           </button>
+
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors border border-slate-200"
+              title="Reset simulation to T+00h"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           {/* Speed Multiplier Switcher */}
           <div className="flex items-center space-x-1 pl-2 font-mono text-[10px]">

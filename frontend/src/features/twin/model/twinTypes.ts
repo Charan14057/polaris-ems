@@ -13,7 +13,7 @@ import {
   StationId
 } from '../../../api/types';
 
-export type TwinViewMode = 'ARCHITECTURAL' | 'SCHEMATIC';
+export type TwinViewMode = '3D_SPATIAL' | 'ARCHITECTURAL' | 'SCHEMATIC' | 'ACCESSIBLE_TABLE';
 
 export type TwinDeviceFilter = 
   | 'ALL' 

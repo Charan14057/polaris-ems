@@ -32,6 +32,8 @@ interface TwinInspectorProps {
   selectedNodeLabel?: string | null;
   tracePowerActive: boolean;
   onToggleTracePower: () => void;
+  traceImpactActive?: boolean;
+  onToggleTraceImpact?: () => void;
   onClose: () => void;
 }
 
@@ -41,6 +43,8 @@ export const TwinInspector: React.FC<TwinInspectorProps> = ({
   selectedNodeLabel,
   tracePowerActive,
   onToggleTracePower,
+  traceImpactActive = false,
+  onToggleTraceImpact,
   onClose
 }) => {
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
@@ -141,22 +145,42 @@ export const TwinInspector: React.FC<TwinInspectorProps> = ({
               </div>
             </div>
 
-            {/* Trace My Power Signature Interaction */}
-            <button
-              type="button"
-              onClick={onToggleTracePower}
-              className={`w-full py-2 px-3 rounded-md flex items-center justify-between text-xs font-mono font-medium transition-all ${
-                tracePowerActive
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 text-slate-800'
-              }`}
-            >
-              <span className="flex items-center space-x-1.5">
-                <Compass className={`w-3.5 h-3.5 ${tracePowerActive ? 'text-white' : 'text-sky-600'}`} />
-                <span>{tracePowerActive ? 'Stop Power Trace' : 'Trace My Power Route'}</span>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            {/* Trace Power & Trace Impact Buttons */}
+            <div className="space-y-1.5">
+              <button
+                type="button"
+                onClick={onToggleTracePower}
+                className={`w-full py-2 px-3 rounded-md flex items-center justify-between text-xs font-mono font-medium transition-all ${
+                  tracePowerActive
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 text-slate-800'
+                }`}
+              >
+                <span className="flex items-center space-x-1.5">
+                  <Compass className={`w-3.5 h-3.5 ${tracePowerActive ? 'text-white' : 'text-sky-600'}`} />
+                  <span>{tracePowerActive ? 'Stop Power Trace' : 'Trace My Power Route'}</span>
+                </span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              {onToggleTraceImpact && (
+                <button
+                  type="button"
+                  onClick={onToggleTraceImpact}
+                  className={`w-full py-2 px-3 rounded-md flex items-center justify-between text-xs font-mono font-medium transition-all ${
+                    traceImpactActive
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-300 text-slate-800'
+                  }`}
+                >
+                  <span className="flex items-center space-x-1.5">
+                    <Activity className={`w-3.5 h-3.5 ${traceImpactActive ? 'text-white' : 'text-amber-600'}`} />
+                    <span>{traceImpactActive ? 'Stop Impact Trace' : 'Trace Disturbance Impact'}</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
             {/* LAYER 2: Expandable Technical View */}
             <div className="border-t border-slate-100 pt-3">
