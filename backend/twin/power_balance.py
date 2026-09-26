@@ -72,6 +72,11 @@ class PowerBalanceEngine:
         if net_power >= 0.0:
             # Surplus renewable scenario
             surplus = net_power
+            # If generator is forced online at min power, dispatch it and absorb surplus in battery
+            if min_diesel_power_kw > 0.01:
+                p_diesel = min(max_diesel_power_kw, min_diesel_power_kw)
+                surplus += p_diesel
+
             p_bat_chg = min(max(0.0, max_battery_charge_kw), surplus)
             p_curt = surplus - p_bat_chg
             p_served = p_load
@@ -110,6 +115,11 @@ class PowerBalanceEngine:
                 p_unserved = unserved_after_diesel
             else:
                 p_unserved = 0.0
+                if min_diesel_power_kw > 0.01:
+                    p_diesel = min(max_diesel_power_kw, min_diesel_power_kw)
+                    chg_absorb = min(max_battery_charge_kw, p_diesel)
+                    p_bat_chg += chg_absorb
+                    p_curt += (p_diesel - chg_absorb)
 
             p_served = p_load - p_unserved
 

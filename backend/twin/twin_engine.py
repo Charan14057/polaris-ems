@@ -346,7 +346,7 @@ class TwinEngine:
         )
 
         p_diesel_max = current_state.diesel.generator_max_power_kw
-        p_diesel_min = current_state.diesel.generator_min_power_kw
+        p_diesel_min = current_state.diesel.generator_min_power_kw if current_state.diesel.generator_status == "ONLINE" else 0.0
         if current_state.fuel.fuel_remaining_l <= 0.01 or current_state.diesel.generator_status == "FAULT":
             p_diesel_max = 0.0
             p_diesel_min = 0.0

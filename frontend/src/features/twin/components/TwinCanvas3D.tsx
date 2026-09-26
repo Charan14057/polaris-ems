@@ -71,6 +71,57 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   const [cameraMode, setCameraMode] = useState<'ISOMETRIC' | 'TOP' | 'FRONT'>('ISOMETRIC');
   const [wireframeOnly, setWireframeOnly] = useState<boolean>(false);
   const [webGlAvailable, setWebGlAvailable] = useState<boolean>(true);
+  const [showReferenceComparison, setShowReferenceComparison] = useState<boolean>(false);
+
+  // Authoritative real-world station reference specifications
+  const refData = {
+    BHARATI: {
+      title: 'Bharati Antarctic Station (Real Reference)',
+      location: 'Larsemann Hills, East Antarctica (69°24′S, 76°11′E)',
+      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      spec: 'Elevated aerodynamic structure on 24 heavy-duty stilts to prevent snow drift accumulation.',
+      decks: [
+        'Deck 0 / Ground: Seawater intake & fuel storage farm base context',
+        'Deck 1 (Engineering): Generator bays, BESS battery bank, HVAC and water utilities',
+        'Deck 2 (Habitation): Living modules, galley, operations & communications bridge',
+        'Deck 3 (Observation): Core atmospheric and environmental science laboratories'
+      ],
+      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
+    },
+    MAITRI: {
+      title: 'Maitri Antarctic Station (Real Reference)',
+      location: 'Schirmacher Oasis, Queen Maud Land (70°46′S, 11°44′E)',
+      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      spec: 'Central enclosed heated corridor spine connecting modular living, utility, and laboratory blocks.',
+      decks: [
+        'Central Spine: Heated transit and electrical distribution corridor connecting modules',
+        'Main Block: Habitation quarters, medical ward, communications center',
+        'Power House: Tri-diesel generators and central thermal boilers',
+        'Water Pump House: Lake Priyadarshini water pipeline intake and pump station'
+      ],
+      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
+    },
+    HIMADRI: {
+      title: 'Himadri Arctic Station (Real Reference)',
+      location: 'Ny-Ålesund, Spitsbergen, Svalbard (78°55′N, 11°56′E)',
+      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      spec: 'Two-storey insulated timber Nordic research station with ground wet labs and upper living quarters.',
+      decks: [
+        'Ground Floor: Scientific laboratories, sample freezers, operational prep bay',
+        'Upper Floor: Scientist residential suites, computing desks, communications room',
+        'Settlement Link: 400V grid interconnection with Ny-Ålesund central utility hub',
+        'Roof Array: Atmospheric sampling masts and satellite communications link'
+      ],
+      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
+    }
+  }[viewModel.stationId.toUpperCase()] || {
+    title: 'Polar Station Reference',
+    location: 'Polar Research Station',
+    basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+    spec: 'Standard Polar Research Microgrid Enclosure',
+    decks: ['Lower Engineering', 'Upper Habitation'],
+    disclaimer: 'Representative spatial reconstruction.'
+  };
 
   // Active 3D profile for the current station
   const stationProfile3D: StationSpatial3DProfile = 
@@ -783,6 +834,20 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         <div className="w-[1px] h-4 bg-slate-200 mx-1" />
         <button
           type="button"
+          onClick={() => setShowReferenceComparison(!showReferenceComparison)}
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors ${
+            showReferenceComparison 
+              ? 'bg-indigo-600 text-white font-bold shadow-xs' 
+              : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100 font-semibold'
+          }`}
+          title="Toggle Real Reference vs 3D Digital Twin Comparison Mode"
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>REFERENCE ↔ TWIN</span>
+        </button>
+        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+        <button
+          type="button"
           onClick={() => setWireframeOnly(!wireframeOnly)}
           className={`p-1 rounded text-slate-600 hover:text-slate-900 transition-colors ${wireframeOnly ? 'bg-slate-200' : ''}`}
           title="Toggle Wireframe Architecture"
@@ -798,6 +863,55 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {/* Real Reference vs 3D Digital Twin Comparison Panel */}
+      {showReferenceComparison && (
+        <div className="absolute top-16 left-4 bottom-14 z-20 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-lg border border-indigo-200 p-4 shadow-xl flex flex-col justify-between overflow-y-auto font-sans">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
+              <div className="flex items-center space-x-1.5 text-xs font-mono font-bold text-indigo-900">
+                <Layers className="w-4 h-4 text-indigo-600" />
+                <span>ARCHITECTURAL REFERENCE</span>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowReferenceComparison(false)}
+                className="text-xs text-slate-400 hover:text-slate-700 px-1 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">{refData.title}</h3>
+              <p className="text-[11px] text-slate-500 font-mono">{refData.location}</p>
+              <div className="mt-1 inline-block text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                {refData.basis}
+              </div>
+            </div>
+
+            <div className="bg-slate-50 rounded p-2.5 border border-slate-200 text-xs text-slate-700 space-y-1">
+              <span className="font-bold text-[10px] font-mono text-slate-400 block uppercase">STRUCTURAL PROFILE</span>
+              <p className="text-[11px] leading-relaxed">{refData.spec}</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="font-bold text-[10px] font-mono text-slate-400 block uppercase">DECK &amp; UTILITY SCHEMATIC</span>
+              {refData.decks.map((deck, idx) => (
+                <div key={idx} className="flex items-start space-x-2 text-[11px] text-slate-700 bg-white p-1.5 rounded border border-slate-100">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                  <span>{deck}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-indigo-100 mt-3 text-[10px] text-slate-500 font-sans">
+            <div className="font-bold text-slate-700 font-mono mb-0.5">PRESENTATION PERSPECTIVE:</div>
+            <p className="italic">{refData.disclaimer}</p>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Left: Navigation Hints */}
       <div className="absolute bottom-4 left-4 z-10 flex items-center space-x-2 text-[10px] font-mono text-slate-400 bg-white/90 px-2.5 py-1 rounded border border-slate-200 pointer-events-none">

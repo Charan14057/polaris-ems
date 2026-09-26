@@ -49,7 +49,8 @@ import {
   Layout,
   Table,
   Cpu,
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 export const EnergyTwinView: React.FC = () => {
@@ -162,6 +163,42 @@ export const EnergyTwinView: React.FC = () => {
     initialHorizon: 24
   });
 
+  const [demoMode, setDemoMode] = useState<boolean>(false);
+
+  // Real-time EventSource listener for authoritative state streaming
+  useEffect(() => {
+    if (twinDisplayMode !== 'LIVE') return;
+    let eventSource: EventSource | null = null;
+    try {
+      const streamUrl = `/api/v1/twin/live/${currentStation}/stream`;
+      eventSource = new EventSource(streamUrl);
+      eventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload?.state) {
+            setLiveState(payload.state);
+            if (payload.metadata?.wall_clock_timestamp) {
+              setLastLiveUpdate(payload.metadata.wall_clock_timestamp);
+            }
+          }
+        } catch {
+          // Permissive handling for transient chunk
+        }
+      };
+      eventSource.onerror = () => {
+        // SSE auto-reconnects natively
+      };
+    } catch (e) {
+      console.warn('SSE stream init advisory:', e);
+    }
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [currentStation, twinDisplayMode]);
+
   // Active Twin State: In LIVE mode, derived strictly from live simulation state. In REPLAY mode, driven by timeline scrub.
   const activeTwinState = useMemo(() => {
     if (twinDisplayMode === 'REPLAY') {
@@ -170,64 +207,55 @@ export const EnergyTwinView: React.FC = () => {
     return liveState || trajectoryStates[0] || null;
   }, [twinDisplayMode, playbackCurrentState, liveState, trajectoryStates]);
 
-  // Handle live recalculation
+  // Handle live recalculation directly from backend live session
   const handleLiveRecalculate = async () => {
     setRecalculating(true);
     try {
-      const res = await api.getTwinCurrentState(currentStation);
-      if (res?.data) {
-        setLiveState(res.data);
+      const res = await api.getLiveTwinSnapshot(currentStation);
+      if (res?.data?.state) {
+        setLiveState(res.data.state);
+        setLastLiveUpdate(res.data.metadata?.wall_clock_timestamp || new Date().toISOString());
       }
     } catch {
       // Recompute timestamp
     } finally {
-      setLastLiveUpdate(new Date().toISOString());
       setRecalculating(false);
     }
   };
 
-  // Simulate manual action through existing backend logic / reactive twin state update
-  const handleSimulateManualAction = (actionId: string) => {
-    setLiveState(prev => {
-      const base = prev || trajectoryStates[0] || {};
-      const updated = JSON.parse(JSON.stringify(base));
-
-      if (actionId === 'dg1_start') {
-        if (!updated.diesel) updated.diesel = {};
-        updated.diesel.generator_power_kw = 40.0;
-        updated.diesel.online = true;
-        if (!updated.battery) updated.battery = {};
-        updated.battery.charge_kw = 8.3;
-        updated.battery.discharge_kw = 0.0;
-      } else if (actionId === 'bess_charge_force') {
-        if (!updated.battery) updated.battery = {};
-        updated.battery.charge_kw = 15.0;
-        updated.battery.discharge_kw = 0.0;
-        if (updated.battery.soc_pct) updated.battery.soc_pct = Math.min(1.0, updated.battery.soc_pct + 0.08);
-      } else if (actionId === 'shed_flexible') {
-        if (!updated.loads) updated.loads = {};
-        updated.loads.total_load_kw = Math.max(12.0, (updated.loads.total_load_kw || 35.0) - 14.5);
+  // Dispatch manual action through backend control endpoint and authoritative twin recalculation
+  const handleSimulateManualAction = async (actionId: string) => {
+    setRecalculating(true);
+    try {
+      const res = await api.dispatchManualControl({
+        station_id: currentStation,
+        action_id: actionId
+      });
+      if (res?.data?.state) {
+        setLiveState(res.data.state);
+        setLastLiveUpdate(res.data.trace?.wall_clock || new Date().toISOString());
       }
-      updated.timestamp = new Date().toISOString();
-      return updated;
-    });
-    setLastLiveUpdate(new Date().toISOString());
+    } catch (e) {
+      console.warn('Manual action dispatch advisory:', e);
+    } finally {
+      setRecalculating(false);
+    }
   };
 
-  // Approve auto recommendation through existing optimizer results
-  const handleApproveAutoRecommendation = () => {
-    setLiveState(prev => {
-      const base = prev || trajectoryStates[0] || {};
-      const updated = JSON.parse(JSON.stringify(base));
-      if (!updated.diesel) updated.diesel = {};
-      updated.diesel.generator_power_kw = 0.0;
-      updated.diesel.online = false;
-      if (!updated.battery) updated.battery = {};
-      updated.battery.discharge_kw = 4.2;
-      updated.timestamp = new Date().toISOString();
-      return updated;
-    });
-    setLastLiveUpdate(new Date().toISOString());
+  // Approve auto recommendation through authoritative Phase 6 optimizer endpoint
+  const handleApproveAutoRecommendation = async () => {
+    setRecalculating(true);
+    try {
+      const res = await api.approveAutoRecommendation(currentStation);
+      if (res?.data?.state) {
+        setLiveState(res.data.state);
+        setLastLiveUpdate(res.data.trace?.wall_clock || new Date().toISOString());
+      }
+    } catch (e) {
+      console.warn('Auto recommendation approval advisory:', e);
+    } finally {
+      setRecalculating(false);
+    }
   };
 
   // Handle horizon changes by requesting new trajectory
@@ -337,6 +365,25 @@ export const EnergyTwinView: React.FC = () => {
           <span className="text-xs font-mono px-2 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600 font-semibold">
             {viewModel.layoutStatus} MODEL
           </span>
+
+          {/* Executive Presentation Demo Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextMode = !demoMode;
+              setDemoMode(nextMode);
+              if (nextMode) setViewMode('3D_SPATIAL');
+            }}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
+              demoMode
+                ? 'bg-purple-600 text-white shadow-xs'
+                : 'bg-white text-purple-700 hover:bg-purple-50 border border-purple-200'
+            }`}
+            title="Toggle Executive Presentation Demo Mode"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{demoMode ? 'EXIT DEMO' : 'DEMO MODE'}</span>
+          </button>
         </div>
       </div>
 
@@ -381,67 +428,88 @@ export const EnergyTwinView: React.FC = () => {
         currentDemandKw={viewModel.powerSummary.totalLoadKw}
       />
 
+      {/* Demo Mode Presentation Banner */}
+      {demoMode && (
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-xs font-mono flex items-center justify-between text-purple-900 shadow-2xs">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+            <span className="font-bold">EXECUTIVE PRESENTATION DEMO MODE</span>
+            <span className="text-purple-300">•</span>
+            <span className="text-purple-700 text-[11px]">Displaying reference-aligned 3D spatial twin, live directional power flow, source mix, and automated advisory recommendation.</span>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setDemoMode(false)}
+            className="text-[11px] font-bold text-purple-700 hover:text-purple-950 underline shrink-0 ml-3"
+          >
+            Exit Demo Mode
+          </button>
+        </div>
+      )}
+
       {/* 7. Master View Mode Selector Toolbar */}
-      <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-        <div className="flex items-center space-x-2">
-          <span className="text-slate-500 text-[11px] font-bold">TWIN PERSPECTIVE:</span>
-          <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode('3D_SPATIAL')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
-                viewMode === '3D_SPATIAL'
-                  ? 'bg-sky-600 text-white font-bold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Box className="w-3.5 h-3.5" />
-              <span>3D Spatial</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('ARCHITECTURAL')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
-                viewMode === 'ARCHITECTURAL'
-                  ? 'bg-sky-600 text-white font-bold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Layout className="w-3.5 h-3.5" />
-              <span>2D Architectural</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('SCHEMATIC')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
-                viewMode === 'SCHEMATIC'
-                  ? 'bg-sky-600 text-white font-bold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span>Schematic Bus</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('ACCESSIBLE_TABLE')}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
-                viewMode === 'ACCESSIBLE_TABLE'
-                  ? 'bg-sky-600 text-white font-bold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Table className="w-3.5 h-3.5" />
-              <span>Accessible Table</span>
-            </button>
+      {!demoMode && (
+        <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center space-x-2">
+            <span className="text-slate-500 text-[11px] font-bold">TWIN PERSPECTIVE:</span>
+            <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('3D_SPATIAL')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
+                  viewMode === '3D_SPATIAL'
+                    ? 'bg-sky-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>3D Spatial</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('ARCHITECTURAL')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
+                  viewMode === 'ARCHITECTURAL'
+                    ? 'bg-sky-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Layout className="w-3.5 h-3.5" />
+                <span>2D Architectural</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('SCHEMATIC')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
+                  viewMode === 'SCHEMATIC'
+                    ? 'bg-sky-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5" />
+                <span>Schematic Bus</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('ACCESSIBLE_TABLE')}
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded text-xs transition-colors ${
+                  viewMode === 'ACCESSIBLE_TABLE'
+                    ? 'bg-sky-600 text-white font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Table className="w-3.5 h-3.5" />
+                <span>Accessible Table</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 text-slate-500 text-[11px]">
+            <span>Geometry Basis:</span>
+            <span className="font-semibold text-slate-800">{viewModel.geometryBasis}</span>
           </div>
         </div>
-
-        <div className="flex items-center space-x-2 text-slate-500 text-[11px]">
-          <span>Geometry Basis:</span>
-          <span className="font-semibold text-slate-800">{viewModel.geometryBasis}</span>
-        </div>
-      </div>
+      )}
 
       {/* 8. Main Twin Canvas & Side Inspector Layout */}
       <div className="flex flex-col lg:flex-row gap-5 items-start">

@@ -41,5 +41,7 @@ tmp/
 .env.production
 
 # Node
+**/node_modules/
 node_modules/
 frontend/dist/
+dist/

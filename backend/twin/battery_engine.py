@@ -9,7 +9,7 @@ Simulates electrochemical energy storage dynamics with polar cold temperature de
 - Energy conservation: delta_E = P_charge * eta_chg * dt - (P_discharge / eta_dis) * dt
 """
 
-from typing import Tuple
+from typing import Tuple, Optional
 import numpy as np
 
 from backend.twin.state import BatteryState
@@ -23,14 +23,15 @@ class BatteryEngine:
         self.profile = profile
         self.b_spec = profile.electrical
 
-    def compute_derating(self, ambient_temp_c: float) -> Tuple[float, float]:
+    def compute_derating(self, ambient_temp_c: float, nominal_capacity_kwh: Optional[float] = None) -> Tuple[float, float]:
         """
         Calculates temperature derating factor and current usable capacity in kWh.
         """
+        base_cap = float(nominal_capacity_kwh if nominal_capacity_kwh is not None else self.b_spec.battery_capacity_kwh)
         derate_coeff = float(self.b_spec.battery_cold_derate_coeff)
         # Derating kicks in below -10°C, capped at 30% reduction (derate >= 0.70)
         derate = max(0.70, 1.0 - derate_coeff * max(0.0, -10.0 - ambient_temp_c))
-        usable_kwh = float(self.b_spec.battery_capacity_kwh * derate)
+        usable_kwh = float(base_cap * derate)
         return float(round(derate, 4)), float(round(usable_kwh, 2))
 
     def get_dispatch_limits(
@@ -46,7 +47,7 @@ class BatteryEngine:
         Returns:
             (max_charge_kw, max_discharge_kw)
         """
-        _, usable_kwh = self.compute_derating(ambient_temp_c)
+        _, usable_kwh = self.compute_derating(ambient_temp_c, nominal_capacity_kwh=current_state.capacity_kwh)
         eta_chg = current_state.charge_efficiency
         eta_dis = current_state.discharge_efficiency
 
@@ -77,7 +78,8 @@ class BatteryEngine:
         """
         Executes discrete state transition for the battery storage.
         """
-        derate, usable_kwh = self.compute_derating(ambient_temp_c)
+        cap_kwh = current_state.capacity_kwh
+        derate, usable_kwh = self.compute_derating(ambient_temp_c, nominal_capacity_kwh=cap_kwh)
         eta_chg = current_state.charge_efficiency
         eta_dis = current_state.discharge_efficiency
 
@@ -104,7 +106,7 @@ class BatteryEngine:
             energy_kwh=round(clamped_energy, 2),
             charge_kw=round(charge_kw, 2),
             discharge_kw=round(discharge_kw, 2),
-            capacity_kwh=float(self.b_spec.battery_capacity_kwh),
+            capacity_kwh=cap_kwh,
             usable_capacity_kwh=usable_kwh,
             charge_efficiency=eta_chg,
             discharge_efficiency=eta_dis,

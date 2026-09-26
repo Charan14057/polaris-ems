@@ -142,7 +142,7 @@ class TwinAPIAdapter:
                 )
                 # Scenario execution generates baseline and perturbed trajectories
                 # Use the perturbed scenario state sequence
-                trajectory = engine.simulate(initial_state=initial_state, trajectory_steps=driving_steps)
+                trajectory = scen_res.scenario_trajectory
                 # Attach scenario summary indicators
                 summary = trajectory.summary
                 summary["scenario_id"] = scen_id

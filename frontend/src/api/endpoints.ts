@@ -169,4 +169,45 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(params),
     }),
+
+  // Phase 18 Production Live Twin Session & Streaming
+  getLiveTwinSnapshot: (stationId: StationId | string) =>
+    apiRequest<Record<string, any>>(`/api/v1/twin/live/${stationId.toUpperCase()}`),
+
+  dispatchManualControl: (params: { station_id: StationId | string; action_id: string; parameters?: Record<string, any> }) =>
+    apiRequest<Record<string, any>>('/api/v1/twin/control/manual', {
+      method: 'POST',
+      body: JSON.stringify({
+        station_id: params.station_id.toUpperCase(),
+        action_id: params.action_id,
+        parameters: params.parameters || {}
+      }),
+    }),
+
+  approveAutoRecommendation: (stationId: StationId | string) =>
+    apiRequest<Record<string, any>>('/api/v1/twin/control/auto-approve', {
+      method: 'POST',
+      body: JSON.stringify({ station_id: stationId.toUpperCase() }),
+    }),
+
+  applyLiveScenario: (stationId: StationId | string, scenarioId: string) =>
+    apiRequest<Record<string, any>>('/api/v1/twin/scenario/apply', {
+      method: 'POST',
+      body: JSON.stringify({
+        station_id: stationId.toUpperCase(),
+        scenario_id: scenarioId.toUpperCase()
+      }),
+    }),
+
+  clearLiveScenario: (stationId: StationId | string) =>
+    apiRequest<Record<string, any>>('/api/v1/twin/scenario/clear', {
+      method: 'POST',
+      body: JSON.stringify({ station_id: stationId.toUpperCase() }),
+    }),
+
+  tracePowerFlow: (stationId: StationId | string, targetId: string) =>
+    apiRequest<Record<string, any>>(`/api/v1/twin/trace/power/${stationId.toUpperCase()}/${targetId}`),
+
+  traceAssetImpact: (stationId: StationId | string, assetId: string) =>
+    apiRequest<Record<string, any>>(`/api/v1/twin/trace/impact/${stationId.toUpperCase()}/${assetId}`),
 };

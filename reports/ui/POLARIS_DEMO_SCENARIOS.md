@@ -234,3 +234,31 @@ Every demonstration must respect the strict **Epistemic Boundary**:
 - **Expected Trace Result:** Impact assessment matrix generated in < 15ms.
 - **What Presenter Should Say:** "Trace Impact lets operators ask 'What happens if this switch trips?' before touching a physical circuit breaker, protecting mission-critical life support."
 - **What Must NOT Be Claimed:** Do not claim this is an irreversible physical breaker trip.
+
+---
+
+### DEMO 14: Real-Time Live Twin Session & Wall-Clock Progression
+- **Station:** BHARATI
+- **Starting State:** Default Energy Twin view in LIVE mode.
+- **Scenario:** Stateful live simulation session running continuously in the backend.
+- **User Action:** Observe the live timestamp advancing synchronous with wall-clock execution; toggle between LIVE and REPLAY.
+- **Expected Visible Change:** Simulation clock advances in real-time; SSE event stream delivers fresh computational state deltas every 1.5 seconds.
+- **Expected Power-Flow Change:** Flow beams pulse with dynamic kW loading; battery floats between charge and discharge.
+- **Expected Source-Mix Change:** Reconciled continuously with actual `TwinState` conservation invariants.
+- **Expected Policy Result:** Evaluated continuously under active baseline dispatch.
+- **What Presenter Should Say:** "LIVE mode is not a precomputed trajectory playback or frontend timer. The backend owns a stateful LiveTwinSession whose simulation clock synchronizes with actual wall-clock execution."
+- **What Must NOT Be Claimed:** Do not claim this is live satellite SCADA from Antarctica.
+
+---
+
+### DEMO 15: Real Architectural Reference Comparison & Executive Demo Mode
+- **Station:** BHARATI / MAITRI / HIMADRI
+- **Starting State:** 3D Spatial Digital Twin view open.
+- **Scenario:** Executive presentation comparing physical base architectural references with the 3D computational model.
+- **User Action:** Click "REFERENCE ↔ TWIN" in the 3D toolbar; click "DEMO MODE" in the top banner.
+- **Expected Visible Change:** 
+  1. The Reference comparison drawer opens displaying the verified station structural specifications (Bharati 24 stilts, Maitri central corridor, Himadri 2-storey Nordic frame) side-by-side with the 3D model.
+  2. In Demo Mode, secondary configuration toolbars collapse, presenting an executive view focused on the 3D twin, directional energy flow, clean source mix, and automated advisory recommendation.
+- **What Presenter Should Say:** "Here is our approved architectural reference alongside the 3D digital reconstruction. The computational state from our TwinEngine is projected directly onto the topological energy layer."
+- **What Must NOT Be Claimed:** Do not claim the 3D geometry is an exact millimeter-surveyed BIM scan (it is explicitly classified as CONFIGURED / REPRESENTATIVE).
+
