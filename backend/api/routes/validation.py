@@ -47,7 +47,7 @@ router = APIRouter(prefix="/validation", tags=["Validation & Benchmarking"])
 
 
 @router.get("/forecast", response_model=APIResponse[List[ForecastMetricItem]])
-async def get_forecast_metrics(request: Request) -> APIResponse[List[ForecastMetricItem]]:
+def get_forecast_metrics(request: Request) -> APIResponse[List[ForecastMetricItem]]:
     """Returns standardized point-forecast evaluation metrics across registered models."""
     val = get_forecast_validator()
     data = val.get_forecast_metrics()
@@ -55,7 +55,7 @@ async def get_forecast_metrics(request: Request) -> APIResponse[List[ForecastMet
 
 
 @router.get("/calibration", response_model=APIResponse[List[ProbabilisticCalibrationItem]])
-async def get_uncertainty_calibration(request: Request) -> APIResponse[List[ProbabilisticCalibrationItem]]:
+def get_uncertainty_calibration(request: Request) -> APIResponse[List[ProbabilisticCalibrationItem]]:
     """Returns empirical coverage and sharpness across conformal calibrators."""
     val = get_forecast_validator()
     data = val.get_probabilistic_calibration()
@@ -63,7 +63,7 @@ async def get_uncertainty_calibration(request: Request) -> APIResponse[List[Prob
 
 
 @router.get("/baselines", response_model=APIResponse[List[BaselineComparisonRow]])
-async def get_baseline_comparisons(request: Request) -> APIResponse[List[BaselineComparisonRow]]:
+def get_baseline_comparisons(request: Request) -> APIResponse[List[BaselineComparisonRow]]:
     """Compares production models against persistence, seasonal naive, ridge, and random forest."""
     val = get_forecast_validator()
     data = val.get_baseline_comparisons()
@@ -71,7 +71,7 @@ async def get_baseline_comparisons(request: Request) -> APIResponse[List[Baselin
 
 
 @router.get("/regimes", response_model=APIResponse[List[RegimeEvaluationItem]])
-async def get_regime_evaluations(request: Request) -> APIResponse[List[RegimeEvaluationItem]]:
+def get_regime_evaluations(request: Request) -> APIResponse[List[RegimeEvaluationItem]]:
     """Evaluates forecast degradation ratios across polar disturbance regimes."""
     val = get_forecast_validator()
     data = val.get_regime_evaluations()
@@ -79,7 +79,7 @@ async def get_regime_evaluations(request: Request) -> APIResponse[List[RegimeEva
 
 
 @router.get("/leakage-audit", response_model=APIResponse[LeakageAuditReport])
-async def get_leakage_audit(request: Request) -> APIResponse[LeakageAuditReport]:
+def get_leakage_audit(request: Request) -> APIResponse[LeakageAuditReport]:
     """Returns automated data leakage and causality verification report."""
     val = get_forecast_validator()
     data = val.run_leakage_audit()
@@ -87,7 +87,7 @@ async def get_leakage_audit(request: Request) -> APIResponse[LeakageAuditReport]
 
 
 @router.get("/optimizer", response_model=APIResponse[List[OptimizerBenchmarkComparison]])
-async def get_optimizer_benchmarks(request: Request) -> APIResponse[List[OptimizerBenchmarkComparison]]:
+def get_optimizer_benchmarks(request: Request) -> APIResponse[List[OptimizerBenchmarkComparison]]:
     """Returns fair benchmark matrix comparing baseline simulation vs optimizer modes."""
     bench = get_optimizer_benchmark()
     data = bench.run_benchmark_matrix()
@@ -95,7 +95,7 @@ async def get_optimizer_benchmarks(request: Request) -> APIResponse[List[Optimiz
 
 
 @router.get("/resilience/{station_id}", response_model=APIResponse[ResilienceStressValidationItem])
-async def get_resilience_validation(station_id: str, request: Request) -> APIResponse[ResilienceStressValidationItem]:
+def get_resilience_validation(station_id: str, request: Request) -> APIResponse[ResilienceStressValidationItem]:
     """Returns resilience stress response consistency and invariant pass rates."""
     val = get_resilience_validator()
     data = val.validate_stress_sequence(station_id)
@@ -103,7 +103,7 @@ async def get_resilience_validation(station_id: str, request: Request) -> APIRes
 
 
 @router.get("/edge", response_model=APIResponse[List[EdgeDegradationValidationItem]])
-async def get_edge_validation(request: Request) -> APIResponse[List[EdgeDegradationValidationItem]]:
+def get_edge_validation(request: Request) -> APIResponse[List[EdgeDegradationValidationItem]]:
     """Returns edge behavior across 7 canonical degraded telemetry conditions."""
     val = get_edge_validator()
     data = val.validate_all_conditions()
@@ -111,7 +111,7 @@ async def get_edge_validation(request: Request) -> APIResponse[List[EdgeDegradat
 
 
 @router.get("/explain/{station_id}/{target}", response_model=APIResponse[ModelExplanationResponse])
-async def get_feature_explainability(
+def get_feature_explainability(
     station_id: str,
     target: str,
     request: Request
@@ -126,7 +126,7 @@ async def get_feature_explainability(
 
 
 @router.get("/replay/{trace_id}", response_model=APIResponse[ReplayReproductionReport])
-async def replay_decision_trace(trace_id: str, request: Request) -> APIResponse[ReplayReproductionReport]:
+def replay_decision_trace(trace_id: str, request: Request) -> APIResponse[ReplayReproductionReport]:
     """Reruns the complete pipeline from recorded trace inputs and evaluates reproducibility."""
     runner = get_replay_runner()
     try:
@@ -139,7 +139,7 @@ async def replay_decision_trace(trace_id: str, request: Request) -> APIResponse[
 
 
 @router.get("/performance", response_model=APIResponse[Dict[str, Dict[str, float]]])
-async def get_performance_latencies(
+def get_performance_latencies(
     station_id: str = "BHARATI",
     request: Request = None
 ) -> APIResponse[Dict[str, Dict[str, float]]]:
@@ -150,7 +150,7 @@ async def get_performance_latencies(
 
 
 @router.get("/evidence", response_model=APIResponse[List[SIHEvidenceRow]])
-async def get_sih_evidence_table(request: Request) -> APIResponse[List[SIHEvidenceRow]]:
+def get_sih_evidence_table(request: Request) -> APIResponse[List[SIHEvidenceRow]]:
     """Returns the consolidated, audit-ready SIH technical evidence table."""
     engine = get_sih_evidence_engine()
     data = engine.generate_evidence_table()
@@ -158,7 +158,7 @@ async def get_sih_evidence_table(request: Request) -> APIResponse[List[SIHEviden
 
 
 @router.get("/summary", response_model=APIResponse[BenchmarkSuiteSummary])
-async def get_benchmark_suite_summary(request: Request) -> APIResponse[BenchmarkSuiteSummary]:
+def get_benchmark_suite_summary(request: Request) -> APIResponse[BenchmarkSuiteSummary]:
     """Returns high-level executive benchmark summary metrics."""
     engine = get_sih_evidence_engine()
     data = engine.generate_suite_summary()
@@ -166,7 +166,7 @@ async def get_benchmark_suite_summary(request: Request) -> APIResponse[Benchmark
 
 
 @router.get("/archive/stats", response_model=APIResponse[Dict[str, Any]])
-async def get_archive_stats(request: Request) -> APIResponse[Dict[str, Any]]:
+def get_archive_stats(request: Request) -> APIResponse[Dict[str, Any]]:
     """Returns cold decision trace archive statistics."""
     archive = get_trace_archive()
     data = archive.get_archive_stats()

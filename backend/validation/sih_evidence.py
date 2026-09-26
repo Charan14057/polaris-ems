@@ -43,9 +43,13 @@ class SIHEvidenceEngine:
         self.replay_runner = get_replay_runner()
         self.explainer = get_model_explainer()
         self.archive = get_trace_archive()
+        self._evidence_cache: Optional[List[SIHEvidenceRow]] = None
+        self._summary_cache: Optional[BenchmarkSuiteSummary] = None
 
-    def generate_evidence_table(self) -> List[SIHEvidenceRow]:
+    def generate_evidence_table(self, force_refresh: bool = False) -> List[SIHEvidenceRow]:
         """Compiles the authoritative, measured SIH evidence table."""
+        if not force_refresh and self._evidence_cache is not None:
+            return self._evidence_cache
         rows: List[SIHEvidenceRow] = []
 
         # 1. Probabilistic Forecasting (Phase 3)
@@ -183,10 +187,13 @@ class SIHEvidenceEngine:
             outcome=BenchmarkOutcome.PASS
         ))
 
+        self._evidence_cache = rows
         return rows
 
-    def generate_suite_summary(self) -> BenchmarkSuiteSummary:
+    def generate_suite_summary(self, force_refresh: bool = False) -> BenchmarkSuiteSummary:
         """Derives executive benchmark metrics across all validation layers."""
+        if not force_refresh and self._summary_cache is not None:
+            return self._summary_cache
         calibs = self.fc_val.get_probabilistic_calibration()
         avg_cov = sum(c.interval_80_coverage for c in calibs) / max(1, len(calibs)) * 100.0
 
@@ -198,7 +205,7 @@ class SIHEvidenceEngine:
         twin_pass_rate = round((twin_valid_count / max(1, len(opt_res))) * 100.0, 1)
         avg_fuel_pct = round(sum(r.fuel_savings_pct for r in opt_res) / max(1, len(opt_res)), 1)
 
-        return BenchmarkSuiteSummary(
+        summary = BenchmarkSuiteSummary(
             suite_id="POLARIS-P13-BENCHMARK-SUITE-V1.0",
             executed_at=datetime.now(timezone.utc).isoformat(),
             software_version="1.0.0",
@@ -212,6 +219,8 @@ class SIHEvidenceEngine:
             leakage_audit_clean=True,
             total_benchmarks_executed=10
         )
+        self._summary_cache = summary
+        return summary
 
     def export_evidence_markdown(self) -> str:
         """Generates the SIH Technical Evidence Package in GitHub-flavored markdown."""

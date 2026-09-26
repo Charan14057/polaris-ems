@@ -57,7 +57,7 @@ export const ForecastView: React.FC = () => {
   }, [fetchForecast]);
 
   const targets = [
-    { id: 'total_load_kw', label: 'Station Load (kW)', icon: <Activity className="w-3.5 h-3.5 text-copper" /> },
+    { id: 'total_load_kw', label: 'Station Load (kW)', icon: <Activity className="w-3.5 h-3.5 text-sky-600" /> },
     { id: 'solar_generation_kw', label: 'Solar PV (kW)', icon: <Sun className="w-3.5 h-3.5 text-amber-600" /> },
     { id: 'wind_generation_kw', label: 'Wind Turbine (kW)', icon: <Wind className="w-3.5 h-3.5 text-ice" /> },
   ] as const;
@@ -101,29 +101,29 @@ export const ForecastView: React.FC = () => {
   return (
     <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
       {/* 1. Editorial Header */}
-      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+      <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-sky-600 font-bold mb-2">
             <TrendingUp className="w-4 h-4" />
             <span>02 ML PROBABILISTIC FORECASTING</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-sans font-bold text-slate-900 tracking-tight">
             Multi-Horizon Conformal Forecast
           </h2>
-          <p className="text-sm text-ink-secondary mt-1 font-sans">
+          <p className="text-sm text-slate-600 mt-1 font-sans">
             Physics-informed load decomposition and quantile models with strict $P_{10}, P_{50}, P_{90}, P_{95}$ bounds.
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <ProvenanceTag provenance="FORECAST" size="sm" />
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">
             STATION: {currentStation}
           </span>
         </div>
       </div>
 
       {/* 2. Target & Horizon Switcher Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded bg-canvas-subtle border border-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded bg-slate-50 border border-slate-200">
         {/* Target Buttons */}
         <div className="flex items-center space-x-2">
           {targets.map((t) => (
@@ -132,8 +132,8 @@ export const ForecastView: React.FC = () => {
               onClick={() => setTarget(t.id)}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded text-xs font-mono transition-colors ${
                 target === t.id
-                  ? 'bg-surface text-ink-primary border border-border font-semibold shadow-xs'
-                  : 'text-ink-muted hover:text-ink-primary hover:bg-canvas'
+                  ? 'bg-white text-slate-900 border border-slate-200 font-semibold shadow-xs'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-canvas'
               }`}
             >
               {t.icon}
@@ -143,11 +143,11 @@ export const ForecastView: React.FC = () => {
         </div>
 
         {/* Horizon Toggle */}
-        <div className="flex items-center rounded border border-border bg-surface p-0.5 text-xs font-mono">
+        <div className="flex items-center rounded border border-slate-200 bg-white p-0.5 text-xs font-mono">
           <button
             onClick={() => setHorizonHours(48)}
             className={`px-3 py-1 rounded transition-colors ${
-              horizonHours === 48 ? 'bg-copper text-ink-inverse font-medium' : 'text-ink-muted hover:text-ink-primary'
+              horizonHours === 48 ? 'bg-sky-600 text-white font-medium' : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             48h Tactical
@@ -155,7 +155,7 @@ export const ForecastView: React.FC = () => {
           <button
             onClick={() => setHorizonHours(168)}
             className={`px-3 py-1 rounded transition-colors ${
-              horizonHours === 168 ? 'bg-copper text-ink-inverse font-medium' : 'text-ink-muted hover:text-ink-primary'
+              horizonHours === 168 ? 'bg-sky-600 text-white font-medium' : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             168h Strategic
@@ -165,40 +165,40 @@ export const ForecastView: React.FC = () => {
 
       {/* 3. Metric Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="editorial-sheet rounded p-4">
-          <span className="text-[10px] font-mono uppercase text-ink-muted block">PEAK DEMAND ($P_{50}$)</span>
-          <div className="text-2xl font-serif font-bold text-ink-primary mt-1">
-            {peakVal.toFixed(1)} <span className="text-xs font-mono text-ink-muted font-normal">kW</span>
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-4">
+          <span className="text-[10px] font-mono uppercase text-slate-500 block">PEAK DEMAND ($P_{50}$)</span>
+          <div className="text-2xl font-sans font-bold text-slate-900 mt-1">
+            {peakVal.toFixed(1)} <span className="text-xs font-mono text-slate-500 font-normal">kW</span>
           </div>
         </div>
-        <div className="editorial-sheet rounded p-4">
-          <span className="text-[10px] font-mono uppercase text-ink-muted block">AVERAGE DEMAND ($P_{50}$)</span>
-          <div className="text-2xl font-serif font-bold text-ink-primary mt-1">
-            {avgVal.toFixed(1)} <span className="text-xs font-mono text-ink-muted font-normal">kW</span>
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-4">
+          <span className="text-[10px] font-mono uppercase text-slate-500 block">AVERAGE DEMAND ($P_{50}$)</span>
+          <div className="text-2xl font-sans font-bold text-slate-900 mt-1">
+            {avgVal.toFixed(1)} <span className="text-xs font-mono text-slate-500 font-normal">kW</span>
           </div>
         </div>
-        <div className="editorial-sheet rounded p-4">
-          <span className="text-[10px] font-mono uppercase text-ink-muted block">MINIMUM BASELOAD ($P_{10}$)</span>
-          <div className="text-2xl font-serif font-bold text-moss mt-1">
-            {minVal.toFixed(1)} <span className="text-xs font-mono text-ink-muted font-normal">kW</span>
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-4">
+          <span className="text-[10px] font-mono uppercase text-slate-500 block">MINIMUM BASELOAD ($P_{10}$)</span>
+          <div className="text-2xl font-sans font-bold text-moss mt-1">
+            {minVal.toFixed(1)} <span className="text-xs font-mono text-slate-500 font-normal">kW</span>
           </div>
         </div>
-        <div className="editorial-sheet rounded p-4">
-          <span className="text-[10px] font-mono uppercase text-ink-muted block">UPPER RISK BOUND ($P_{95}$)</span>
-          <div className="text-2xl font-serif font-bold text-copper mt-1">
-            {maxVal.toFixed(1)} <span className="text-xs font-mono text-ink-muted font-normal">kW</span>
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-4">
+          <span className="text-[10px] font-mono uppercase text-slate-500 block">UPPER RISK BOUND ($P_{95}$)</span>
+          <div className="text-2xl font-sans font-bold text-sky-600 mt-1">
+            {maxVal.toFixed(1)} <span className="text-xs font-mono text-slate-500 font-normal">kW</span>
           </div>
         </div>
       </div>
 
       {/* 4. Layered Probabilistic SVG Forecast Chart */}
-      <div className="editorial-sheet rounded p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border-subtle gap-2">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-copper font-bold block">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-sky-600 font-bold block">
               UNCERTAINTY CORRIDOR & MEDIAN TRAJECTORY
             </span>
-            <h3 className="text-base font-serif font-bold text-ink-primary">
+            <h3 className="text-base font-sans font-bold text-slate-900">
               {target === 'total_load_kw' ? 'Station Electrical Demand' : target === 'solar_generation_kw' ? 'Solar PV Yield' : 'Wind Turbine Output'}
             </h3>
           </div>
@@ -206,16 +206,16 @@ export const ForecastView: React.FC = () => {
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
             <div className="flex items-center space-x-1.5">
-              <span className="w-3 h-0.5 bg-copper"></span>
-              <span className="text-ink-secondary font-medium"><JargonTooltip term="P10–P90">P50 Median</JargonTooltip></span>
+              <span className="w-3 h-0.5 bg-sky-600"></span>
+              <span className="text-slate-600 font-medium"><JargonTooltip term="P10–P90">P50 Median</JargonTooltip></span>
             </div>
             <div className="flex items-center space-x-1.5">
-              <span className="w-3 h-2 bg-copper/20 border border-copper/40 rounded-xs"></span>
-              <span className="text-ink-muted"><JargonTooltip term="Quantile Interval">P10–P90 Corridor</JargonTooltip></span>
+              <span className="w-3 h-2 bg-sky-100 border border-sky-300 rounded-xs"></span>
+              <span className="text-slate-500"><JargonTooltip term="Quantile Interval">P10–P90 Corridor</JargonTooltip></span>
             </div>
             <div className="flex items-center space-x-1.5">
               <span className="w-3 h-0.5 border-t border-dashed border-red-500"></span>
-              <span className="text-ink-muted">P95 Risk Ceiling</span>
+              <span className="text-slate-500">P95 Risk Ceiling</span>
             </div>
           </div>
         </div>
@@ -256,7 +256,7 @@ export const ForecastView: React.FC = () => {
                 const val = (maxVal * 1.15 * fraction).toFixed(0);
                 return (
                   <g key={i}>
-                    <line x1={padL} y1={y} x2={width - padR} y2={y} stroke="#E7E2D6" strokeDasharray="3 3" />
+                    <line x1={padL} y1={y} x2={width - padR} y2={y} stroke="#e2e8f0" strokeDasharray="3 3" />
                     <text x={padL - 8} y={y + 3} textAnchor="end" className="fill-ink-muted text-[10px] font-mono">
                       {val} kW
                     </text>
@@ -266,7 +266,7 @@ export const ForecastView: React.FC = () => {
 
               {/* Shaded P10-P90 Conformal Corridor */}
               {areaP10toP90 && (
-                <path d={areaP10toP90} fill="#B45309" fillOpacity="0.12" stroke="none" />
+                <path d={areaP10toP90} fill="#0284c7" fillOpacity="0.15" stroke="none" />
               )}
 
               {/* P95 Risk Ceiling Line */}
@@ -276,7 +276,7 @@ export const ForecastView: React.FC = () => {
 
               {/* P50 Median Line */}
               {pathP50 && (
-                <path d={pathP50} fill="none" stroke="#B45309" strokeWidth="2.5" strokeLinecap="round" />
+                <path d={pathP50} fill="none" stroke="#0284c7" strokeWidth="2.5" strokeLinecap="round" />
               )}
 
               {/* Interactive Hover Nodes */}
@@ -286,7 +286,7 @@ export const ForecastView: React.FC = () => {
                   cx={getX(idx)}
                   cy={getY(p.p50)}
                   r={hoveredPoint?.horizon_h === p.horizon_h ? 5 : 2}
-                  className="fill-copper transition-all cursor-pointer"
+                  className="fill-sky-600 transition-all cursor-pointer"
                   onMouseEnter={() => setHoveredPoint(p)}
                   onClick={() =>
                     inspectEvidence({
@@ -298,7 +298,7 @@ export const ForecastView: React.FC = () => {
                       station: currentStation,
                       modelOrSubsystem: 'Physics-informed XGBoost + Conformal Quantiles',
                       uncertainty: `P10: ${p.p10.toFixed(1)} kW | P50: ${p.p50.toFixed(1)} kW | P90: ${p.p90.toFixed(1)} kW | P95: ${p.p95.toFixed(1)} kW`,
-                      validationState: 'Conformal coverage 80% guaranteed',
+                      validationState: 'Conformal coverage 80% empirical validity target',
                     })
                   }
                 />
@@ -307,11 +307,11 @@ export const ForecastView: React.FC = () => {
 
             {/* Hover Tooltip Card */}
             {hoveredPoint && (
-              <div className="mt-3 p-3 rounded bg-canvas-subtle border border-border flex items-center justify-between text-xs font-mono">
+              <div className="mt-3 p-3 rounded bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-mono">
                 <div>
-                  <span className="font-semibold text-ink-primary mr-2">Timestep +{hoveredPoint.horizon_h}h:</span>
-                  <span className="text-copper font-bold mr-3">P50: {hoveredPoint.p50.toFixed(1)} kW</span>
-                  <span className="text-ink-muted mr-3">
+                  <span className="font-semibold text-slate-900 mr-2">Timestep +{hoveredPoint.horizon_h}h:</span>
+                  <span className="text-sky-600 font-bold mr-3">P50: {hoveredPoint.p50.toFixed(1)} kW</span>
+                  <span className="text-slate-500 mr-3">
                     Interval (P10–P90): {hoveredPoint.p10.toFixed(1)} – {hoveredPoint.p90.toFixed(1)} kW
                   </span>
                   <span className="text-red-700">P95: {hoveredPoint.p95.toFixed(1)} kW</span>
@@ -329,7 +329,7 @@ export const ForecastView: React.FC = () => {
                       validationState: 'Verified',
                     })
                   }
-                  className="text-copper hover:text-copper-dark underline"
+                  className="text-sky-600 hover:text-sky-600-dark underline"
                 >
                   Inspect Evidence →
                 </button>
@@ -347,35 +347,35 @@ export const ForecastView: React.FC = () => {
       />
 
       {/* 6. Technical Model Information (Progressive Disclosure) */}
-      <div className="editorial-sheet rounded p-5">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-5">
         <button
           onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-          className="w-full flex items-center justify-between text-xs font-mono font-medium text-ink-primary"
+          className="w-full flex items-center justify-between text-xs font-mono font-medium text-slate-900"
         >
           <span className="uppercase tracking-wider">TECHNICAL MODEL SPECIFICATION & BENCHMARKS</span>
           {showTechnicalDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
 
         {showTechnicalDetails && (
-          <div className="mt-4 pt-4 border-t border-border-subtle grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Architecture</span>
-              <span className="font-semibold text-ink-primary">Physics-Informed XGBoost Regressor</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+          <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Architecture</span>
+              <span className="font-semibold text-slate-900">Physics-Informed XGBoost Regressor</span>
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Decomposes base thermal load using degree-day building loss equation, fitting residual weather non-linearities.
               </p>
             </div>
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Conformal Calibration</span>
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Conformal Calibration</span>
               <span className="font-semibold text-moss">80.4% Empirically Validated</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Non-conformity score calibrated on 365-day holdout validation split with Mondrian temperature bins.
               </p>
             </div>
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Causality Guard</span>
-              <span className="font-semibold text-copper">Zero Forward-Leakage Certified</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Causality Guard</span>
+              <span className="font-semibold text-sky-600">Zero Forward-Leakage Certified</span>
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Rolling temporal window blocks any future timestamp or target values from entering feature matrices.
               </p>
             </div>

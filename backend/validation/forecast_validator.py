@@ -43,9 +43,16 @@ class ForecastValidator:
         self.stations = ["BHARATI", "MAITRI", "HIMADRI"]
         self.targets = ["total_load_kw", "solar_generation_kw", "wind_generation_kw"]
         self.horizons = [1, 6, 12, 24, 48, 168]
+        self._metrics_cache: Optional[List[ForecastMetricItem]] = None
+        self._calibration_cache: Optional[List[ProbabilisticCalibrationItem]] = None
+        self._baselines_cache: Optional[List[BaselineComparisonRow]] = None
+        self._regimes_cache: Optional[List[RegimeEvaluationItem]] = None
+        self._leakage_cache: Optional[LeakageAuditReport] = None
 
     def get_forecast_metrics(self) -> List[ForecastMetricItem]:
         """Loads and compiles standardized evaluation metrics across all registered models."""
+        if self._metrics_cache is not None:
+            return self._metrics_cache
         items: List[ForecastMetricItem] = []
         for model_name in self.registry.list_models():
             try:
@@ -75,10 +82,13 @@ class ForecastValidator:
                     ))
             except Exception:
                 continue
+        self._metrics_cache = items
         return items
 
     def get_probabilistic_calibration(self) -> List[ProbabilisticCalibrationItem]:
         """Validates empirical coverage and sharpness across registered conformal calibrators."""
+        if self._calibration_cache is not None:
+            return self._calibration_cache
         items: List[ProbabilisticCalibrationItem] = []
         for model_name in self.registry.list_models():
             try:
@@ -109,10 +119,13 @@ class ForecastValidator:
                     ))
             except Exception:
                 continue
+        self._calibration_cache = items
         return items
 
     def get_baseline_comparisons(self) -> List[BaselineComparisonRow]:
         """Compares production models directly against persistence, seasonal naive, ridge, and random forest."""
+        if self._baselines_cache is not None:
+            return self._baselines_cache
         rows: List[BaselineComparisonRow] = []
         for model_name in self.registry.list_models():
             try:
@@ -214,10 +227,13 @@ class ForecastValidator:
                     ))
             except Exception:
                 continue
+        self._baselines_cache = rows
         return rows
 
     def get_regime_evaluations(self) -> List[RegimeEvaluationItem]:
         """Evaluates model performance across canonical Phase 5 disturbance regimes."""
+        if self._regimes_cache is not None:
+            return self._regimes_cache
         regimes = [
             ("NORMAL", 1.0),
             ("CLOUD_SURGE", 1.45),
@@ -244,6 +260,7 @@ class ForecastValidator:
                         degradation_ratio=round(ratio, 2),
                         evidence_type="SIMULATED"
                     ))
+        self._regimes_cache = items
         return items
 
     def run_leakage_audit(self) -> LeakageAuditReport:
@@ -255,6 +272,8 @@ class ForecastValidator:
         3. Zero future target leakage in lag generation.
         4. Causal feature availability at forecast origin.
         """
+        if self._leakage_cache is not None:
+            return self._leakage_cache
         diagnostics = []
         clean = True
 
@@ -270,7 +289,7 @@ class ForecastValidator:
         diagnostics.append("Audited chronological splits: Train [0..60%], Calib [60..75%], Test [75..100%].")
         diagnostics.append("Zero future target leakage verified across all feature matrices.")
 
-        return LeakageAuditReport(
+        report = LeakageAuditReport(
             audit_passed=clean,
             chronological_split_verified=True,
             zero_future_weather_leakage=True,
@@ -278,6 +297,8 @@ class ForecastValidator:
             causal_feature_availability_verified=True,
             diagnostics=diagnostics
         )
+        self._leakage_cache = report
+        return report
 
     def export_csv(self) -> str:
         """Exports benchmark metrics to CSV string."""

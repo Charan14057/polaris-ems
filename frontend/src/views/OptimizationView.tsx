@@ -175,15 +175,15 @@ export const OptimizationView: React.FC = () => {
               onClick={() => setMode(m.id)}
               className={`p-4 rounded border text-left transition-all ${
                 isSelected
-                  ? 'bg-surface border-copper shadow-raised ring-1 ring-copper/30'
-                  : 'editorial-sheet hover:border-border hover:shadow-sheet'
+                  ? 'bg-white border-sky-600 shadow-raised ring-1 ring-copper/30'
+                  : 'bg-white border border-slate-200 shadow-xs hover:border-slate-200 hover:shadow-sheet'
               }`}
             >
               <div className="flex items-center justify-between text-xs font-mono mb-1">
-                <span className="font-semibold text-ink-primary">{m.label}</span>
-                {isSelected && <span className="w-2 h-2 rounded-full bg-copper" />}
+                <span className="font-semibold text-slate-900">{m.label}</span>
+                {isSelected && <span className="w-2 h-2 rounded-full bg-sky-600" />}
               </div>
-              <p className="text-xs text-ink-muted font-sans leading-relaxed">{m.desc}</p>
+              <p className="text-xs text-slate-500 font-sans leading-relaxed">{m.desc}</p>
             </button>
           );
         })}
@@ -222,17 +222,17 @@ export const OptimizationView: React.FC = () => {
       </div>
 
       {/* 5. Dispatch Schedule Timeline Table */}
-      <div className="editorial-sheet rounded p-6 space-y-4">
-        <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-6 space-y-4">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-copper font-bold block">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-sky-600 font-bold block">
               DISPATCH SCHEDULE LEDGER
             </span>
-            <h3 className="text-base font-serif font-bold text-ink-primary">
+            <h3 className="text-base font-sans font-bold text-slate-900">
               Hourly Multi-Source Generator Profiles
             </h3>
           </div>
-          <span className="text-xs font-mono text-ink-muted">FIRST 12 TIMESTEPS (PREVIEW)</span>
+          <span className="text-xs font-mono text-slate-500">FIRST 12 TIMESTEPS (PREVIEW)</span>
         </div>
 
         <ExplainThis
@@ -255,7 +255,7 @@ export const OptimizationView: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-border text-ink-muted uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px]">
                   <th className="py-2.5 px-3">Step</th>
                   <th className="py-2.5 px-3">Solar (kW)</th>
                   <th className="py-2.5 px-3">Wind (kW)</th>
@@ -270,7 +270,7 @@ export const OptimizationView: React.FC = () => {
                 {(schedule.slice(0, 12)).map((row, idx) => {
                   const bPower = row.p_battery_discharge_kw > 0 ? row.p_battery_discharge_kw : -row.p_battery_charge_kw;
                   return (
-                    <tr key={idx} className="hover:bg-canvas-subtle transition-colors">
+                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
                       <td className="py-2 px-3 font-semibold text-slate-900">+{row.t}h</td>
                       <td className="py-2 px-3 text-amber-600 font-mono-numbers">{row.p_solar_kw !== undefined ? row.p_solar_kw.toFixed(1) : '—'}</td>
                       <td className="py-2 px-3 text-sky-600 font-medium font-mono-numbers">{row.p_wind_kw !== undefined ? row.p_wind_kw.toFixed(1) : '—'}</td>
@@ -313,35 +313,35 @@ export const OptimizationView: React.FC = () => {
       />
 
       {/* 7. Expandable Solver Technical Details */}
-      <div className="editorial-sheet rounded p-5">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-5">
         <button
           onClick={() => setShowSolverDetails(!showSolverDetails)}
-          className="w-full flex items-center justify-between text-xs font-mono font-medium text-ink-primary"
+          className="w-full flex items-center justify-between text-xs font-mono font-medium text-slate-900"
         >
           <span className="uppercase tracking-wider">SOLVER INTERNAL SPECIFICATIONS & CONVERGENCE</span>
           {showSolverDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
 
         {showSolverDetails && (
-          <div className="mt-4 pt-4 border-t border-border-subtle grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Mathematical Engine</span>
-              <span className="font-semibold text-ink-primary">HiGHS C++ Native Solver (Pyomo Bindings)</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+          <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Mathematical Engine</span>
+              <span className="font-semibold text-slate-900">HiGHS C++ Native Solver (Pyomo Bindings)</span>
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Branch-and-cut MILP algorithm with presolve reduction and dual simplex crash.
               </p>
             </div>
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Optimality Invariant</span>
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Optimality Invariant</span>
               <span className="font-semibold text-moss">Absolute Gap = 0.00% (Certified)</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Zero heuristic relaxation on binary commitment variables.
               </p>
             </div>
-            <div className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-              <span className="text-ink-muted uppercase block text-[10px] mb-1">Fair Baseline Benchmark</span>
-              <span className="font-semibold text-copper">14.8% Fuel Savings vs Rule-Based</span>
-              <p className="text-[11px] text-ink-muted mt-1 font-sans">
+            <div className="p-3 rounded bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 uppercase block text-[10px] mb-1">Fair Baseline Benchmark</span>
+              <span className="font-semibold text-sky-600">14.8% Fuel Savings vs Rule-Based</span>
+              <p className="text-[11px] text-slate-500 mt-1 font-sans">
                 Validated in Phase 13 scientific benchmark against legacy uncoordinated setpoint dispatchers.
               </p>
             </div>

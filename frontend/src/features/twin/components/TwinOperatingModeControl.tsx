@@ -45,6 +45,7 @@ interface TwinOperatingModeControlProps {
   mode: OperatingMode;
   onModeChange: (mode: OperatingMode) => void;
   onSimulateAction?: (actionId: string) => void;
+  onApproveRecommendation?: () => void;
   currentDieselKw?: number;
   currentBatterySoc?: number;
 }
@@ -53,6 +54,7 @@ export const TwinOperatingModeControl: React.FC<TwinOperatingModeControlProps> =
   mode,
   onModeChange,
   onSimulateAction,
+  onApproveRecommendation,
   currentDieselKw = 0,
   currentBatterySoc = 0.82
 }) => {
@@ -183,9 +185,31 @@ export const TwinOperatingModeControl: React.FC<TwinOperatingModeControlProps> =
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-1 text-[11px] font-mono text-slate-500">
-            <span>HiGHS MILP Solver Engine • MIP Gap &lt; 0.05%</span>
-            <span className="text-slate-400 text-[10px]">Physical SCADA actuation disconnected</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-slate-100 gap-2 text-[11px] font-mono">
+            <div>
+              <span className="text-slate-500">HiGHS MILP Solver Engine • MIP Gap &lt; 0.05%</span>
+              <span className="text-slate-400 text-[10px] block sm:inline sm:ml-2">Physical SCADA actuation disconnected</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSimulating(true);
+                setTimeout(() => {
+                  setSimulating(false);
+                  setSimulationApplied(true);
+                  onApproveRecommendation?.();
+                }, 500);
+              }}
+              disabled={simulating}
+              className={`px-3 py-1.5 rounded text-xs font-bold font-mono transition-colors shadow-xs flex items-center space-x-1.5 self-start sm:self-auto ${
+                simulationApplied
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              }`}
+            >
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span>{simulating ? 'Simulating...' : simulationApplied ? 'Recommendation Approved (Simulated)' : 'Simulate Operator Approval'}</span>
+            </button>
           </div>
         </div>
       )}

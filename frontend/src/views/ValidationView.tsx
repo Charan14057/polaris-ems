@@ -68,7 +68,7 @@ export const ValidationView: React.FC = () => {
   const { inspectEvidence } = useEvidence();
 
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('evidence');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // Data states
@@ -99,7 +99,7 @@ export const ValidationView: React.FC = () => {
 
   const loadAllData = async () => {
     try {
-      setLoading(true);
+      // non-blocking initial render
       const [
         sumRes,
         evRes,
@@ -194,45 +194,36 @@ export const ValidationView: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-8 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <div className="w-10 h-10 border-2 border-[#B45309]/30 border-t-[#B45309] rounded-full animate-spin"></div>
-        <p className="text-sm font-mono text-[#78716C] tracking-wider">
-          Aggregating Scientific Benchmarks & Model Attributions...
-        </p>
-      </div>
-    );
-  }
+
 
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Editorial Header */}
-      <div className="border-b border-[#DDD6C6] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#78716C] mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
             <span>10 Scientific Validation &amp; Benchmarks</span>
             <span>•</span>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <h1 className="font-serif text-3xl lg:text-4xl text-[#1C1917] tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
             Scientific Validation Console
           </h1>
-          <p className="text-sm text-[#57534E] font-sans mt-2 max-w-2xl">
+          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
             Empirical accuracy audits, non-linear Digital Twin replay, Shapley feature attributions, and offline resilience proofs.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-mono px-2.5 py-1 rounded bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0] font-bold">
+          <span className="text-[10px] font-mono px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
             SUITE STATUS: {summary?.overall_outcome || 'PASS'}
           </span>
           <button
             onClick={loadAllData}
-            className="px-3 py-1.5 rounded text-xs font-mono font-medium bg-white hover:bg-[#F6F3EC] text-[#1C1917] border border-[#DDD6C6] flex items-center space-x-1.5 transition shadow-sm"
+            className="px-3 py-1.5 rounded text-xs font-mono font-medium bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 flex items-center space-x-1.5 transition shadow-sm"
             title="Refresh All Benchmarks"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#B45309] ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-sky-700 ${refreshing ? 'animate-spin' : ''}`} />
             <span>Re-evaluate Suite</span>
           </button>
         </div>
@@ -254,52 +245,52 @@ export const ValidationView: React.FC = () => {
 
       {/* Executive KPI Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">Forecast Point MAE</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#1C1917] mt-1">
-            {summary?.forecast_mae_average || 3.55} <span className="text-xs text-[#78716C] font-normal">kW</span>
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Forecast Point MAE</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-slate-900 mt-1">
+            {summary?.forecast_mae_average || 3.55} <span className="text-xs text-slate-500 font-normal">kW</span>
           </div>
-          <span className="text-[10px] text-[#166534] font-mono">Norm Err &lt; 4.8%</span>
+          <span className="text-[10px] text-emerald-700 font-mono">Norm Err &lt; 4.8%</span>
         </div>
 
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">80% Interval Coverage</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#166534] mt-1">
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">80% Interval Coverage</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-emerald-700 mt-1">
             {summary?.conformal_coverage_average_pct || 84.3}%
           </div>
-          <span className="text-[10px] text-[#78716C] font-mono">Calibrated (Gap &lt; 2%)</span>
+          <span className="text-[10px] text-slate-500 font-mono">Calibrated (Gap &lt; 2%)</span>
         </div>
 
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">Spinning Reserve</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#B45309] mt-1">
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Spinning Reserve</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-sky-700 mt-1">
             30%–40%
           </div>
-          <span className="text-[10px] text-[#78716C] font-mono">Floor Strictly Defended</span>
+          <span className="text-[10px] text-slate-500 font-mono">Floor Strictly Defended</span>
         </div>
 
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">Twin Replay Feasibility</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#0284C7] mt-1">
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Twin Replay Feasibility</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-sky-600 mt-1">
             {summary?.twin_replay_pass_rate_pct !== undefined ? summary.twin_replay_pass_rate_pct.toFixed(1) : '83.3'}%
           </div>
-          <span className="text-[10px] text-[#166534] font-mono">Physical Bounds Enforced</span>
+          <span className="text-[10px] text-emerald-700 font-mono">Physical Bounds Enforced</span>
         </div>
 
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">Offline Safety</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#6B21A8] mt-1">
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Offline Safety</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-indigo-700 mt-1">
             {summary?.offline_safety_compliance_pct || 100.0}%
           </div>
-          <span className="text-[10px] text-[#166534] font-mono">Zero Central Solves</span>
+          <span className="text-[10px] text-emerald-700 font-mono">Zero Central Solves</span>
         </div>
 
-        <div className="p-3.5 rounded bg-white border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider block">Reproducibility</span>
-          <div className="text-base font-bold font-mono font-mono-numbers text-[#0F766E] mt-1">
+        <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
+          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Reproducibility</span>
+          <div className="text-base font-bold font-mono font-mono-numbers text-teal-700 mt-1">
             {summary?.reproducibility_rate_pct || 100.0}%
           </div>
-          <span className="text-[10px] text-[#166534] font-mono">Deterministic Closed-Loop</span>
+          <span className="text-[10px] text-emerald-700 font-mono">Deterministic Closed-Loop</span>
         </div>
       </div>
 
@@ -312,7 +303,7 @@ export const ValidationView: React.FC = () => {
       />
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex border-b border-[#DDD6C6] overflow-x-auto no-scrollbar gap-1 text-xs font-mono">
+      <div className="flex border-b border-slate-200 overflow-x-auto no-scrollbar gap-1 text-xs font-mono">
         {[
           { id: 'evidence', label: 'Technical Evidence Package', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'models', label: 'Predictive Models vs Baselines', icon: <TrendingUp className="w-3.5 h-3.5" /> },
@@ -329,8 +320,8 @@ export const ValidationView: React.FC = () => {
             onClick={() => setActiveSubTab(tab.id as SubTab)}
             className={`flex items-center space-x-2 px-3 py-2 border-b-2 font-medium transition-all whitespace-nowrap ${
               activeSubTab === tab.id
-                ? 'border-[#B45309] text-[#B45309] bg-white'
-                : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
+                ? 'border-sky-600 text-sky-700 bg-white'
+                : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
             {tab.icon}
@@ -344,22 +335,22 @@ export const ValidationView: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 Consolidated Operational Evidence Matrix
               </h2>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Verifiable engineering claims across core autonomous capabilities with explicit data classifications.
               </p>
             </div>
-            <span className="text-[11px] font-mono text-[#78716C]">
+            <span className="text-[11px] font-mono text-slate-500">
               {evidence.length} Audited Capabilities
             </span>
           </div>
 
-          <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white shadow-sm">
+          <div className="overflow-x-auto rounded border border-slate-200 bg-white shadow-sm">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-[#F6F3EC] border-b border-[#DDD6C6] text-[#78716C] font-mono text-[11px] uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-mono text-[11px] uppercase tracking-wider">
                   <th className="py-2.5 px-3">Core Capability</th>
                   <th className="py-2.5 px-3">Empirical Test Description</th>
                   <th className="py-2.5 px-3">Metric Measured</th>
@@ -369,32 +360,32 @@ export const ValidationView: React.FC = () => {
                   <th className="py-2.5 px-3 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#DDD6C6]">
+              <tbody className="divide-y divide-slate-200">
                 {evidence.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-[#F6F3EC]/80 transition-colors">
-                    <td className="py-2.5 px-3 font-mono font-semibold text-[#1C1917] whitespace-nowrap">
+                  <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-2.5 px-3 font-mono font-semibold text-slate-900 whitespace-nowrap">
                       {row.capability}
                     </td>
-                    <td className="py-2.5 px-3 text-[#57534E] max-w-xs font-sans">
+                    <td className="py-2.5 px-3 text-slate-600 max-w-xs font-sans">
                       {row.test_description}
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-[#B45309] whitespace-nowrap">
+                    <td className="py-2.5 px-3 font-mono text-sky-700 whitespace-nowrap">
                       {row.metric_measured}
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-[#1C1917] font-medium font-mono-numbers">
+                    <td className="py-2.5 px-3 font-mono text-slate-900 font-medium font-mono-numbers">
                       {row.measured_result}
                     </td>
                     <td className="py-2.5 px-3">
                       <ProvenanceTag provenance={row.evidence_class} size="xs" />
                     </td>
-                    <td className="py-2.5 px-3 text-[#78716C] text-[11px] max-w-xs font-sans">
+                    <td className="py-2.5 px-3 text-slate-500 text-[11px] max-w-xs font-sans">
                       {row.limitations}
                     </td>
                     <td className="py-2.5 px-3 text-center">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
                         row.outcome === 'PASS' 
-                          ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]' 
-                          : 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}>
                         {row.outcome}
                       </span>
@@ -411,45 +402,45 @@ export const ValidationView: React.FC = () => {
       {activeSubTab === 'models' && (
         <div className="space-y-6">
           {leakageAudit && (
-            <div className="p-4 rounded bg-white border border-[#DDD6C6] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div className="p-4 rounded bg-white border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded bg-[#EBF7F0] border border-[#BBF7D0] flex items-center justify-center text-[#166534]">
+                <div className="w-8 h-8 rounded bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-900">
                     Chronological &amp; Data Leakage Audit: CLEAN
                   </h3>
-                  <p className="text-[11px] text-[#78716C] mt-0.5 font-sans">
+                  <p className="text-[11px] text-slate-500 mt-0.5 font-sans">
                     Verified strict chronological train/val/test splits, t-k causal lag boundaries, and zero future weather leakage.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 text-[11px] font-mono text-[#166534]">
+              <div className="flex items-center space-x-2 text-[11px] font-mono text-emerald-700">
                 <span>0 Violations Detected</span>
-                <span className="text-[#DDD6C6]">|</span>
+                <span className="text-slate-300">|</span>
                 <span>{leakageAudit.diagnostics.length} Pipeline Guards Active</span>
               </div>
             </div>
           )}
 
-          <div className="editorial-sheet p-6 space-y-4">
+          <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+                <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                   Production Models vs Heuristic &amp; Linear Baselines
                 </h3>
-                <p className="text-xs text-[#57534E] mt-0.5">
+                <p className="text-xs text-slate-600 mt-0.5">
                   Direct numerical comparison on identical test partitions across 24h operational horizons.
                 </p>
               </div>
               <ProvenanceTag provenance="SYNTHETIC" size="xs" />
             </div>
 
-            <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+            <div className="overflow-x-auto rounded border border-slate-200 bg-white">
               <table className="w-full text-left text-xs border-collapse font-mono">
                 <thead>
-                  <tr className="bg-[#F6F3EC] text-[#78716C] text-[11px] border-b border-[#DDD6C6] uppercase tracking-wider">
+                  <tr className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200 uppercase tracking-wider">
                     <th className="py-2.5 px-3">Station</th>
                     <th className="py-2.5 px-3">Target</th>
                     <th className="py-2.5 px-3">Model Architecture</th>
@@ -460,18 +451,18 @@ export const ValidationView: React.FC = () => {
                     <th className="py-2.5 px-3">vs Persistence</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#DDD6C6]">
+                <tbody className="divide-y divide-slate-200">
                   {baselines.map((b, i) => (
                     <tr 
                       key={i} 
-                      className={`hover:bg-[#F6F3EC]/80 transition-colors ${
-                        b.baseline_type === 'PRODUCTION_XGB' ? 'bg-[#FEF3C7]/40 font-semibold text-[#1C1917]' : 'text-[#57534E]'
+                      className={`hover:bg-slate-50 transition-colors ${
+                        b.baseline_type === 'PRODUCTION_XGB' ? 'bg-amber-50/40 font-semibold text-slate-900' : 'text-slate-600'
                       }`}
                     >
                       <td className="py-2.5 px-3">{b.station_id}</td>
                       <td className="py-2.5 px-3">{b.target}</td>
                       <td className="py-2.5 px-3 flex items-center space-x-1.5">
-                        {b.baseline_type === 'PRODUCTION_XGB' && <Zap className="w-3 h-3 text-[#B45309]" />}
+                        {b.baseline_type === 'PRODUCTION_XGB' && <Zap className="w-3 h-3 text-sky-700" />}
                         <span>{b.model_name}</span>
                       </td>
                       <td className="py-2.5 px-3 font-mono-numbers">{b.mae.toFixed(3)}</td>
@@ -481,10 +472,10 @@ export const ValidationView: React.FC = () => {
                       <td className="py-2.5 px-3">
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           b.relative_improvement_pct > 0 
-                            ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : b.relative_improvement_pct === 0 
-                            ? 'text-[#78716C]'
-                            : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]'
+                            ? 'text-slate-500'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}>
                           {b.relative_improvement_pct > 0 ? `+${b.relative_improvement_pct}%` : `${b.relative_improvement_pct}%`}
                         </span>
@@ -500,13 +491,13 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 3: Uncertainty Calibration */}
       {activeSubTab === 'uncertainty' && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 Finite-Sample Conformal Prediction Coverage
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Empirical probability calibration (P10–P95) and non-crossing monotonic interval bounds across stations and horizons.
               </p>
             </div>
@@ -514,29 +505,29 @@ export const ValidationView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded bg-white border border-[#DDD6C6] shadow-sm">
-              <span className="text-xs font-mono text-[#78716C]">80% Nominal Band (P10–P90)</span>
-              <div className="text-2xl font-bold font-mono font-mono-numbers text-[#0284C7] mt-1">84.3%</div>
-              <p className="text-[11px] text-[#166534] mt-1">Nominal gap +4.3% (Conservative safety buffer)</p>
+            <div className="p-4 rounded bg-white border border-slate-200 shadow-sm">
+              <span className="text-xs font-mono text-slate-500">80% Nominal Band (P10–P90)</span>
+              <div className="text-2xl font-bold font-mono font-mono-numbers text-sky-600 mt-1">84.3%</div>
+              <p className="text-[11px] text-emerald-700 mt-1">Nominal gap +4.3% (Conservative safety buffer)</p>
             </div>
 
-            <div className="p-4 rounded bg-white border border-[#DDD6C6] shadow-sm">
-              <span className="text-xs font-mono text-[#78716C]">Quantile Crossings</span>
-              <div className="text-2xl font-bold font-mono font-mono-numbers text-[#166534] mt-1">0</div>
-              <p className="text-[11px] text-[#78716C] mt-1">P10 &le; P50 &le; P90 &le; P95 strictly maintained</p>
+            <div className="p-4 rounded bg-white border border-slate-200 shadow-sm">
+              <span className="text-xs font-mono text-slate-500">Quantile Crossings</span>
+              <div className="text-2xl font-bold font-mono font-mono-numbers text-emerald-700 mt-1">0</div>
+              <p className="text-[11px] text-slate-500 mt-1">P10 &le; P50 &le; P90 &le; P95 strictly maintained</p>
             </div>
 
-            <div className="p-4 rounded bg-white border border-[#DDD6C6] shadow-sm">
-              <span className="text-xs font-mono text-[#78716C]">Average Interval Sharpness</span>
-              <div className="text-2xl font-bold font-mono font-mono-numbers text-[#B45309] mt-1">11.8 <span className="text-xs font-normal text-[#78716C]">kW</span></div>
-              <p className="text-[11px] text-[#78716C] mt-1">Bounded operational dispersion</p>
+            <div className="p-4 rounded bg-white border border-slate-200 shadow-sm">
+              <span className="text-xs font-mono text-slate-500">Average Interval Sharpness</span>
+              <div className="text-2xl font-bold font-mono font-mono-numbers text-sky-700 mt-1">11.8 <span className="text-xs font-normal text-slate-500">kW</span></div>
+              <p className="text-[11px] text-slate-500 mt-1">Bounded operational dispersion</p>
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+          <div className="overflow-x-auto rounded border border-slate-200 bg-white">
             <table className="w-full text-left text-xs border-collapse font-mono">
               <thead>
-                <tr className="bg-[#F6F3EC] text-[#78716C] text-[11px] border-b border-[#DDD6C6] uppercase tracking-wider">
+                <tr className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200 uppercase tracking-wider">
                   <th className="py-2.5 px-3">Station</th>
                   <th className="py-2.5 px-3">Target</th>
                   <th className="py-2.5 px-3">Horizon</th>
@@ -547,18 +538,18 @@ export const ValidationView: React.FC = () => {
                   <th className="py-2.5 px-3 text-center">Calibrated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#DDD6C6]">
+              <tbody className="divide-y divide-slate-200">
                 {calibration.map((c, i) => (
-                  <tr key={i} className="hover:bg-[#F6F3EC]/80 transition-colors">
+                  <tr key={i} className="hover:bg-slate-50 transition-colors">
                     <td className="py-2.5 px-3">{c.station_id}</td>
                     <td className="py-2.5 px-3">{c.target}</td>
                     <td className="py-2.5 px-3">{c.horizon_hours}h</td>
                     <td className="py-2.5 px-3 font-mono-numbers">{(c.p10_coverage * 100).toFixed(1)}%</td>
                     <td className="py-2.5 px-3 font-mono-numbers">{(c.p90_coverage * 100).toFixed(1)}%</td>
-                    <td className="py-2.5 px-3 text-[#0284C7] font-medium font-mono-numbers">{(c.interval_80_coverage * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 px-3 text-sky-600 font-medium font-mono-numbers">{(c.interval_80_coverage * 100).toFixed(1)}%</td>
                     <td className="py-2.5 px-3 font-mono-numbers">{c.interval_80_width_kw.toFixed(2)}</td>
                     <td className="py-2.5 px-3 text-center">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0] font-bold">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
                         VALIDATED
                       </span>
                     </td>
@@ -572,23 +563,23 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 4: Optimizer & Twin Replay */}
       {activeSubTab === 'optimizer' && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 Microgrid Dispatch vs Counterfactual Baseline Simulation
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Equivalent physical initial state and disturbance trajectories evaluated under HiGHS MILP and closed-loop Digital Twin replay.
               </p>
             </div>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
 
-          <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+          <div className="overflow-x-auto rounded border border-slate-200 bg-white">
             <table className="w-full text-left text-xs border-collapse font-mono">
               <thead>
-                <tr className="bg-[#F6F3EC] text-[#78716C] text-[11px] border-b border-[#DDD6C6] uppercase tracking-wider">
+                <tr className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200 uppercase tracking-wider">
                   <th className="py-2.5 px-3">Station</th>
                   <th className="py-2.5 px-3">Scenario</th>
                   <th className="py-2.5 px-3">Mode</th>
@@ -600,39 +591,39 @@ export const ValidationView: React.FC = () => {
                   <th className="py-2.5 px-3">Optimality Tier</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#DDD6C6]">
+              <tbody className="divide-y divide-slate-200">
                 {optimizerBench.map((opt, i) => (
-                  <tr key={i} className="hover:bg-[#F6F3EC]/80 transition-colors">
-                    <td className="py-2.5 px-3 font-semibold text-[#1C1917]">{opt.station_id}</td>
+                  <tr key={i} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{opt.station_id}</td>
                     <td className="py-2.5 px-3">{opt.scenario_id}</td>
-                    <td className="py-2.5 px-3 text-[#0284C7]">{opt.mode}</td>
+                    <td className="py-2.5 px-3 text-sky-600">{opt.mode}</td>
                     <td className="py-2.5 px-3 font-mono-numbers">{opt.baseline_fuel_liters.toFixed(1)} L</td>
-                    <td className="py-2.5 px-3 text-[#1C1917] font-medium font-mono-numbers">{opt.optimized_fuel_liters.toFixed(1)} L</td>
+                    <td className="py-2.5 px-3 text-slate-900 font-medium font-mono-numbers">{opt.optimized_fuel_liters.toFixed(1)} L</td>
                     <td className="py-2.5 px-3">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         opt.fuel_delta_liters > 0 
-                          ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]' 
-                          : 'text-[#78716C]'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                          : 'text-slate-500'
                       }`}>
                         {opt.fuel_delta_liters > 0 ? `-${opt.fuel_delta_liters.toFixed(1)} L (${opt.fuel_savings_pct}%)` : 'Life-Safety Heating Priority'}
                       </span>
                     </td>
                     <td className="py-2.5 px-3">
                       {opt.twin_replay_valid ? (
-                        <span className="inline-flex items-center space-x-1 text-[#166534] font-bold">
+                        <span className="inline-flex items-center space-x-1 text-emerald-700 font-bold">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>FEASIBLE</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center space-x-1 text-[#B45309] font-bold">
+                        <span className="inline-flex items-center space-x-1 text-sky-700 font-bold">
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span>LIMIT FLAG (Derating)</span>
                         </span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 text-[#78716C] font-mono-numbers">{opt.solver_time_sec.toFixed(3)}s</td>
+                    <td className="py-2.5 px-3 text-slate-500 font-mono-numbers">{opt.solver_time_sec.toFixed(3)}s</td>
                     <td className="py-2.5 px-3">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#F6F3EC] text-[#0369A1] border border-[#DDD6C6]">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-50 text-sky-700 border border-slate-200">
                         {opt.optimality_tier}
                       </span>
                     </td>
@@ -646,13 +637,13 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 5: Resilience Stress & Invariant Proofs */}
       {activeSubTab === 'resilience' && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 Escalating Disturbance Stress Progression
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Validates non-chaotic resilience progression across increasing environmental stresses without assuming artificial monotonicity.
               </p>
             </div>
@@ -662,48 +653,48 @@ export const ValidationView: React.FC = () => {
           {resilienceVal && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               {resilienceVal.scenario_sequence.map((sc, idx) => (
-                <div key={idx} className="p-4 rounded bg-white border border-[#DDD6C6] space-y-2 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#78716C] uppercase tracking-wider">Step {idx + 1}</span>
-                  <div className="text-sm font-bold font-mono text-[#1C1917]">{sc}</div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[#F6F3EC] text-xs font-mono">
-                    <span className="text-[#78716C]">State:</span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] font-bold text-[10px]">
+                <div key={idx} className="p-4 rounded bg-white border border-slate-200 space-y-2 shadow-sm">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Step {idx + 1}</span>
+                  <div className="text-sm font-bold font-mono text-slate-900">{sc}</div>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs font-mono">
+                    <span className="text-slate-500">State:</span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[10px]">
                       {resilienceVal.observed_states[idx]}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-[#78716C]">Resilience Index:</span>
-                    <span className="text-[#0284C7] font-bold font-mono-numbers">{resilienceVal.observed_composite_indices[idx]}</span>
+                    <span className="text-slate-500">Resilience Index:</span>
+                    <span className="text-sky-600 font-bold font-mono-numbers">{resilienceVal.observed_composite_indices[idx]}</span>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-3 shadow-sm">
-            <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-[#B45309] flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-[#166534]" />
+          <div className="p-4 rounded bg-white border border-slate-200 space-y-3 shadow-sm">
+            <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-sky-700 flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-700" />
               <span>Formally Verified Physical Invariants ({resilienceVal?.invariants_passed_count}/{resilienceVal?.total_invariants_count} Passed)</span>
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-[#57534E]">
-              <div className="p-2.5 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex items-center space-x-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#166534] flex-shrink-0" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-600">
+              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                 <span>1. Generator Outage Capacity Monotonicity (N-1 &lt; N)</span>
               </div>
-              <div className="p-2.5 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex items-center space-x-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#166534] flex-shrink-0" />
+              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                 <span>2. Genuine Load Power Demand Conservation</span>
               </div>
-              <div className="p-2.5 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex items-center space-x-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#166534] flex-shrink-0" />
+              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                 <span>3. Solar/Wind Upper-Bound Non-Creation</span>
               </div>
-              <div className="p-2.5 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex items-center space-x-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#166534] flex-shrink-0" />
+              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                 <span>4. Usable Battery Cold-Derating Bound</span>
               </div>
-              <div className="p-2.5 rounded bg-[#F6F3EC] border border-[#DDD6C6] flex items-center space-x-2 sm:col-span-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#166534] flex-shrink-0" />
+              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center space-x-2 sm:col-span-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                 <span>5. Resupply Gap Delay Strict Monotonic Ordering</span>
               </div>
             </div>
@@ -713,23 +704,23 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 6: Edge Offline Safety */}
       {activeSubTab === 'edge' && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 Field Communications Loss &amp; Offline Safety Proof
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Proves that when WAN/satellite connectivity drops, zero mathematical solvers execute and autonomous safe-hold postures engage.
               </p>
             </div>
             <ProvenanceTag provenance="CONFIGURED" size="xs" />
           </div>
 
-          <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+          <div className="overflow-x-auto rounded border border-slate-200 bg-white">
             <table className="w-full text-left text-xs border-collapse font-mono">
               <thead>
-                <tr className="bg-[#F6F3EC] text-[#78716C] text-[11px] border-b border-[#DDD6C6] uppercase tracking-wider">
+                <tr className="bg-slate-50 text-slate-500 text-[11px] border-b border-slate-200 uppercase tracking-wider">
                   <th className="py-2.5 px-3">Field Condition</th>
                   <th className="py-2.5 px-3">Edge Mode</th>
                   <th className="py-2.5 px-3">Connectivity State</th>
@@ -739,17 +730,17 @@ export const ValidationView: React.FC = () => {
                   <th className="py-2.5 px-3 text-center">Safety Verified</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#DDD6C6]">
+              <tbody className="divide-y divide-slate-200">
                 {edgeVal.map((e, idx) => (
-                  <tr key={idx} className="hover:bg-[#F6F3EC]/80 transition-colors">
-                    <td className="py-2.5 px-3 font-semibold text-[#1C1917]">{e.condition}</td>
-                    <td className="py-2.5 px-3 text-[#0284C7]">{e.edge_mode}</td>
+                  <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900">{e.condition}</td>
+                    <td className="py-2.5 px-3 text-sky-600">{e.edge_mode}</td>
                     <td className="py-2.5 px-3">{e.connectivity_state}</td>
                     <td className="py-2.5 px-3">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         e.fallback_posture === 'SAFE_HOLD' 
-                          ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]' 
-                          : 'bg-[#F6F3EC] text-[#78716C]'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200' 
+                          : 'bg-slate-50 text-slate-500'
                       }`}>
                         {e.fallback_posture}
                       </span>
@@ -757,15 +748,15 @@ export const ValidationView: React.FC = () => {
                     <td className="py-2.5 px-3">
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         e.central_solver_invoked 
-                          ? 'text-[#0284C7]' 
-                          : 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]'
+                          ? 'text-sky-600' 
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       }`}>
                         {e.central_solver_invoked ? 'PERMITTED (ONLINE)' : '0 SOLVERS (OFFLINE SAFE)'}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 font-mono-numbers">{e.buffered_observations} items</td>
                     <td className="py-2.5 px-3 text-center">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0] font-bold">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
                         VERIFIED
                       </span>
                     </td>
@@ -779,28 +770,28 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 7: Tree SHAP Explainability */}
       {activeSubTab === 'explain' && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-[#B45309]" />
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-sky-700" />
                 <span>Exact Tree SHAP Feature Attribution</span>
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Native XGBoost Tree SHAP Shapley values decomposition with mathematical additivity proof.
               </p>
             </div>
 
             {/* Target Selector */}
-            <div className="flex items-center bg-white p-1 rounded border border-[#DDD6C6] gap-1 font-mono text-xs">
+            <div className="flex items-center bg-white p-1 rounded border border-slate-200 gap-1 font-mono text-xs">
               {(['total_load_kw', 'solar_generation_kw', 'wind_generation_kw'] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => handleTargetChange(t)}
                   className={`px-2.5 py-1 rounded transition-all ${
                     explainTarget === t 
-                      ? 'bg-[#1C1917] text-white font-semibold' 
-                      : 'text-[#78716C] hover:text-[#1C1917]'
+                      ? 'bg-slate-900 text-white font-semibold' 
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   {t.replace('_kw', '')}
@@ -809,8 +800,8 @@ export const ValidationView: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3 rounded bg-[#FEF3C7] border border-[#FDE68A] flex items-center space-x-2 text-xs font-mono text-[#92400E]">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#B45309]" />
+          <div className="p-3 rounded bg-amber-50 border border-amber-200 flex items-center space-x-2 text-xs font-mono text-amber-800">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-sky-700" />
             <span>
               DISCIPLINE LABEL: MODEL CONTRIBUTION ONLY — NOT PHYSICAL CAUSATION. Shows statistical marginal feature impact on the model prediction.
             </span>
@@ -819,50 +810,50 @@ export const ValidationView: React.FC = () => {
           {explanation && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs font-mono">
-                <div className="p-3 rounded bg-white border border-[#DDD6C6] shadow-sm">
-                  <span className="text-[#78716C] text-[10px]">Expected Base Value E[f(x)]</span>
-                  <div className="text-lg font-bold text-[#1C1917] mt-0.5 font-mono-numbers">{explanation.base_value.toFixed(2)} kW</div>
+                <div className="p-3 rounded bg-white border border-slate-200 shadow-sm">
+                  <span className="text-slate-500 text-[10px]">Expected Base Value E[f(x)]</span>
+                  <div className="text-lg font-bold text-slate-900 mt-0.5 font-mono-numbers">{explanation.base_value.toFixed(2)} kW</div>
                 </div>
-                <div className="p-3 rounded bg-white border border-[#DDD6C6] shadow-sm">
-                  <span className="text-[#78716C] text-[10px]">Model Output f(x)</span>
-                  <div className="text-lg font-bold text-[#0284C7] mt-0.5 font-mono-numbers">{explanation.predicted_value.toFixed(2)} kW</div>
+                <div className="p-3 rounded bg-white border border-slate-200 shadow-sm">
+                  <span className="text-slate-500 text-[10px]">Model Output f(x)</span>
+                  <div className="text-lg font-bold text-sky-600 mt-0.5 font-mono-numbers">{explanation.predicted_value.toFixed(2)} kW</div>
                 </div>
-                <div className="p-3 rounded bg-white border border-[#DDD6C6] shadow-sm">
-                  <span className="text-[#78716C] text-[10px]">Shapley Additivity</span>
-                  <div className="text-lg font-bold text-[#166534] mt-0.5">
+                <div className="p-3 rounded bg-white border border-slate-200 shadow-sm">
+                  <span className="text-slate-500 text-[10px]">Shapley Additivity</span>
+                  <div className="text-lg font-bold text-emerald-700 mt-0.5">
                     {explanation.additivity_verified ? 'EXACT PROOF' : 'APPROX'}
                   </div>
                 </div>
-                <div className="p-3 rounded bg-white border border-[#DDD6C6] shadow-sm">
-                  <span className="text-[#78716C] text-[10px]">Explanation Engine</span>
-                  <div className="text-xs font-bold text-[#57534E] mt-1">{explanation.explanation_method}</div>
+                <div className="p-3 rounded bg-white border border-slate-200 shadow-sm">
+                  <span className="text-slate-500 text-[10px]">Explanation Engine</span>
+                  <div className="text-xs font-bold text-slate-600 mt-1">{explanation.explanation_method}</div>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917]">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
                   Top Contributing Feature Drivers (Ranked by |&Phi;|)
                 </h4>
                 <div className="space-y-1.5 font-mono text-xs">
                   {explanation.contributions.map((c, i) => {
                     const isPositive = c.shapley_value >= 0;
                     return (
-                      <div key={i} className="p-2.5 rounded bg-white border border-[#DDD6C6] flex items-center justify-between gap-3 shadow-sm">
+                      <div key={i} className="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between gap-3 shadow-sm">
                         <div className="flex items-center space-x-2">
-                          <span className="text-[#78716C] text-[10px] w-4">{i + 1}.</span>
-                          <span className="text-[#1C1917] font-semibold">{c.feature_name}</span>
-                          <span className="text-[#78716C] text-[11px]">(val: {c.feature_value})</span>
+                          <span className="text-slate-500 text-[10px] w-4">{i + 1}.</span>
+                          <span className="text-slate-900 font-semibold">{c.feature_name}</span>
+                          <span className="text-slate-500 text-[11px]">(val: {c.feature_value})</span>
                         </div>
 
                         <div className="flex items-center space-x-3">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-mono-numbers ${
                             isPositive 
-                              ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]' 
-                              : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                              : 'bg-rose-50 text-rose-700 border border-rose-200'
                           }`}>
                             {isPositive ? `+${c.shapley_value.toFixed(3)} kW` : `${c.shapley_value.toFixed(3)} kW`}
                           </span>
-                          <span className="text-[11px] text-[#78716C] w-12 text-right font-mono-numbers">
+                          <span className="text-[11px] text-slate-500 w-12 text-right font-mono-numbers">
                             {c.relative_contribution_pct.toFixed(1)}%
                           </span>
                         </div>
@@ -878,13 +869,13 @@ export const ValidationView: React.FC = () => {
 
       {/* TAB 8: Closed-Loop Trace Replay & Archival */}
       {activeSubTab === 'reproduce' && (
-        <div className="editorial-sheet p-6 space-y-6">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917]">
+              <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900">
                 End-to-End Decision Trace Reproducibility
               </h3>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Reruns the entire frozen multi-phase pipeline from recorded trace input snapshots to verify closed-loop reproducibility.
               </p>
             </div>
@@ -892,7 +883,7 @@ export const ValidationView: React.FC = () => {
             <button
               onClick={handleTriggerReplay}
               disabled={refreshing}
-              className="px-4 py-2 rounded text-xs font-mono font-bold bg-[#B45309] hover:bg-[#92400E] text-white flex items-center space-x-2 transition shadow-sm disabled:opacity-50"
+              className="px-4 py-2 rounded text-xs font-mono font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center space-x-2 transition shadow-sm disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               <span>{refreshing ? 'Executing Replay...' : 'Replay Decision Trace'}</span>
@@ -900,52 +891,52 @@ export const ValidationView: React.FC = () => {
           </div>
 
           {replayReport && (
-            <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-3 font-mono text-xs shadow-sm">
+            <div className="p-4 rounded bg-white border border-slate-200 space-y-3 font-mono text-xs shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[#78716C]">Replay Target Trace:</span>
-                <span className="text-[#0284C7] font-bold">{replayReport.original_trace_id}</span>
+                <span className="text-slate-500">Replay Target Trace:</span>
+                <span className="text-sky-600 font-bold">{replayReport.original_trace_id}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#78716C]">Classification Outcome:</span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]">
+                <span className="text-slate-500">Classification Outcome:</span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   {replayReport.reproduction_category}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#78716C]">Max Numerical Error:</span>
-                <span className="text-[#1C1917] font-mono-numbers">{replayReport.max_absolute_error.toFixed(5)}</span>
+                <span className="text-slate-500">Max Numerical Error:</span>
+                <span className="text-slate-900 font-mono-numbers">{replayReport.max_absolute_error.toFixed(5)}</span>
               </div>
-              <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6] text-[#57534E]">
+              <div className="p-3 rounded bg-slate-50 border border-slate-200 text-slate-600">
                 {replayReport.notes}
               </div>
             </div>
           )}
 
-          <div className="p-4 rounded bg-white border border-[#DDD6C6] space-y-3 shadow-sm">
+          <div className="p-4 rounded bg-white border border-slate-200 space-y-3 shadow-sm">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                <Database className="w-4 h-4 text-[#B45309]" />
+              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                <Database className="w-4 h-4 text-sky-700" />
                 <span>Pluggable Cold Storage Trace Archive</span>
               </h4>
-              <span className="text-[10px] font-mono text-[#166534] bg-[#EBF7F0] px-2 py-0.5 rounded border border-[#BBF7D0] font-semibold">
+              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-semibold">
                 LOCAL_COMPRESSED_GZIP ACTIVE
               </span>
             </div>
-            <p className="text-xs text-[#57534E]">
+            <p className="text-xs text-slate-600">
               Decoupled archival store extending the 500-record active memory boundary with gzip compression.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono pt-2">
-              <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6]">
-                <span className="text-[#78716C] text-[10px]">Archived Traces</span>
-                <div className="text-base font-bold text-[#1C1917] mt-0.5 font-mono-numbers">{archiveStats.total_archived_traces || 0}</div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 text-[10px]">Archived Traces</span>
+                <div className="text-base font-bold text-slate-900 mt-0.5 font-mono-numbers">{archiveStats.total_archived_traces || 0}</div>
               </div>
-              <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6]">
-                <span className="text-[#78716C] text-[10px]">Compressed Storage</span>
-                <div className="text-base font-bold text-[#0284C7] mt-0.5 font-mono-numbers">{archiveStats.total_archive_bytes || 0} bytes</div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 text-[10px]">Compressed Storage</span>
+                <div className="text-base font-bold text-sky-600 mt-0.5 font-mono-numbers">{archiveStats.total_archive_bytes || 0} bytes</div>
               </div>
-              <div className="p-3 rounded bg-[#F6F3EC] border border-[#DDD6C6]">
-                <span className="text-[#78716C] text-[10px]">Storage Backend</span>
-                <div className="text-base font-bold text-[#166534] mt-0.5">LOCAL_COMPRESSED_GZIP</div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 text-[10px]">Storage Backend</span>
+                <div className="text-base font-bold text-emerald-700 mt-0.5">LOCAL_COMPRESSED_GZIP</div>
               </div>
             </div>
           </div>
@@ -957,106 +948,106 @@ export const ValidationView: React.FC = () => {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                <Compass className="w-4 h-4 text-[#B45309]" />
+              <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                <Compass className="w-4 h-4 text-sky-700" />
                 <span>Real-World External Integration &amp; Calibration Control</span>
               </h2>
-              <p className="text-xs text-[#57534E] mt-0.5">
+              <p className="text-xs text-slate-600 mt-0.5">
                 Evaluates live external provider quality, model-vs-observed residuals, twin reality fidelity, and drift classification.
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-[11px] font-mono text-[#78716C]">Physical SCADA:</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+              <span className="text-[11px] font-mono text-slate-500">Physical SCADA:</span>
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
                 DISCONNECTED (NO SCADA HARDWARE)
               </span>
             </div>
           </div>
 
-          <div className="editorial-sheet p-6 space-y-3">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-              <CloudSun className="w-4 h-4 text-[#B45309]" />
+          <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+              <CloudSun className="w-4 h-4 text-sky-700" />
               <span>External Weather Provider Ingestion Status</span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 font-mono text-xs">
-              <div className="p-3 rounded bg-white border border-[#DDD6C6] space-y-1.5 shadow-sm">
+              <div className="p-3 rounded bg-white border border-slate-200 space-y-1.5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1C1917] font-bold">Open-Meteo API</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]">
+                  <span className="text-slate-900 font-bold">Open-Meteo API</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     AVAILABLE
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Provenance:</span>
                   <ProvenanceTag provenance="FORECAST" />
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Validation Bounds:</span>
-                  <span className="text-[#166534]">POLAR DOMAIN PASS</span>
+                  <span className="text-emerald-700">POLAR DOMAIN PASS</span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Circuit Breaker:</span>
-                  <span className="text-[#57534E]">ACTIVE (Threshold: 5)</span>
+                  <span className="text-slate-600">ACTIVE (Threshold: 5)</span>
                 </div>
               </div>
 
-              <div className="p-3 rounded bg-white border border-[#DDD6C6] space-y-1.5 shadow-sm">
+              <div className="p-3 rounded bg-white border border-slate-200 space-y-1.5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1C1917] font-bold">Station Weather Cache</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]">
+                  <span className="text-slate-900 font-bold">Station Weather Cache</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                     FRESH (&lt; 3600s)
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Causality Guard:</span>
-                  <span className="text-[#166534]">STRICT OPERATIONAL PASS</span>
+                  <span className="text-emerald-700">STRICT OPERATIONAL PASS</span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Completeness:</span>
-                  <span className="text-[#1C1917]">100.0% (Zero gaps)</span>
+                  <span className="text-slate-900">100.0% (Zero gaps)</span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Fallback Mechanism:</span>
-                  <span className="text-[#57534E]">SYNTHETIC PHYSICS ARTIFACTS</span>
+                  <span className="text-slate-600">SYNTHETIC PHYSICS ARTIFACTS</span>
                 </div>
               </div>
 
-              <div className="p-3 rounded bg-white border border-[#DDD6C6] space-y-1.5 shadow-sm">
+              <div className="p-3 rounded bg-white border border-slate-200 space-y-1.5 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1C1917] font-bold">Physical Microgrid SCADA</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+                  <span className="text-slate-900 font-bold">Physical Microgrid SCADA</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                     DISCONNECTED
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Connection Truth:</span>
-                  <span className="text-[#B45309]">ZERO PHYSICAL HARDWARE</span>
+                  <span className="text-sky-700">ZERO PHYSICAL HARDWARE</span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Execution Tier:</span>
-                  <span className="text-[#57534E]">CALIBRATED DIGITAL TWIN</span>
+                  <span className="text-slate-600">CALIBRATED DIGITAL TWIN</span>
                 </div>
-                <div className="flex items-center justify-between text-[#78716C] text-[11px]">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
                   <span>Real-Time Claim:</span>
-                  <span className="text-[#991B1B] font-bold">PROHIBITED BY GOVERNANCE</span>
+                  <span className="text-rose-700 font-bold">PROHIBITED BY GOVERNANCE</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Model-vs-Observed Residual Metrics */}
-          <div className="editorial-sheet p-6 space-y-3">
+          <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4 text-[#B45309]" />
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4 text-sky-700" />
                 <span>Model vs Observed Forecast Residual Evaluation</span>
               </h3>
-              <span className="text-[10px] font-mono text-[#0284C7]">WORKSTREAM E METRICS</span>
+              <span className="text-[10px] font-mono text-sky-600">WORKSTREAM E METRICS</span>
             </div>
-            <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+            <div className="overflow-x-auto rounded border border-slate-200 bg-white">
               <table className="w-full text-left font-mono text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#DDD6C6] bg-[#F6F3EC] text-[#78716C] text-[11px]">
+                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 text-[11px]">
                     <th className="py-2.5 px-3">STATION</th>
                     <th className="py-2.5 px-3">TARGET</th>
                     <th className="py-2.5 px-3">HORIZON</th>
@@ -1069,29 +1060,29 @@ export const ValidationView: React.FC = () => {
                     <th className="py-2.5 px-3">PROVENANCE</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#DDD6C6]">
+                <tbody className="divide-y divide-slate-200">
                   {realityMetrics.length > 0 ? (
                     realityMetrics.map((m, idx) => (
-                      <tr key={idx} className="hover:bg-[#F6F3EC]/80">
-                        <td className="py-2 px-3 font-bold text-[#1C1917]">{m.station_id}</td>
-                        <td className="py-2 px-3 text-[#0284C7]">{m.target}</td>
-                        <td className="py-2 px-3 text-[#78716C]">{m.horizon_hours}h</td>
-                        <td className="py-2 px-3 text-[#78716C] font-mono-numbers">{m.n_samples}</td>
-                        <td className="py-2 px-3 text-[#1C1917] font-bold font-mono-numbers">{m.mae.toFixed(2)}</td>
-                        <td className="py-2 px-3 text-[#57534E] font-mono-numbers">{m.rmse.toFixed(2)}</td>
-                        <td className="py-2 px-3 text-[#57534E] font-mono-numbers">{m.smape.toFixed(1)}%</td>
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2 px-3 font-bold text-slate-900">{m.station_id}</td>
+                        <td className="py-2 px-3 text-sky-600">{m.target}</td>
+                        <td className="py-2 px-3 text-slate-500">{m.horizon_hours}h</td>
+                        <td className="py-2 px-3 text-slate-500 font-mono-numbers">{m.n_samples}</td>
+                        <td className="py-2 px-3 text-slate-900 font-bold font-mono-numbers">{m.mae.toFixed(2)}</td>
+                        <td className="py-2 px-3 text-slate-600 font-mono-numbers">{m.rmse.toFixed(2)}</td>
+                        <td className="py-2 px-3 text-slate-600 font-mono-numbers">{m.smape.toFixed(1)}%</td>
                         <td className="py-2 px-3">
-                          <span className={`font-mono-numbers ${m.signed_bias >= 0 ? 'text-[#B45309]' : 'text-[#0284C7]'}`}>
+                          <span className={`font-mono-numbers ${m.signed_bias >= 0 ? 'text-sky-700' : 'text-sky-600'}`}>
                             {m.signed_bias > 0 ? `+${m.signed_bias.toFixed(2)}` : m.signed_bias.toFixed(2)}
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-[#166534] font-bold font-mono-numbers">{m.interval_80_coverage.toFixed(1)}%</td>
+                        <td className="py-2 px-3 text-emerald-700 font-bold font-mono-numbers">{m.interval_80_coverage.toFixed(1)}%</td>
                         <td className="py-2 px-3"><ProvenanceTag provenance={m.provenance as any} /></td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={10} className="py-4 text-center text-[#78716C]">
+                      <td colSpan={10} className="py-4 text-center text-slate-500">
                         Loading operational evaluation metrics...
                       </td>
                     </tr>
@@ -1103,34 +1094,34 @@ export const ValidationView: React.FC = () => {
 
           {/* Twin Reality Check & Operational Drift Categorization */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="editorial-sheet p-6 space-y-3">
+            <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-[#B45309]" />
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                  <Zap className="w-4 h-4 text-sky-700" />
                   <span>Digital Twin Reality Check (Workstream F)</span>
                 </h3>
-                <span className="text-[10px] font-mono text-[#166534]">CONSERVATION ENFORCED</span>
+                <span className="text-[10px] font-mono text-emerald-700">CONSERVATION ENFORCED</span>
               </div>
-              <p className="text-xs text-[#57534E]">
+              <p className="text-xs text-slate-600">
                 Compares reference benchmark telemetry against Digital Twin physical simulations across electrical, thermal, battery, and fuel subsystems without mutating Phase 4.
               </p>
               <div className="space-y-2 font-mono text-xs">
                 {twinChecks.slice(0, 4).map((tc, idx) => (
-                  <div key={idx} className="p-2.5 rounded bg-white border border-[#DDD6C6] flex items-center justify-between shadow-sm">
+                  <div key={idx} className="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between shadow-sm">
                     <div>
-                      <div className="font-bold text-[#1C1917] capitalize">{tc.subsystem} Subsystem</div>
-                      <div className="text-[10px] text-[#78716C] font-mono-numbers">
+                      <div className="font-bold text-slate-900 capitalize">{tc.subsystem} Subsystem</div>
+                      <div className="text-[10px] text-slate-500 font-mono-numbers">
                         Obs: {tc.observed_value} {tc.unit} | Sim: {tc.simulated_value} {tc.unit}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs font-bold text-[#1C1917] font-mono-numbers">
+                      <div className="text-xs font-bold text-slate-900 font-mono-numbers">
                         Δ {tc.residual > 0 ? `+${tc.residual.toFixed(2)}` : tc.residual.toFixed(2)} {tc.unit}
                       </div>
                       <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                         tc.status === 'VALIDATED'
-                          ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]'
-                          : 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}>
                         {tc.status}
                       </span>
@@ -1140,35 +1131,35 @@ export const ValidationView: React.FC = () => {
               </div>
             </div>
 
-            <div className="editorial-sheet p-6 space-y-3">
+            <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-[#7E22CE]" />
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-indigo-700" />
                   <span>Operational Drift Taxonomy (Workstream G)</span>
                 </h3>
-                <span className="text-[10px] font-mono text-[#7E22CE]">4-WAY DISAMBIGUATION</span>
+                <span className="text-[10px] font-mono text-indigo-700">4-WAY DISAMBIGUATION</span>
               </div>
-              <p className="text-xs text-[#57534E]">
+              <p className="text-xs text-slate-600">
                 Rigorous operational distinction: prevents false ML retraining alarms by separating provider failures and physical plant shifts from ML degradation.
               </p>
               <div className="space-y-2 font-mono text-xs">
                 {driftIndicators.map((di, idx) => (
-                  <div key={idx} className="p-2.5 rounded bg-white border border-[#DDD6C6] flex items-center justify-between shadow-sm">
+                  <div key={idx} className="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between shadow-sm">
                     <div>
-                      <div className="font-bold text-[#1C1917]">{di.metric_name}</div>
-                      <div className="text-[10px] text-[#78716C]">{di.description}</div>
+                      <div className="font-bold text-slate-900">{di.metric_name}</div>
+                      <div className="text-[10px] text-slate-500">{di.description}</div>
                     </div>
                     <div className="text-right">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
                         di.severity === 'NOMINAL'
-                          ? 'bg-[#EBF7F0] text-[#166534] border-[#BBF7D0]'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                           : di.severity === 'WARNING'
-                          ? 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
-                          : 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]'
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-rose-50 text-rose-700 border-rose-200'
                       }`}>
                         {di.drift_type} ({di.severity})
                       </span>
-                      <div className="text-[10px] text-[#78716C] mt-0.5 font-mono-numbers">
+                      <div className="text-[10px] text-slate-500 mt-0.5 font-mono-numbers">
                         Score: {di.score.toFixed(3)} / Thresh: {di.threshold}
                       </div>
                     </div>
@@ -1179,21 +1170,21 @@ export const ValidationView: React.FC = () => {
           </div>
 
           {/* Calibration Candidates Governance Panel */}
-          <div className="editorial-sheet p-6 space-y-3">
+          <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1C1917] flex items-center space-x-2">
-                <FileCheck className="w-4 h-4 text-[#B45309]" />
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-2">
+                <FileCheck className="w-4 h-4 text-sky-700" />
                 <span>Controlled Model Calibration Candidates (Workstream J)</span>
               </h3>
-              <span className="text-[10px] font-mono text-[#B45309]">NO SILENT RETRAINING POLICY</span>
+              <span className="text-[10px] font-mono text-sky-700">NO SILENT RETRAINING POLICY</span>
             </div>
-            <p className="text-xs text-[#57534E]">
+            <p className="text-xs text-slate-600">
               Discrepancies are quarantined and registered as candidates. Zero models are replaced or retrained silently in production without human oversight and evaluation gates.
             </p>
-            <div className="overflow-x-auto rounded border border-[#DDD6C6] bg-white">
+            <div className="overflow-x-auto rounded border border-slate-200 bg-white">
               <table className="w-full text-left font-mono text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#DDD6C6] bg-[#F6F3EC] text-[#78716C] text-[11px]">
+                  <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 text-[11px]">
                     <th className="py-2.5 px-3">CANDIDATE ID</th>
                     <th className="py-2.5 px-3">TARGET SUBSYSTEM</th>
                     <th className="py-2.5 px-3">MODEL / PARAMETER</th>
@@ -1203,18 +1194,18 @@ export const ValidationView: React.FC = () => {
                     <th className="py-2.5 px-3">GOVERNANCE STATUS</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#DDD6C6]">
+                <tbody className="divide-y divide-slate-200">
                   {calibrationCandidates.length > 0 ? (
                     calibrationCandidates.map((cc) => (
-                      <tr key={cc.candidate_id} className="hover:bg-[#F6F3EC]/80">
-                        <td className="py-2 px-3 font-bold text-[#0284C7]">{cc.candidate_id}</td>
-                        <td className="py-2 px-3 capitalize text-[#1C1917]">{cc.target_subsystem}</td>
-                        <td className="py-2 px-3 text-[#57534E]">{cc.model_or_param}</td>
-                        <td className="py-2 px-3 text-[#78716C] font-mono-numbers">{cc.baseline_metric.toFixed(2)}</td>
-                        <td className="py-2 px-3 text-[#1C1917] font-mono-numbers">{cc.candidate_metric.toFixed(2)}</td>
-                        <td className="py-2 px-3 text-[#B45309] font-mono-numbers">+{cc.quantified_degradation.toFixed(1)}%</td>
+                      <tr key={cc.candidate_id} className="hover:bg-slate-50">
+                        <td className="py-2 px-3 font-bold text-sky-600">{cc.candidate_id}</td>
+                        <td className="py-2 px-3 capitalize text-slate-900">{cc.target_subsystem}</td>
+                        <td className="py-2 px-3 text-slate-600">{cc.model_or_param}</td>
+                        <td className="py-2 px-3 text-slate-500 font-mono-numbers">{cc.baseline_metric.toFixed(2)}</td>
+                        <td className="py-2 px-3 text-slate-900 font-mono-numbers">{cc.candidate_metric.toFixed(2)}</td>
+                        <td className="py-2 px-3 text-sky-700 font-mono-numbers">+{cc.quantified_degradation.toFixed(1)}%</td>
                         <td className="py-2 px-3">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             {cc.status}
                           </span>
                         </td>
@@ -1222,7 +1213,7 @@ export const ValidationView: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="py-4 text-center text-[#78716C]">
+                      <td colSpan={7} className="py-4 text-center text-slate-500">
                         No active calibration candidates. Frozen baseline models operating within nominal envelope.
                       </td>
                     </tr>

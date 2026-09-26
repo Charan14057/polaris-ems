@@ -39,6 +39,7 @@ class OptimizerBenchmark:
     ):
         self.profile_registry = profile_registry or StationProfileRegistry()
         self.safety_registry = safety_registry or SafetyThresholdRegistry()
+        self._matrix_cache: Optional[List[OptimizerBenchmarkComparison]] = None
 
     def _create_trajectory(
         self,
@@ -148,8 +149,10 @@ class OptimizerBenchmark:
             optimality_tier=optimality_tier
         )
 
-    def run_benchmark_matrix(self) -> List[OptimizerBenchmarkComparison]:
+    def run_benchmark_matrix(self, force_refresh: bool = False) -> List[OptimizerBenchmarkComparison]:
         """Runs the standard SIH benchmark matrix across stations, modes, and scenarios."""
+        if not force_refresh and self._matrix_cache is not None:
+            return self._matrix_cache
         configs = [
             ("BHARATI", "NOMINAL", "EXPECTED", 24),
             ("BHARATI", "BLIZZARD", "SCENARIO_ROBUST", 24),
@@ -189,6 +192,7 @@ class OptimizerBenchmark:
                     solver_time_sec=0.45,
                     optimality_tier="EXACT_OPTIMAL"
                 ))
+        self._matrix_cache = results
         return results
 
     def export_csv(self, benchmarks: List[OptimizerBenchmarkComparison]) -> str:

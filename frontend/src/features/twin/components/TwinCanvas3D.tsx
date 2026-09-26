@@ -42,6 +42,8 @@ interface TwinCanvas3DProps {
   selectedDeviceId?: string | null;
   tracePowerActive?: boolean;
   traceImpactActive?: boolean;
+  visualizationLayer?: 'ARCHITECTURE' | 'ENERGY' | 'IMPACT';
+  onVisualizationLayerChange?: (layer: 'ARCHITECTURE' | 'ENERGY' | 'IMPACT') => void;
 }
 
 export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
@@ -51,10 +53,19 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   onSelectNode,
   selectedDeviceId,
   tracePowerActive = false,
-  traceImpactActive = false
+  traceImpactActive = false,
+  visualizationLayer: controlledLayer,
+  onVisualizationLayerChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [internalLayer, setInternalLayer] = useState<'ARCHITECTURE' | 'ENERGY' | 'IMPACT'>('ENERGY');
+  const activeLayer = controlledLayer || internalLayer;
+  const setLayer = (layer: 'ARCHITECTURE' | 'ENERGY' | 'IMPACT') => {
+    setInternalLayer(layer);
+    if (onVisualizationLayerChange) onVisualizationLayerChange(layer);
+  };
 
   const [hoveredObject, setHoveredObject] = useState<SpatialObject3D | null>(null);
   const [cameraMode, setCameraMode] = useState<'ISOMETRIC' | 'TOP' | 'FRONT'>('ISOMETRIC');
@@ -222,12 +233,17 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const centerX = (b.minX + b.maxX) / 2;
       const centerZ = (b.minZ + b.maxZ) / 2;
 
+      // In ARCHITECTURE layer, decks are more prominent; in ENERGY/IMPACT they are subtle backdrops
+      const deckOpacity = activeLayer === 'ARCHITECTURE' 
+        ? Math.min(0.85, deck.opacity * 1.5) 
+        : deck.opacity * 0.7;
+
       // Deck Slab
       const slabGeo = new THREE.BoxGeometry(width, height, depth);
       const slabMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color(deck.color),
         transparent: true,
-        opacity: deck.opacity,
+        opacity: deckOpacity,
         roughness: 0.6,
         wireframe: wireframeOnly
       });
@@ -239,7 +255,10 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
       // Deck Perimeter Edges (Outline)
       const edgeGeo = new THREE.EdgesGeometry(slabGeo);
-      const edgeMat = new THREE.LineBasicMaterial({ color: 0x94a3b8, linewidth: 1 });
+      const edgeMat = new THREE.LineBasicMaterial({ 
+        color: activeLayer === 'ARCHITECTURE' ? 0x64748b : 0x94a3b8, 
+        linewidth: 1 
+      });
       const edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
       edgeLine.position.copy(slabMesh.position);
       scene.add(edgeLine);
@@ -287,11 +306,21 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       if (obj.status === 'STANDBY') hexColor = 0x94a3b8;
 
       const isSelected = selectedDeviceId && (obj.deviceId === selectedDeviceId || obj.id === selectedDeviceId);
+      
+      // Determine if object is part of active trace
+      const isTraceActive = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
+      const isRelatedToSelection = isSelected || (selectedDeviceId && obj.circuitId && obj.circuitId.includes(selectedDeviceId));
+      const objectOpacity = (isTraceActive && !isRelatedToSelection && selectedDeviceId) ? 0.25 : 1.0;
 
       if (obj.meshType === 'turbine') {
         // Wind Turbine: Mast + Nacelle + 3-Blade Rotor
         const mastGeo = new THREE.CylinderGeometry(0.3, 0.5, obj.dimensions[1], 12);
-        const mastMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3 });
+        const mastMat = new THREE.MeshStandardMaterial({ 
+          color: 0xe2e8f0, 
+          roughness: 0.3,
+          transparent: objectOpacity < 1.0,
+          opacity: objectOpacity
+        });
         const mast = new THREE.Mesh(mastGeo, mastMat);
         mast.position.y = 0;
         mast.castShadow = true;
@@ -308,7 +337,11 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         rotorGroup.position.set(0, obj.dimensions[1] / 2, 1.1);
 
         const bladeGeo = new THREE.BoxGeometry(0.2, 3.8, 0.08);
-        const bladeMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8 });
+        const bladeMat = new THREE.MeshStandardMaterial({ 
+          color: 0x38bdf8,
+          transparent: objectOpacity < 1.0,
+          opacity: objectOpacity
+        });
 
         for (let i = 0; i < 3; i++) {
           const blade = new THREE.Mesh(bladeGeo, bladeMat);
@@ -326,7 +359,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         const mat = new THREE.MeshStandardMaterial({
           color: hexColor,
           roughness: 0.4,
-          wireframe: wireframeOnly
+          wireframe: wireframeOnly,
+          transparent: objectOpacity < 1.0,
+          opacity: objectOpacity
         });
         const mesh = new THREE.Mesh(geo, mat);
         mesh.castShadow = true;
@@ -341,7 +376,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           roughness: 0.5,
           wireframe: wireframeOnly,
           emissive: isSelected ? new THREE.Color(0x0284c7) : new THREE.Color(0x000000),
-          emissiveIntensity: isSelected ? 0.35 : 0.0
+          emissiveIntensity: isSelected ? 0.35 : 0.0,
+          transparent: objectOpacity < 1.0,
+          opacity: objectOpacity
         });
         const mesh = new THREE.Mesh(geo, mat);
         mesh.castShadow = true;
@@ -352,7 +389,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         const edgeGeo = new THREE.EdgesGeometry(geo);
         const edgeMat = new THREE.LineBasicMaterial({
           color: isSelected ? 0x0284c7 : 0x475569,
-          linewidth: isSelected ? 2 : 1
+          linewidth: isSelected ? 2 : 1,
+          transparent: objectOpacity < 1.0,
+          opacity: objectOpacity
         });
         const edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
         group.add(edgeLine);
@@ -404,10 +443,21 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         powerKw = Math.abs(viewModel.powerSummary.batteryPowerKw);
       }
 
+      // Dim unrelated circuits during Trace Power / Trace Impact or Impact layer
+      const isTraceMode = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
+      const isRelevantCircuit = !selectedDeviceId || path.circuitId.includes(selectedDeviceId) || path.fromId.includes(selectedDeviceId) || path.toId.includes(selectedDeviceId);
+      
+      let pathOpacity = activeFlow ? 0.85 : 0.2;
+      if (activeLayer === 'ARCHITECTURE') {
+        pathOpacity = activeFlow ? 0.35 : 0.08;
+      } else if (isTraceMode) {
+        pathOpacity = isRelevantCircuit ? (activeFlow ? 0.95 : 0.4) : 0.08;
+      }
+
       const mat = new THREE.LineBasicMaterial({
         color: activeFlow ? lineColor : 0x94a3b8,
         transparent: true,
-        opacity: activeFlow ? 0.85 : 0.2,
+        opacity: pathOpacity,
         linewidth: Math.max(1, Math.min(4, Math.round(powerKw / 10)))
       });
 
@@ -415,9 +465,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       scene.add(line);
       flowLinesRef.current.push(line);
 
-      // Active energy stream particle marker along flow path
-      if (activeFlow) {
-        const particleGeo = new THREE.SphereGeometry(0.25, 8, 8);
+      // Active energy stream particle marker along flow path (only if activeFlow and not dimmed away)
+      if (activeFlow && (!isTraceMode || isRelevantCircuit)) {
+        const particleGeo = new THREE.SphereGeometry(activeLayer === 'ENERGY' ? 0.3 : 0.22, 8, 8);
         const particleMat = new THREE.MeshBasicMaterial({ color: lineColor });
         const particle = new THREE.Mesh(particleGeo, particleMat);
         particle.position.copy(points[0]);
@@ -438,6 +488,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     activeFilter, 
     selectedDeviceId, 
     wireframeOnly, 
+    activeLayer,
+    tracePowerActive,
+    traceImpactActive,
     viewModel.powerSummary.solarGenerationKw,
     viewModel.powerSummary.windGenerationKw,
     viewModel.powerSummary.dieselGenerationKw,
@@ -661,8 +714,42 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         </div>
       </div>
 
-      {/* Top Right: Camera Presets & View Controls */}
+      {/* Top Right: Camera Presets, Layer Selector & View Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-center space-x-1.5 bg-white/95 p-1 rounded-md border border-slate-200 shadow-xs font-mono text-[10px]">
+        {/* Layer Selector */}
+        <div className="flex items-center rounded bg-slate-100 p-0.5 mr-1">
+          <button
+            type="button"
+            onClick={() => setLayer('ARCHITECTURE')}
+            className={`px-2 py-0.5 rounded transition-colors ${
+              activeLayer === 'ARCHITECTURE' ? 'bg-white text-slate-900 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+            }`}
+            title="Structural Architecture Focus"
+          >
+            ARCH
+          </button>
+          <button
+            type="button"
+            onClick={() => setLayer('ENERGY')}
+            className={`px-2 py-0.5 rounded transition-colors ${
+              activeLayer === 'ENERGY' ? 'bg-sky-600 text-white font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+            }`}
+            title="Electrical Power Flow Focus"
+          >
+            ENERGY
+          </button>
+          <button
+            type="button"
+            onClick={() => setLayer('IMPACT')}
+            className={`px-2 py-0.5 rounded transition-colors ${
+              activeLayer === 'IMPACT' ? 'bg-amber-600 text-white font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+            }`}
+            title="Downstream Network Impact Focus"
+          >
+            IMPACT
+          </button>
+        </div>
+        <div className="w-[1px] h-4 bg-slate-200" />
         <button
           type="button"
           onClick={() => setCameraPreset('ISOMETRIC')}

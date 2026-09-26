@@ -92,35 +92,35 @@ export const ResilienceView: React.FC = () => {
   return (
     <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
       {/* 1. Editorial Header */}
-      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+      <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-sky-600 font-bold mb-2">
             <ShieldAlert className="w-4 h-4" />
             <span>06 DYNAMIC RESILIENCE ENGINE</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-sans font-bold text-slate-900 tracking-tight">
             Station Resilience & Survival Envelope
           </h2>
-          <p className="text-sm text-ink-secondary mt-1 font-sans">
+          <p className="text-sm text-slate-600 mt-1 font-sans">
             Continuous multi-horizon assessment of life-support survival envelopes, thermal safe minimums, and binding fuel limits.
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <ProvenanceTag provenance="SIMULATED" size="sm" />
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">
             STATION: {currentStation}
           </span>
         </div>
       </div>
 
       {/* 2. Top Resilience Banner */}
-      <div className="editorial-sheet rounded p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-3 mb-1">
-            <span className="text-xs font-mono text-ink-muted uppercase">ACTIVE RESILIENCE STATE:</span>
+            <span className="text-xs font-mono text-slate-500 uppercase">ACTIVE RESILIENCE STATE:</span>
             <StatusBadge status={resState} size="lg" />
           </div>
-          <p className="text-sm text-ink-secondary max-w-2xl leading-relaxed font-sans mt-2">
+          <p className="text-sm text-slate-600 max-w-2xl leading-relaxed font-sans mt-2">
             {resState === 'SAFE' && 'All vital station systems have ample buffer margins. No unserved energy or thermal breach predicted over the evaluation horizon.'}
             {resState === 'WATCH' && 'Generation or storage margins are tightening under sub-zero ambient stress. Supervisory review recommended.'}
             {resState === 'AT_RISK' && 'One or more subsystem margins (fuel or battery) are approaching reserve minimum thresholds. Preventive dispatch advised.'}
@@ -129,11 +129,11 @@ export const ResilienceView: React.FC = () => {
           </p>
         </div>
 
-        <div className="text-left sm:text-right shrink-0 p-4 rounded bg-canvas-subtle border border-border-subtle">
-          <span className="text-[10px] font-mono text-ink-muted uppercase block">MINIMUM SURVIVAL HORIZON</span>
-          <span className="text-3xl font-serif font-bold text-copper font-mono-numbers">
+        <div className="text-left sm:text-right shrink-0 p-4 rounded bg-slate-50 border border-slate-100">
+          <span className="text-[10px] font-mono text-slate-500 uppercase block">MINIMUM SURVIVAL HORIZON</span>
+          <span className="text-3xl font-sans font-bold text-sky-600 font-mono-numbers">
             {Math.min(...Object.values(horizons)).toFixed(1)}{' '}
-            <span className="text-xs font-mono font-normal text-ink-muted">hours</span>
+            <span className="text-xs font-mono font-normal text-slate-500">hours</span>
           </span>
         </div>
       </div>
@@ -169,10 +169,10 @@ export const ResilienceView: React.FC = () => {
       />
 
       {/* 5. Expandable Analytical Breakdown: Nine Dimensions */}
-      <div className="editorial-sheet rounded p-6">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-6">
         <button
           onClick={() => setShowNineDimensions(!showNineDimensions)}
-          className="w-full flex items-center justify-between text-xs font-mono font-medium text-ink-primary"
+          className="w-full flex items-center justify-between text-xs font-mono font-medium text-slate-900"
         >
           <span className="uppercase tracking-wider">
             NINE-DIMENSION ANALYTICAL HEALTH RADAR (COMPREHENSIVE LEDGER)
@@ -181,18 +181,18 @@ export const ResilienceView: React.FC = () => {
         </button>
 
         {showNineDimensions && (
-          <div className="mt-5 pt-4 border-t border-border-subtle grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {Object.entries(dimensions).map(([dimName, score]) => (
-              <div key={dimName} className="p-3.5 rounded bg-canvas-subtle border border-border-subtle">
+              <div key={dimName} className="p-3.5 rounded bg-slate-50 border border-slate-100">
                 <div className="flex items-center justify-between text-xs font-mono mb-1.5">
-                  <span className="font-medium text-ink-primary font-sans">
+                  <span className="font-medium text-slate-900 font-sans">
                     {dimName.replace(/_/g, ' ').toUpperCase()}
                   </span>
-                  <span className="font-mono-numbers font-semibold text-copper">
+                  <span className="font-mono-numbers font-semibold text-sky-600">
                     {(Number(score) * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-canvas rounded-full overflow-hidden border border-border-subtle">
+                <div className="w-full h-1.5 bg-canvas rounded-full overflow-hidden border border-slate-100">
                   <div
                     className="h-full bg-teal rounded-full"
                     style={{ width: `${Math.min(100, Math.max(5, Number(score) * 100))}%` }}
@@ -206,20 +206,20 @@ export const ResilienceView: React.FC = () => {
 
       {/* 6. Candidate Advisory Recovery Options */}
       {recoveryOptions.length > 0 && (
-        <div className="editorial-sheet rounded p-6">
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase text-copper font-bold mb-3">
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-6">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase text-sky-600 font-bold mb-3">
             <LifeBuoy className="w-4 h-4" />
             <span>ADVISORY OPERATOR RECOVERY OPTIONS</span>
           </div>
           <div className="space-y-3">
             {recoveryOptions.map((opt, idx) => (
-              <div key={idx} className="p-4 rounded bg-canvas-subtle border border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div key={idx} className="p-4 rounded bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center space-x-2 text-xs font-mono">
-                    <span className="font-semibold text-ink-primary">{opt.action_type || (opt as any).action_name}</span>
-                    <span className="text-[10px] text-ink-muted">({opt.target_subsystem})</span>
+                    <span className="font-semibold text-slate-900">{opt.action_type || (opt as any).action_name}</span>
+                    <span className="text-[10px] text-slate-500">({opt.target_subsystem})</span>
                   </div>
-                  <p className="text-xs text-ink-secondary mt-1 font-sans">{opt.rationale || opt.description}</p>
+                  <p className="text-xs text-slate-600 mt-1 font-sans">{opt.rationale || opt.description}</p>
                 </div>
                 <span className="text-xs font-mono text-moss font-semibold shrink-0">
                   +{(opt.expected_survival_horizon_gain_h || (opt as any).estimated_gain_hours || 12.0).toFixed(1)}h Gain

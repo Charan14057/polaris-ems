@@ -173,7 +173,7 @@ export const DecisionRibbon: React.FC<DecisionRibbonProps> = ({
         modelOrSubsystem: 'Stateful Hysteresis Governance Engine',
         validationState: 'Autonomous fail-safe certified',
         mathematicalBasis: 'Strict lexicographical tier order: $P_1 \\succ P_2 \\succ \\dots \\succ P_8$',
-        decisionImpact: 'Life support circuit guaranteed dispatch override',
+        decisionImpact: 'Life support circuit priority dispatch override',
       },
     },
   ];

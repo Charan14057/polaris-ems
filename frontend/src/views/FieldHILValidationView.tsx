@@ -89,11 +89,11 @@ const MOCK_STATE: ValidationState = {
 };
 
 const envStyles: Record<string, string> = {
-  REAL: 'text-[#166534] bg-[#EBF7F0] border-[#BBF7D0]',
-  HIL: 'text-[#92400E] bg-[#FEF3C7] border-[#FDE68A]',
-  LAB: 'text-[#6B21A8] bg-[#F3E8FF] border-[#E9D5FF]',
-  EMULATOR: 'text-[#0369A1] bg-[#E0F2FE] border-[#BAE6FD]',
-  SIMULATION: 'text-[#0284C7] bg-[#E0F2FE] border-[#BAE6FD]',
+  REAL: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+  HIL: 'text-amber-800 bg-amber-50 border-amber-200',
+  LAB: 'text-indigo-700 bg-[#F3E8FF] border-[#E9D5FF]',
+  EMULATOR: 'text-sky-700 bg-sky-50 border-sky-200',
+  SIMULATION: 'text-sky-600 bg-sky-50 border-sky-200',
 };
 
 const EnvBadge: React.FC<{ env: string }> = ({ env }) => (
@@ -104,19 +104,19 @@ const EnvBadge: React.FC<{ env: string }> = ({ env }) => (
 
 const healthIcon = (h: string) => {
   switch (h) {
-    case 'HEALTHY': return <CheckCircle className="w-3.5 h-3.5 text-[#166534]" />;
-    case 'DEGRADED': return <AlertTriangle className="w-3.5 h-3.5 text-[#B45309]" />;
-    case 'FAULT': return <XCircle className="w-3.5 h-3.5 text-[#991B1B]" />;
-    default: return <Info className="w-3.5 h-3.5 text-[#78716C]" />;
+    case 'HEALTHY': return <CheckCircle className="w-3.5 h-3.5 text-emerald-700" />;
+    case 'DEGRADED': return <AlertTriangle className="w-3.5 h-3.5 text-sky-700" />;
+    case 'FAULT': return <XCircle className="w-3.5 h-3.5 text-rose-700" />;
+    default: return <Info className="w-3.5 h-3.5 text-slate-500" />;
   }
 };
 
 const connIcon = (c: string) => {
   switch (c) {
-    case 'CONNECTED': return <Wifi className="w-3.5 h-3.5 text-[#166534]" />;
-    case 'DEGRADED': return <Wifi className="w-3.5 h-3.5 text-[#B45309]" />;
-    case 'OFFLINE': return <WifiOff className="w-3.5 h-3.5 text-[#991B1B]" />;
-    default: return <Wifi className="w-3.5 h-3.5 text-[#78716C]" />;
+    case 'CONNECTED': return <Wifi className="w-3.5 h-3.5 text-emerald-700" />;
+    case 'DEGRADED': return <Wifi className="w-3.5 h-3.5 text-sky-700" />;
+    case 'OFFLINE': return <WifiOff className="w-3.5 h-3.5 text-rose-700" />;
+    default: return <Wifi className="w-3.5 h-3.5 text-slate-500" />;
   }
 };
 
@@ -126,35 +126,35 @@ export const FieldHILValidationView: React.FC = () => {
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Editorial Header */}
-      <div className="border-b border-[#DDD6C6] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#78716C] mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
             <span>11 Field &amp; Hardware-in-the-Loop</span>
             <span>•</span>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <h1 className="font-serif text-3xl lg:text-4xl text-[#1C1917] tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
             Field &amp; HIL Validation
           </h1>
-          <p className="text-sm text-[#57534E] font-sans mt-2 max-w-2xl">
+          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
             Device integration testbed, hardware-in-the-loop emulation, and fault-injection verification across simulated polar microgrids.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 text-xs bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="font-mono text-[#78716C]">Environment:</span>
+        <div className="flex items-center space-x-3 text-xs bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="font-mono text-slate-500">Environment:</span>
           <EnvBadge env={state.environment} />
-          <span className="text-[#DDD6C6]">|</span>
-          <span className="font-mono text-[#78716C]">
-            Station: <strong className="text-[#1C1917]">{state.station_id}</strong>
+          <span className="text-slate-300">|</span>
+          <span className="font-mono text-slate-500">
+            Station: <strong className="text-slate-900">{state.station_id}</strong>
           </span>
         </div>
       </div>
 
       {/* Strict Physical SCADA Boundary Notice */}
-      <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded p-4 flex items-start space-x-3">
-        <AlertTriangle className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
-        <div className="text-xs text-[#92400E]">
+      <div className="bg-amber-50 border border-amber-200 rounded p-4 flex items-start space-x-3">
+        <AlertTriangle className="w-4 h-4 text-sky-700 shrink-0 mt-0.5" />
+        <div className="text-xs text-amber-800">
           <div className="font-bold uppercase tracking-wider font-mono">
             Physical Boundary Notice — Verified Testbed Environment
           </div>
@@ -184,16 +184,16 @@ export const FieldHILValidationView: React.FC = () => {
       {/* Status Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Edge Mode', value: state.edge_mode, icon: <Cpu className="w-4 h-4 text-[#B45309]" /> },
+          { label: 'Edge Mode', value: state.edge_mode, icon: <Cpu className="w-4 h-4 text-sky-700" /> },
           { label: 'Connectivity', value: state.connectivity_state, icon: connIcon(state.connectivity_state) },
-          { label: 'Fallback', value: state.fallback_posture, icon: <Shield className="w-4 h-4 text-[#B45309]" /> },
-          { label: 'Buffer Depth', value: String(state.buffer_depth), icon: <Database className="w-4 h-4 text-[#0284C7]" /> },
+          { label: 'Fallback', value: state.fallback_posture, icon: <Shield className="w-4 h-4 text-sky-700" /> },
+          { label: 'Buffer Depth', value: String(state.buffer_depth), icon: <Database className="w-4 h-4 text-sky-600" /> },
         ].map((card) => (
-          <div key={card.label} className="bg-white border border-[#DDD6C6] rounded p-3 flex items-center space-x-3 shadow-sm">
+          <div key={card.label} className="bg-white border border-slate-200 rounded p-3 flex items-center space-x-3 shadow-sm">
             <div className="shrink-0">{card.icon}</div>
             <div className="min-w-0">
-              <div className="text-[10px] text-[#78716C] uppercase tracking-wider font-mono">{card.label}</div>
-              <div className="text-xs text-[#1C1917] font-mono font-semibold truncate mt-0.5">{card.value}</div>
+              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono">{card.label}</div>
+              <div className="text-xs text-slate-900 font-mono font-semibold truncate mt-0.5">{card.value}</div>
             </div>
           </div>
         ))}
@@ -208,15 +208,15 @@ export const FieldHILValidationView: React.FC = () => {
       />
 
       {/* Device Fleet Table */}
-      <div className="editorial-sheet p-6 space-y-4">
+      <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Server className="w-4 h-4 text-[#B45309]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <Server className="w-4 h-4 text-sky-700" />
+            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Hardware &amp; Emulator Fleet
             </h3>
           </div>
-          <span className="text-xs font-mono text-[#78716C]">
+          <span className="text-xs font-mono text-slate-500">
             Testbed Device Registry
           </span>
         </div>
@@ -224,7 +224,7 @@ export const FieldHILValidationView: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono">
             <thead>
-              <tr className="text-[#78716C] uppercase tracking-wider border-b border-[#DDD6C6] text-[10px]">
+              <tr className="text-slate-500 uppercase tracking-wider border-b border-slate-200 text-[10px]">
                 <th className="py-2.5 px-3 text-left">Device</th>
                 <th className="py-2.5 px-3 text-left">Type</th>
                 <th className="py-2.5 px-3 text-left">Adapter</th>
@@ -234,16 +234,16 @@ export const FieldHILValidationView: React.FC = () => {
                 <th className="py-2.5 px-3 text-left">Quality</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#DDD6C6]">
+            <tbody className="divide-y divide-slate-200">
               {state.devices.map((d) => (
-                <tr key={d.device_id} className="hover:bg-[#F6F3EC]/80 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-[#1C1917]">{d.device_id}</td>
-                  <td className="py-2.5 px-3 text-[#57534E]">{d.device_type}</td>
-                  <td className="py-2.5 px-3 text-[#78716C]">{d.adapter}</td>
+                <tr key={d.device_id} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-2.5 px-3 font-semibold text-slate-900">{d.device_id}</td>
+                  <td className="py-2.5 px-3 text-slate-600">{d.device_type}</td>
+                  <td className="py-2.5 px-3 text-slate-500">{d.adapter}</td>
                   <td className="py-2.5 px-3"><EnvBadge env={d.environment} /></td>
-                  <td className="py-2.5 px-3 flex items-center space-x-1.5">{healthIcon(d.health)}<span className="text-[#1C1917]">{d.health}</span></td>
+                  <td className="py-2.5 px-3 flex items-center space-x-1.5">{healthIcon(d.health)}<span className="text-slate-900">{d.health}</span></td>
                   <td className="py-2.5 px-3">{connIcon(d.connectivity)}</td>
-                  <td className="py-2.5 px-3 text-[#166534] font-bold">{d.telemetry_quality}</td>
+                  <td className="py-2.5 px-3 text-emerald-700 font-bold">{d.telemetry_quality}</td>
                 </tr>
               ))}
             </tbody>
@@ -254,27 +254,27 @@ export const FieldHILValidationView: React.FC = () => {
       {/* Active Faults & Actuation Boundary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Active Faults */}
-        <div className="editorial-sheet p-6 space-y-3">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
           <div className="flex items-center space-x-2">
-            <AlertTriangle className="w-4 h-4 text-[#B45309]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <AlertTriangle className="w-4 h-4 text-sky-700" />
+            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Injected Fault Scenarios ({state.active_faults.length})
             </h3>
           </div>
 
           <div className="space-y-2">
             {state.active_faults.length === 0 ? (
-              <p className="text-xs text-[#78716C]">No active fault conditions injected.</p>
+              <p className="text-xs text-slate-500">No active fault conditions injected.</p>
             ) : (
               state.active_faults.map((f, idx) => (
-                <div key={idx} className="flex items-center space-x-3 bg-white p-3 rounded border border-[#DDD6C6] text-xs">
-                  <XCircle className="w-4 h-4 text-[#991B1B] shrink-0" />
+                <div key={idx} className="flex items-center space-x-3 bg-white p-3 rounded border border-slate-200 text-xs">
+                  <XCircle className="w-4 h-4 text-rose-700 shrink-0" />
                   <div className="flex-1 min-w-0 font-mono">
-                    <span className="font-bold text-[#991B1B]">{f.fault_class}/{f.fault_type}</span>
-                    <span className="text-[#78716C] mx-1">→</span>
-                    <span className="text-[#1C1917]">{f.target}</span>
+                    <span className="font-bold text-rose-700">{f.fault_class}/{f.fault_type}</span>
+                    <span className="text-slate-500 mx-1">→</span>
+                    <span className="text-slate-900">{f.target}</span>
                   </div>
-                  <span className="text-[10px] text-[#A8A29E] font-mono">{f.timestamp}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{f.timestamp}</span>
                 </div>
               ))
             )}
@@ -282,32 +282,32 @@ export const FieldHILValidationView: React.FC = () => {
         </div>
 
         {/* Actuation & Decision Trace */}
-        <div className="editorial-sheet p-6 space-y-3">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
           <div className="flex items-center space-x-2">
-            <Zap className="w-4 h-4 text-[#B45309]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <Zap className="w-4 h-4 text-sky-700" />
+            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Actuation Authorization &amp; Trace
             </h3>
           </div>
 
-          <div className="space-y-2 text-xs font-mono bg-white p-3.5 rounded border border-[#DDD6C6]">
-            <div className="flex justify-between py-1 border-b border-[#F6F3EC]">
-              <span className="text-[#78716C]">Authorization State</span>
-              <span className={state.actuation_auth ? 'text-[#166534] font-bold' : 'text-[#991B1B] font-bold'}>
+          <div className="space-y-2 text-xs font-mono bg-white p-3.5 rounded border border-slate-200">
+            <div className="flex justify-between py-1 border-b border-slate-100">
+              <span className="text-slate-500">Authorization State</span>
+              <span className={state.actuation_auth ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
                 {state.actuation_auth ? 'AUTHORIZED (SIMULATED)' : 'DENIED'}
               </span>
             </div>
-            <div className="flex justify-between py-1 border-b border-[#F6F3EC]">
-              <span className="text-[#78716C]">Last Outcome</span>
-              <span className="text-[#1C1917]">{state.last_actuation_outcome}</span>
+            <div className="flex justify-between py-1 border-b border-slate-100">
+              <span className="text-slate-500">Last Outcome</span>
+              <span className="text-slate-900">{state.last_actuation_outcome}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-[#F6F3EC]">
-              <span className="text-[#78716C]">Decision Trace ID</span>
-              <span className="text-[#0284C7] truncate max-w-[200px]">{state.trace_id}</span>
+            <div className="flex justify-between py-1 border-b border-slate-100">
+              <span className="text-slate-500">Decision Trace ID</span>
+              <span className="text-sky-600 truncate max-w-[200px]">{state.trace_id}</span>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-[#78716C]">Validation Result</span>
-              <span className="text-[#166534] font-bold">{state.validation_result}</span>
+              <span className="text-slate-500">Validation Result</span>
+              <span className="text-emerald-700 font-bold">{state.validation_result}</span>
             </div>
           </div>
         </div>

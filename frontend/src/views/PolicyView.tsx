@@ -92,51 +92,51 @@ export const PolicyView: React.FC = () => {
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Editorial Header */}
-      <div className="border-b border-[#DDD6C6] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#78716C] mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
             <span>07 Policy Governance</span>
             <span>•</span>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <h1 className="font-serif text-3xl lg:text-4xl text-[#1C1917] tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
             Autonomous Policy Governance
           </h1>
-          <p className="text-sm text-[#57534E] font-sans mt-2 max-w-2xl">
+          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
             Deterministic decision rules, priority ordering (P1 &gt; ... &gt; P8), stateful hysteresis, and four-tier optimizer handoff.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-xs font-mono text-[#78716C] uppercase">Active Directive:</span>
+        <div className="flex items-center space-x-3 bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-xs font-mono text-slate-500 uppercase">Active Directive:</span>
           <StatusBadge status={policyData.policy_state} size="md" />
         </div>
       </div>
 
       {/* Primary Directive Callout */}
-      <div className="editorial-sheet p-6 space-y-4">
+      <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#B45309] font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-sky-700 font-semibold">
               Primary Operational Directive
             </span>
-            <div className="font-serif text-2xl lg:text-3xl text-[#1C1917]">
+            <div className="font-sans font-semibold text-2xl lg:text-3xl text-slate-900">
               {policyData.primary_directive}
             </div>
-            <p className="text-xs text-[#78716C] font-sans">
+            <p className="text-xs text-slate-500 font-sans">
               Evaluated across {policyData.evaluated_rules_count} deterministic rules with active hysteresis anti-chatter damping.
             </p>
           </div>
 
-          <div className="flex items-center space-x-4 p-3 bg-[#F6F3EC] rounded border border-[#DDD6C6] text-xs font-mono shrink-0">
+          <div className="flex items-center space-x-4 p-3 bg-slate-50 rounded border border-slate-200 text-xs font-mono shrink-0">
             <div>
-              <div className="text-[10px] text-[#A8A29E] uppercase">Handoff Status</div>
-              <div className="text-sm font-semibold text-[#1C1917] mt-0.5">{handoff.handoff_status}</div>
+              <div className="text-[10px] text-slate-400 uppercase">Handoff Status</div>
+              <div className="text-sm font-semibold text-slate-900 mt-0.5">{handoff.handoff_status}</div>
             </div>
             <div className="h-8 w-px bg-[#DDD6C6]" />
             <div>
-              <div className="text-[10px] text-[#A8A29E] uppercase">Recommended Mode</div>
-              <div className="text-sm font-semibold text-[#B45309] mt-0.5">{handoff.recommended_mode}</div>
+              <div className="text-[10px] text-slate-400 uppercase">Recommended Mode</div>
+              <div className="text-sm font-semibold text-sky-700 mt-0.5">{handoff.recommended_mode}</div>
             </div>
           </div>
         </div>
@@ -168,12 +168,12 @@ export const PolicyView: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Scale className="w-4 h-4 text-[#B45309]" />
-            <h2 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <Scale className="w-4 h-4 text-sky-700" />
+            <h2 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Operational Priority Hierarchy (P1 → P8)
             </h2>
           </div>
-          <span className="text-xs font-mono text-[#78716C]">
+          <span className="text-xs font-mono text-slate-500">
             Deterministic Priority Cascade
           </span>
         </div>
@@ -182,19 +182,19 @@ export const PolicyView: React.FC = () => {
           {priorityLadder.map((tier) => (
             <div 
               key={tier.tier}
-              className="p-4 bg-white rounded border border-[#DDD6C6] hover:border-[#B45309]/50 transition-colors shadow-sm flex items-start space-x-3"
+              className="p-4 bg-white rounded border border-slate-200 hover:border-sky-600/50 transition-colors shadow-sm flex items-start space-x-3"
             >
-              <span className="px-2 py-0.5 rounded bg-[#F6F3EC] text-[#B45309] font-mono text-xs font-bold border border-[#DDD6C6] shrink-0">
+              <span className="px-2 py-0.5 rounded bg-slate-50 text-sky-700 font-mono text-xs font-bold border border-slate-200 shrink-0">
                 {tier.tier}
               </span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-xs font-bold text-[#1C1917] truncate">{tier.title}</h3>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F6F3EC] text-[#57534E]">
+                  <h3 className="text-xs font-bold text-slate-900 truncate">{tier.title}</h3>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-50 text-slate-600">
                     {tier.status}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#78716C] font-sans mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-500 font-sans mt-1 leading-relaxed">
                   {tier.desc}
                 </p>
               </div>
@@ -204,27 +204,27 @@ export const PolicyView: React.FC = () => {
       </div>
 
       {/* Four-Tier Optimizer Handoff Contract Table */}
-      <div className="editorial-sheet p-6 space-y-4">
+      <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <ArrowUpDown className="w-4 h-4 text-[#B45309]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <ArrowUpDown className="w-4 h-4 text-sky-700" />
+            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Four-Tier Optimizer Handoff Contract
             </h3>
           </div>
-          <span className="text-xs font-mono text-[#78716C]">
+          <span className="text-xs font-mono text-slate-500">
             Requested Constraints ≠ Optimizer-Enforced Constraints
           </span>
         </div>
 
-        <p className="text-xs text-[#57534E] font-sans leading-relaxed">
+        <p className="text-xs text-slate-600 font-sans leading-relaxed">
           {handoff.advisory_rationale}
         </p>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead>
-              <tr className="border-b border-[#DDD6C6] text-[#78716C] uppercase text-[10px]">
+              <tr className="border-b border-slate-200 text-slate-500 uppercase text-[10px]">
                 <th className="py-2.5 px-3">Policy Constraint</th>
                 <th className="py-2.5 px-3">Requested Target</th>
                 <th className="py-2.5 px-3">Enforcement Tier</th>
@@ -232,32 +232,32 @@ export const PolicyView: React.FC = () => {
                 <th className="py-2.5 px-3 text-right">Evidence</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#DDD6C6]">
+            <tbody className="divide-y divide-slate-200">
               {Object.entries(handoff.requested_constraints || {}).map(([key, val]) => {
                 const tier = tiers[key] || 'DECLARATIVE_ONLY';
                 const isEnforced = key in (handoff.optimizer_enforced_constraints || {});
                 return (
-                  <tr key={key} className="hover:bg-[#F6F3EC]/80 transition-colors">
-                    <td className="py-2.5 px-3 text-[#1C1917] font-semibold">{key}</td>
-                    <td className="py-2.5 px-3 text-[#B45309] font-mono-numbers">{String(val)}</td>
+                  <tr key={key} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-2.5 px-3 text-slate-900 font-semibold">{key}</td>
+                    <td className="py-2.5 px-3 text-sky-700 font-mono-numbers">{String(val)}</td>
                     <td className="py-2.5 px-3">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         tier === 'DIRECTLY_SUPPORTED' 
-                          ? 'bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : tier === 'DERIVED_FROM_SUPPORTED_INPUT'
-                          ? 'bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]'
+                          ? 'bg-sky-50 text-sky-700 border border-sky-200'
                           : tier === 'DECLARATIVE_ONLY'
-                          ? 'bg-[#F6F3EC] text-[#78716C] border border-[#DDD6C6]'
-                          : 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                          ? 'bg-slate-50 text-slate-500 border border-slate-200'
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}>
                         {tier}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-center">
                       {isEnforced ? (
-                        <span className="text-[#166534] font-bold">✓ Enforced</span>
+                        <span className="text-emerald-700 font-bold">✓ Enforced</span>
                       ) : (
-                        <span className="text-[#A8A29E]">Post-Replay Monitored</span>
+                        <span className="text-slate-400">Post-Replay Monitored</span>
                       )}
                     </td>
                     <td className="py-2.5 px-3 text-right">
@@ -273,7 +273,7 @@ export const PolicyView: React.FC = () => {
                           uncertaintyInterval: 'Exact Constraint',
                           governingInvariant: 'Priority cascade: Requested policy constraints are mapped to solver linear inequalities where physically supported.'
                         })}
-                        className="text-[10px] font-mono text-[#0284C7] hover:underline"
+                        className="text-[10px] font-mono text-sky-600 hover:underline"
                       >
                         Inspect →
                       </button>
@@ -288,23 +288,23 @@ export const PolicyView: React.FC = () => {
 
       {/* Stateful Hysteresis Deadband Inspector */}
       {policyData.hysteresis && (
-        <div className="editorial-sheet p-6 space-y-4">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Sliders className="w-4 h-4 text-[#B45309]" />
-              <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+              <Sliders className="w-4 h-4 text-sky-700" />
+              <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
                 Stateful Hysteresis Telemetry
               </h3>
             </div>
-            <span className="text-xs font-mono text-[#78716C]">Anti-Oscillation Damping</span>
+            <span className="text-xs font-mono text-slate-500">Anti-Oscillation Damping</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
             {Object.entries(policyData.hysteresis.consecutive_steps || {}).map(([state, steps]) => (
-              <div key={state} className="p-3 bg-white rounded border border-[#DDD6C6]">
-                <span className="text-[#78716C] text-[10px] uppercase truncate block">{state}</span>
-                <div className="text-lg font-bold font-mono-numbers text-[#1C1917] mt-1">
-                  {steps} <span className="text-xs text-[#A8A29E] font-normal">steps stable</span>
+              <div key={state} className="p-3 bg-white rounded border border-slate-200">
+                <span className="text-slate-500 text-[10px] uppercase truncate block">{state}</span>
+                <div className="text-lg font-bold font-mono-numbers text-slate-900 mt-1">
+                  {steps} <span className="text-xs text-slate-400 font-normal">steps stable</span>
                 </div>
               </div>
             ))}
@@ -313,17 +313,17 @@ export const PolicyView: React.FC = () => {
       )}
 
       {/* Fired & Evaluated Rules List */}
-      <div className="editorial-sheet p-6 space-y-4">
+      <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Layers className="w-4 h-4 text-[#B45309]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-[#1C1917]">
+            <Layers className="w-4 h-4 text-sky-700" />
+            <h3 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-900">
               Active Policy Rules ({policyData.active_rules?.length || 0} Fired)
             </h3>
           </div>
           <button
             onClick={() => setShowSuppressed(!showSuppressed)}
-            className="text-xs text-[#0284C7] hover:underline font-mono"
+            className="text-xs text-sky-600 hover:underline font-mono"
           >
             {showSuppressed ? 'Hide Suppressed Rules' : 'Show Suppressed Rules'}
           </button>
@@ -331,38 +331,38 @@ export const PolicyView: React.FC = () => {
 
         <div className="space-y-2.5">
           {policyData.active_rules?.map((rule) => (
-            <div key={rule.rule_id} className="p-3 bg-white rounded border border-[#DDD6C6] text-xs flex items-start justify-between gap-3 shadow-sm">
+            <div key={rule.rule_id} className="p-3 bg-white rounded border border-slate-200 text-xs flex items-start justify-between gap-3 shadow-sm">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] font-bold">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold">
                     {rule.priority_tier}
                   </span>
-                  <span className="font-bold text-[#1C1917] font-mono">{rule.rule_id}</span>
-                  <span className="text-[#78716C]">• {rule.action}</span>
+                  <span className="font-bold text-slate-900 font-mono">{rule.rule_id}</span>
+                  <span className="text-slate-500">• {rule.action}</span>
                 </div>
-                <p className="text-[#57534E] text-[11px] font-sans">{rule.rationale}</p>
+                <p className="text-slate-600 text-[11px] font-sans">{rule.rationale}</p>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0] uppercase font-bold shrink-0">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase font-bold shrink-0">
                 ACTIVE
               </span>
             </div>
           ))}
 
           {showSuppressed && policyData.suppressed_rules?.map((rule) => (
-            <div key={rule.rule_id} className="p-3 bg-[#F6F3EC]/60 rounded border border-[#DDD6C6] text-xs flex items-start justify-between gap-3 opacity-70">
+            <div key={rule.rule_id} className="p-3 bg-slate-50/60 rounded border border-slate-200 text-xs flex items-start justify-between gap-3 opacity-70">
               <div className="space-y-1">
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#E7E5E4] text-[#78716C]">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#E7E5E4] text-slate-500">
                     {rule.priority_tier}
                   </span>
-                  <span className="font-bold text-[#78716C] font-mono">{rule.rule_id}</span>
-                  <span className="text-[#A8A29E]">• {rule.action}</span>
+                  <span className="font-bold text-slate-500 font-mono">{rule.rule_id}</span>
+                  <span className="text-slate-400">• {rule.action}</span>
                 </div>
-                <p className="text-[#78716C] text-[11px] font-sans">
+                <p className="text-slate-500 text-[11px] font-sans">
                   Suppressed: {rule.suppression_reason || 'Lower priority than active life-safety rule'}
                 </p>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#E7E5E4] text-[#78716C] uppercase shrink-0">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#E7E5E4] text-slate-500 uppercase shrink-0">
                 SUPPRESSED
               </span>
             </div>

@@ -104,65 +104,65 @@ export const EdgeView: React.FC = () => {
   const getEdgeModeBadge = (mode?: string) => {
     switch (mode) {
       case 'CONNECTED_OPERATION':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]">CONNECTED OPERATION</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-emerald-50 text-emerald-700 border border-emerald-200">CONNECTED OPERATION</span>;
       case 'DEGRADED_CONNECTIVITY':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">DEGRADED CONNECTIVITY</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-amber-50 text-amber-800 border border-amber-200">DEGRADED CONNECTIVITY</span>;
       case 'OFFLINE_EDGE':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]">OFFLINE EDGE MODE</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-rose-50 text-rose-700 border border-rose-200">OFFLINE EDGE MODE</span>;
       case 'RECOVERY_SYNC':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]">RECOVERY RECONCILIATION</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-sky-50 text-sky-700 border border-sky-200">RECOVERY RECONCILIATION</span>;
       case 'SAFE_HOLD':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]">SAFE HOLD POSTURE</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#F3E8FF] text-indigo-700 border border-[#E9D5FF]">SAFE HOLD POSTURE</span>;
       default:
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-[#F6F3EC] text-[#78716C] border border-[#DDD6C6]">UNKNOWN</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded bg-slate-50 text-slate-500 border border-slate-200">UNKNOWN</span>;
     }
   };
 
   const getConnBadge = (conn?: string) => {
     switch (conn) {
       case 'CONNECTED':
-        return <span className="flex items-center space-x-1.5 text-xs text-[#166534] font-medium"><Wifi className="w-3.5 h-3.5" /><span>Active Link</span></span>;
+        return <span className="flex items-center space-x-1.5 text-xs text-emerald-700 font-medium"><Wifi className="w-3.5 h-3.5" /><span>Active Link</span></span>;
       case 'DEGRADED':
-        return <span className="flex items-center space-x-1.5 text-xs text-[#B45309] font-medium"><Activity className="w-3.5 h-3.5" /><span>Degraded (High Loss)</span></span>;
+        return <span className="flex items-center space-x-1.5 text-xs text-sky-700 font-medium"><Activity className="w-3.5 h-3.5" /><span>Degraded (High Loss)</span></span>;
       case 'OFFLINE':
-        return <span className="flex items-center space-x-1.5 text-xs text-[#991B1B] font-medium"><WifiOff className="w-3.5 h-3.5" /><span>Offline / Blackout</span></span>;
+        return <span className="flex items-center space-x-1.5 text-xs text-rose-700 font-medium"><WifiOff className="w-3.5 h-3.5" /><span>Offline / Blackout</span></span>;
       case 'RECONNECTING':
-        return <span className="flex items-center space-x-1.5 text-xs text-[#0284C7] font-medium"><RefreshCw className="w-3.5 h-3.5 animate-spin" /><span>Handshake / Sync</span></span>;
+        return <span className="flex items-center space-x-1.5 text-xs text-sky-600 font-medium"><RefreshCw className="w-3.5 h-3.5 animate-spin" /><span>Handshake / Sync</span></span>;
       default:
-        return <span className="text-xs text-[#78716C]">Unknown</span>;
+        return <span className="text-xs text-slate-500">Unknown</span>;
     }
   };
 
   const getHealthBadge = (health?: string) => {
     switch (health) {
       case 'HEALTHY':
-        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[#EBF7F0] text-[#166534] border border-[#BBF7D0]">HEALTHY</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-50 text-emerald-700 border border-emerald-200">HEALTHY</span>;
       case 'DEGRADED':
-        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">DEGRADED</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-800 border border-amber-200">DEGRADED</span>;
       case 'UNAVAILABLE':
-        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[#F6F3EC] text-[#78716C] border border-[#DDD6C6]">UNAVAILABLE</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-slate-50 text-slate-500 border border-slate-200">UNAVAILABLE</span>;
       case 'FAULT':
-        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]">FAULT</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-rose-50 text-rose-700 border border-rose-200">FAULT</span>;
       default:
-        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[#F6F3EC] text-[#A8A29E]">UNKNOWN</span>;
+        return <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-slate-50 text-slate-400">UNKNOWN</span>;
     }
   };
 
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Editorial Header */}
-      <div className="border-b border-[#DDD6C6] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#78716C] mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
             <span>08 Edge Intelligence & Devices</span>
             <span>•</span>
             <ProvenanceTag provenance="SIMULATED" size="xs" />
           </div>
-          <h1 className="font-serif text-3xl lg:text-4xl text-[#1C1917] tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
             Edge Intelligence & Field Fleet
           </h1>
-          <p className="text-sm text-[#57534E] font-sans mt-2 max-w-2xl">
-            Station <strong className="text-[#1C1917]">{activeStation}</strong> local node telemetry normalization, data quality validation, device fleet health, and bounded buffer reconciliation.
+          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
+            Station <strong className="text-slate-900">{activeStation}</strong> local node telemetry normalization, data quality validation, device fleet health, and bounded buffer reconciliation.
           </p>
         </div>
 
@@ -171,7 +171,7 @@ export const EdgeView: React.FC = () => {
           <button
             onClick={fetchData}
             disabled={isLoading}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-white hover:bg-[#F6F3EC] text-[#1C1917] border border-[#DDD6C6] transition shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 transition shadow-sm"
             title="Refresh local edge state"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
@@ -181,7 +181,7 @@ export const EdgeView: React.FC = () => {
           <button
             onClick={handleSync}
             disabled={isSyncing || (stateData?.buffer_depth === 0 && !connData?.sync_in_progress)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-[#B45309] hover:bg-[#92400E] text-white transition shadow-sm disabled:opacity-50"
+            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-sky-600 hover:bg-sky-700 text-white transition shadow-sm disabled:opacity-50"
             title="Reconcile buffered telemetry with central backend"
           >
             <ArrowUpDown className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -210,47 +210,47 @@ export const EdgeView: React.FC = () => {
 
       {/* Operational Diagnostics Ribbon */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Connectivity</span>
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Connectivity</span>
           <div className="mt-1">{getConnBadge(connData?.connectivity_state)}</div>
         </div>
 
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Fallback Posture</span>
-          <span className="text-xs font-semibold text-[#B45309] block mt-1 truncate" title={stateData?.fallback_posture}>
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Fallback Posture</span>
+          <span className="text-xs font-semibold text-sky-700 block mt-1 truncate" title={stateData?.fallback_posture}>
             {stateData?.fallback_posture || 'HOLD_LAST_STATE'}
           </span>
         </div>
 
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Local Buffer Queue</span>
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Local Buffer Queue</span>
           <div className="flex items-center space-x-1 mt-1">
-            <Database className="w-3.5 h-3.5 text-[#0284C7]" />
-            <span className="text-xs font-bold text-[#1C1917] font-mono-numbers">
-              {stateData?.buffer_depth ?? 0} <span className="text-[10px] font-normal text-[#78716C]">items</span>
+            <Database className="w-3.5 h-3.5 text-sky-600" />
+            <span className="text-xs font-bold text-slate-900 font-mono-numbers">
+              {stateData?.buffer_depth ?? 0} <span className="text-[10px] font-normal text-slate-500">items</span>
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Fleet Devices</span>
-          <span className="text-xs font-semibold text-[#1C1917] block mt-1 font-mono-numbers">
-            {stateData?.healthy_devices_count ?? 0} <span className="text-[#A8A29E] font-normal">/</span> {stateData?.active_devices_count ?? 0} <span className="text-[#166534] font-normal">Healthy</span>
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Fleet Devices</span>
+          <span className="text-xs font-semibold text-slate-900 block mt-1 font-mono-numbers">
+            {stateData?.healthy_devices_count ?? 0} <span className="text-slate-400 font-normal">/</span> {stateData?.active_devices_count ?? 0} <span className="text-emerald-700 font-normal">Healthy</span>
           </span>
         </div>
 
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Packet Loss Rate</span>
-          <span className="text-xs font-semibold text-[#1C1917] block mt-1 font-mono-numbers">
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Packet Loss Rate</span>
+          <span className="text-xs font-semibold text-slate-900 block mt-1 font-mono-numbers">
             {connData?.packet_loss_pct ?? 0}%
           </span>
         </div>
 
-        <div className="bg-white p-3 rounded border border-[#DDD6C6] shadow-sm">
-          <span className="text-[10px] text-[#78716C] block font-mono uppercase tracking-wider">Sync Freshness</span>
+        <div className="bg-white p-3 rounded border border-slate-200 shadow-sm">
+          <span className="text-[10px] text-slate-500 block font-mono uppercase tracking-wider">Sync Freshness</span>
           <div className="flex items-center space-x-1 mt-1">
-            <Clock className="w-3.5 h-3.5 text-[#78716C]" />
-            <span className="text-xs text-[#57534E] font-mono font-mono-numbers">
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-xs text-slate-600 font-mono font-mono-numbers">
               {stateData?.sync_freshness_sec != null ? `${stateData.sync_freshness_sec}s ago` : 'N/A'}
             </span>
           </div>
@@ -266,15 +266,15 @@ export const EdgeView: React.FC = () => {
       />
 
       {/* Field Connectivity & Fault Diagnostics Harness */}
-      <div className="editorial-sheet p-6 space-y-4">
+      <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Layers className="w-4 h-4 text-[#B45309]" />
-            <h2 className="text-xs font-semibold text-[#1C1917] uppercase tracking-wider font-mono">
+            <Layers className="w-4 h-4 text-sky-700" />
+            <h2 className="text-xs font-semibold text-slate-900 uppercase tracking-wider font-mono">
               Field Connectivity &amp; Fault Diagnostics Harness
             </h2>
           </div>
-          <span className="text-[10px] text-[#78716C] font-mono">
+          <span className="text-[10px] text-slate-500 font-mono">
             PROTOCOL TESTING // VERIFIED EDGE HARNESS
           </span>
         </div>
@@ -291,12 +291,12 @@ export const EdgeView: React.FC = () => {
               onClick={() => handleSimulateCondition(cond.id)}
               className={`p-3 rounded text-left border transition ${
                 simCondition === cond.id
-                  ? 'bg-[#FEF3C7] border-[#B45309] text-[#92400E] shadow-sm'
-                  : 'bg-white border-[#DDD6C6] text-[#57534E] hover:border-[#B45309]/50'
+                  ? 'bg-amber-50 border-sky-600 text-amber-800 shadow-sm'
+                  : 'bg-white border-slate-200 text-slate-600 hover:border-sky-600/50'
               }`}
             >
-              <div className="font-semibold text-xs text-[#1C1917]">{cond.label}</div>
-              <div className="text-[11px] text-[#78716C] mt-1">{cond.desc}</div>
+              <div className="font-semibold text-xs text-slate-900">{cond.label}</div>
+              <div className="text-[11px] text-slate-500 mt-1">{cond.desc}</div>
             </button>
           ))}
         </div>
@@ -304,34 +304,34 @@ export const EdgeView: React.FC = () => {
 
       {/* Reconciliation Audit Log (if recently synced) */}
       {lastSyncResult && (
-        <div className="editorial-sheet p-6 space-y-3">
+        <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-[#166534]" />
-              <h3 className="text-xs font-bold text-[#1C1917]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+              <h3 className="text-xs font-bold text-slate-900">
                 Reconciliation Audit Report (Executed in {lastSyncResult.execution_duration_ms}ms)
               </h3>
             </div>
-            <span className="text-[11px] font-mono text-[#0284C7]">
+            <span className="text-[11px] font-mono text-sky-600">
               Processed: {lastSyncResult.processed_count} | Duplicates Dropped: {lastSyncResult.duplicate_count} | Gaps Flagged: {lastSyncResult.gap_count}
             </span>
           </div>
 
           <div className="max-h-40 overflow-y-auto space-y-1.5 text-xs font-mono pr-2">
             {lastSyncResult.audit_log.map((entry, idx) => (
-              <div key={idx} className="bg-white p-2.5 rounded border border-[#DDD6C6] flex items-center justify-between text-[11px]">
+              <div key={idx} className="bg-white p-2.5 rounded border border-slate-200 flex items-center justify-between text-[11px]">
                 <div className="flex items-center space-x-2">
                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                    entry.action === 'ACCEPTED_NEW' ? 'bg-[#EBF7F0] text-[#166534]' :
-                    entry.action === 'DUPLICATE_DROPPED' ? 'bg-[#F6F3EC] text-[#78716C]' :
-                    entry.action === 'GAP_FLAGGED' ? 'bg-[#FEF3C7] text-[#92400E]' :
-                    'bg-[#E0F2FE] text-[#0369A1]'
+                    entry.action === 'ACCEPTED_NEW' ? 'bg-emerald-50 text-emerald-700' :
+                    entry.action === 'DUPLICATE_DROPPED' ? 'bg-slate-50 text-slate-500' :
+                    entry.action === 'GAP_FLAGGED' ? 'bg-amber-50 text-amber-800' :
+                    'bg-sky-50 text-sky-700'
                   }`}>
                     {entry.action}
                   </span>
-                  <span className="text-[#1C1917]">{entry.device_id}::{entry.channel}</span>
+                  <span className="text-slate-900">{entry.device_id}::{entry.channel}</span>
                 </div>
-                <span className="text-[#78716C] text-[10px]">{entry.reason}</span>
+                <span className="text-slate-500 text-[10px]">{entry.reason}</span>
               </div>
             ))}
           </div>
@@ -342,8 +342,8 @@ export const EdgeView: React.FC = () => {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
-            <Cpu className="w-4 h-4 text-[#B45309]" />
-            <h2 className="text-sm font-bold text-[#1C1917] font-mono uppercase tracking-wide">
+            <Cpu className="w-4 h-4 text-sky-700" />
+            <h2 className="text-sm font-bold text-slate-900 font-mono uppercase tracking-wide">
               Station Device Fleet Catalog ({filteredDevices.length} Devices)
             </h2>
           </div>
@@ -356,8 +356,8 @@ export const EdgeView: React.FC = () => {
                 onClick={() => setSelectedDeviceType(type)}
                 className={`px-2.5 py-1 rounded text-[11px] font-mono transition ${
                   selectedDeviceType === type
-                    ? 'bg-[#1C1917] text-white font-semibold'
-                    : 'bg-white text-[#78716C] border border-[#DDD6C6] hover:bg-[#F6F3EC]'
+                    ? 'bg-slate-900 text-white font-semibold'
+                    : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 {type === 'ALL' ? 'All Classes' : type.replace('_', ' ')}
@@ -373,18 +373,18 @@ export const EdgeView: React.FC = () => {
             return (
               <div 
                 key={dev.device_id}
-                className="bg-white border border-[#DDD6C6] rounded p-4 hover:border-[#B45309]/50 transition-colors shadow-sm flex flex-col justify-between"
+                className="bg-white border border-slate-200 rounded p-4 hover:border-sky-600/50 transition-colors shadow-sm flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-mono text-[#B45309] uppercase tracking-wider block font-semibold">
+                      <span className="text-[10px] font-mono text-sky-700 uppercase tracking-wider block font-semibold">
                         {dev.device_type}
                       </span>
-                      <h3 className="text-sm font-semibold text-[#1C1917] mt-0.5">
+                      <h3 className="text-sm font-semibold text-slate-900 mt-0.5">
                         {dev.name}
                       </h3>
-                      <span className="text-[11px] font-mono text-[#78716C]">
+                      <span className="text-[11px] font-mono text-slate-500">
                         ID: {dev.device_id}
                       </span>
                     </div>
@@ -392,16 +392,16 @@ export const EdgeView: React.FC = () => {
                   </div>
 
                   {/* Rated Capacity & Protocol */}
-                  <div className="mt-3 pt-3 border-t border-[#DDD6C6] grid grid-cols-2 gap-2 text-xs">
+                  <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-[10px] text-[#78716C] block">Rated Capacity</span>
-                      <span className="font-mono font-mono-numbers text-[#1C1917]">
+                      <span className="text-[10px] text-slate-500 block">Rated Capacity</span>
+                      <span className="font-mono font-mono-numbers text-slate-900">
                         {dev.rated_capacity != null ? `${dev.rated_capacity} ${dev.unit}` : 'N/A'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#78716C] block">Bus / Protocol</span>
-                      <span className="font-mono text-[#57534E] text-[11px] truncate block" title={dev.source_metadata.protocol}>
+                      <span className="text-[10px] text-slate-500 block">Bus / Protocol</span>
+                      <span className="font-mono text-slate-600 text-[11px] truncate block" title={dev.source_metadata.protocol}>
                         {dev.source_metadata.protocol || 'LOCAL_BUS'}
                       </span>
                     </div>
@@ -409,7 +409,7 @@ export const EdgeView: React.FC = () => {
 
                   {/* Telemetry Channels */}
                   <div className="mt-3">
-                    <span className="text-[10px] text-[#78716C] font-mono uppercase block mb-1">
+                    <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">
                       Validated Channels ({dev.telemetry_channels.length})
                     </span>
                     <div className="flex flex-wrap gap-1">
@@ -430,10 +430,10 @@ export const EdgeView: React.FC = () => {
                               uncertaintyInterval: `Operational bounds [${ch.min_val}, ${ch.max_val}] ${ch.unit}`,
                               governingInvariant: 'Hardware telemetry bounds check verified: readings outside operational range trigger DEGRADED device state.'
                             })}
-                            className="bg-[#F6F3EC] px-2 py-1 rounded text-[10px] border border-[#DDD6C6] flex items-center space-x-1.5 hover:border-[#B45309] transition-colors"
+                            className="bg-slate-50 px-2 py-1 rounded text-[10px] border border-slate-200 flex items-center space-x-1.5 hover:border-sky-600 transition-colors"
                           >
-                            <span className="text-[#78716C]">{ch.channel}:</span>
-                            <span className="font-mono font-semibold text-[#B45309] font-mono-numbers">
+                            <span className="text-slate-500">{ch.channel}:</span>
+                            <span className="font-mono font-semibold text-sky-700 font-mono-numbers">
                               {reading?.value != null ? `${reading.value} ${ch.unit}` : `${ch.min_val}–${ch.max_val} ${ch.unit}`}
                             </span>
                           </button>
@@ -445,8 +445,8 @@ export const EdgeView: React.FC = () => {
 
                 {/* Health Signals */}
                 {health?.contributing_signals && health.contributing_signals.length > 0 && (
-                  <div className="mt-3 pt-2 border-t border-[#DDD6C6] text-[10px] text-[#78716C] flex items-center space-x-1">
-                    <Activity className="w-3 h-3 text-[#B45309]" />
+                  <div className="mt-3 pt-2 border-t border-slate-200 text-[10px] text-slate-500 flex items-center space-x-1">
+                    <Activity className="w-3 h-3 text-sky-700" />
                     <span className="truncate">Signals: {health.contributing_signals.join(', ')}</span>
                   </div>
                 )}
@@ -457,10 +457,10 @@ export const EdgeView: React.FC = () => {
       </div>
 
       {/* Architectural Disclaimer Banner */}
-      <div className="bg-[#F6F3EC] border border-[#DDD6C6] rounded p-4 flex items-start space-x-3 text-xs text-[#57534E]">
-        <Info className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
+      <div className="bg-slate-50 border border-slate-200 rounded p-4 flex items-start space-x-3 text-xs text-slate-600">
+        <Info className="w-4 h-4 text-sky-700 flex-shrink-0 mt-0.5" />
         <div>
-          <span className="font-semibold text-[#1C1917]">Edge Decision Boundary & Field Safety:</span>
+          <span className="font-semibold text-slate-900">Edge Decision Boundary & Field Safety:</span>
           <p className="mt-0.5">
             Polaris-EMS Edge Layer handles telemetry normalization, data quality validation, and local state buffering during communication dropouts. It operates under safe fallback postures (e.g. HOLD_LAST_VALIDATED_STATE, SAFE_HOLD) and <strong>does not solve mathematical optimization problems or actuate physical generators independently</strong>. When connectivity is verified, dispatch requests are routed to the central Dispatch Optimizer and Policy Governance pipeline.
           </p>

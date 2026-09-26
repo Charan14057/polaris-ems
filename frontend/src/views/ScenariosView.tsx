@@ -112,22 +112,22 @@ export const ScenariosView: React.FC = () => {
   return (
     <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
       {/* 1. Editorial Header */}
-      <div className="border-b border-border pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+      <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-sky-600 font-bold mb-2">
             <Compass className="w-4 h-4" />
             <span>04 STRESS SCENARIO STUDIO</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-sans font-bold text-slate-900 tracking-tight">
             Controlled What-If Perturbations
           </h2>
-          <p className="text-sm text-ink-secondary mt-1 font-sans">
+          <p className="text-sm text-slate-600 mt-1 font-sans">
             Evaluate microgrid survival under 14 locked polar storm, generator trip, and fuel resupply delay presets.
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <ProvenanceTag provenance="SYNTHETIC" size="sm" />
-          <span className="text-xs font-mono px-2 py-0.5 rounded bg-canvas-subtle border border-border text-ink-muted">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-500">
             STATION: {currentStation}
           </span>
         </div>
@@ -142,16 +142,16 @@ export const ScenariosView: React.FC = () => {
       />
 
       {/* 2. Category Filter Bar */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-border-subtle pb-3">
-        <span className="text-xs font-mono text-ink-muted uppercase mr-2">FILTER CLASS:</span>
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
+        <span className="text-xs font-mono text-slate-500 uppercase mr-2">FILTER CLASS:</span>
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
               selectedCategory === cat
-                ? 'bg-copper text-ink-inverse font-medium shadow-xs'
-                : 'bg-canvas-subtle text-ink-secondary hover:bg-surface border border-border-subtle'
+                ? 'bg-sky-600 text-white font-medium shadow-xs'
+                : 'bg-slate-50 text-slate-600 hover:bg-white border border-slate-100'
             }`}
           >
             {cat}
@@ -176,18 +176,18 @@ export const ScenariosView: React.FC = () => {
                 }}
                 className={`p-4 rounded border text-left cursor-pointer transition-all ${
                   isSelected
-                    ? 'bg-surface border-copper shadow-raised ring-1 ring-copper/30'
-                    : 'editorial-sheet hover:border-border hover:shadow-sheet'
+                    ? 'bg-white border-sky-600 shadow-raised ring-1 ring-copper/30'
+                    : 'bg-white border border-slate-200 shadow-xs hover:border-slate-200 hover:shadow-sheet'
                 }`}
               >
-                <div className="flex items-center justify-between text-[10px] font-mono text-ink-muted mb-1">
+                <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
                   <span>{getCategory(scId)}</span>
-                  <span className="text-copper font-medium">{(sc as any).severity || 'MEDIUM'}</span>
+                  <span className="text-sky-600 font-medium">{(sc as any).severity || 'MEDIUM'}</span>
                 </div>
-                <div className="text-sm font-semibold text-ink-primary font-sans">
+                <div className="text-sm font-semibold text-slate-900 font-sans">
                   {sc.name || scId.replace(/_/g, ' ')}
                 </div>
-                <p className="text-xs text-ink-muted mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                   {sc.description || 'Deterministic environmental stress perturbation.'}
                 </p>
               </div>
@@ -198,17 +198,17 @@ export const ScenariosView: React.FC = () => {
 
       {/* 4. Active Scenario Details & Live Evaluate Action */}
       {scenarioDetail && (
-        <div className="editorial-sheet rounded p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-border-subtle gap-3">
+        <div className="bg-white border border-slate-200 shadow-xs rounded p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-3">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-mono uppercase text-copper font-bold">
+                <span className="text-xs font-mono uppercase text-sky-600 font-bold">
                   ACTIVE EXPERIMENT SPECIFICATION
                 </span>
                 <span className="text-border">|</span>
-                <span className="text-xs font-mono text-ink-muted">{scenarioDetail.scenario_id || (scenarioDetail as any).id}</span>
+                <span className="text-xs font-mono text-slate-500">{scenarioDetail.scenario_id || (scenarioDetail as any).id}</span>
               </div>
-              <h3 className="text-xl font-serif font-bold text-ink-primary mt-1">
+              <h3 className="text-xl font-sans font-bold text-slate-900 mt-1">
                 {scenarioDetail.name}
               </h3>
             </div>
@@ -216,14 +216,14 @@ export const ScenariosView: React.FC = () => {
             <button
               onClick={handleEvaluate}
               disabled={evaluating}
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded bg-copper text-ink-inverse text-xs font-mono font-medium hover:bg-copper-dark transition-colors shadow-xs disabled:opacity-50"
+              className="inline-flex items-center space-x-2 px-4 py-2 rounded bg-sky-600 text-white text-xs font-mono font-medium hover:bg-sky-600-dark transition-colors shadow-xs disabled:opacity-50"
             >
               <Play className={`w-3.5 h-3.5 ${evaluating ? 'animate-spin' : ''}`} />
               <span>{evaluating ? 'Solving Optimization Horizon...' : 'Run Controlled Stress Replay'}</span>
             </button>
           </div>
 
-          <p className="text-xs sm:text-sm text-ink-secondary leading-relaxed max-w-4xl font-sans mb-4">
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-4xl font-sans mb-4">
             {scenarioDetail.description}
           </p>
 

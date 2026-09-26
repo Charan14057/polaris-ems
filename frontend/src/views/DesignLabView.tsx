@@ -181,15 +181,15 @@ export const DesignLabView: React.FC = () => {
   return (
     <div className="space-y-8 max-w-[1520px] mx-auto pb-12">
       {/* Editorial Header */}
-      <div className="border-b border-border pb-6">
-        <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-copper font-bold mb-2">
+      <div className="border-b border-slate-200 pb-6">
+        <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-sky-600 font-bold mb-2">
           <Palette className="w-4 h-4" />
           <span>DESIGN DIRECTION LAB & EVALUATION PLATFORM</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-ink-primary tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-sans font-bold text-slate-900 tracking-tight">
           Visual System Directions for Polaris-EMS
         </h2>
-        <p className="text-sm sm:text-base text-ink-secondary mt-2 max-w-3xl leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-3xl leading-relaxed">
           Five visual philosophies were explored to replace the generic cyber-dashboard template with an editorial, human-designed, and mission-critical design language.
         </p>
       </div>
@@ -202,31 +202,31 @@ export const DesignLabView: React.FC = () => {
             onClick={() => setSelectedDirection(dir.id)}
             className={`p-4 rounded border text-left transition-all ${
               selectedDirection === dir.id
-                ? 'bg-surface border-copper shadow-raised ring-1 ring-copper/30'
-                : 'bg-canvas-subtle border-border-subtle hover:border-border hover:bg-surface'
+                ? 'bg-white border-sky-600 shadow-raised ring-1 ring-copper/30'
+                : 'bg-slate-50 border-slate-100 hover:border-slate-200 hover:bg-white'
             }`}
           >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-mono text-ink-muted uppercase">OPTION</span>
+              <span className="text-[10px] font-mono text-slate-500 uppercase">OPTION</span>
               {dir.isAdopted && (
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-copper text-ink-inverse font-bold">
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-600 text-white font-bold">
                   ADOPTED
                 </span>
               )}
             </div>
-            <div className="text-sm font-semibold text-ink-primary font-sans">{dir.name.split(':')[1]}</div>
-            <div className="text-xs text-ink-muted mt-0.5">{dir.subtitle}</div>
+            <div className="text-sm font-semibold text-slate-900 font-sans">{dir.name.split(':')[1]}</div>
+            <div className="text-xs text-slate-500 mt-0.5">{dir.subtitle}</div>
           </button>
         ))}
       </div>
 
       {/* Detailed Direction Deep-Dive */}
-      <div className="editorial-sheet rounded p-6 sm:p-8 space-y-8">
+      <div className="bg-white border border-slate-200 shadow-xs rounded p-6 sm:p-8 space-y-8">
         {/* Title & Tagline */}
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-border-subtle pb-4 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-slate-100 pb-4 gap-2">
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="text-2xl font-serif font-bold text-ink-primary">{active.name}</h3>
+              <h3 className="text-2xl font-sans font-bold text-slate-900">{active.name}</h3>
               {active.isAdopted && (
                 <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-moss-soft text-moss border border-moss/30 flex items-center space-x-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -234,26 +234,26 @@ export const DesignLabView: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-sm text-ink-secondary mt-1 font-sans">{active.tagline}</p>
+            <p className="text-sm text-slate-600 mt-1 font-sans">{active.tagline}</p>
           </div>
-          <span className="text-xs font-mono text-ink-muted">{active.subtitle}</span>
+          <span className="text-xs font-mono text-slate-500">{active.subtitle}</span>
         </div>
 
         {/* Color Palette Swatches */}
         <div>
-          <h4 className="text-xs font-mono uppercase tracking-widest text-ink-muted mb-3 font-semibold">
+          <h4 className="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3 font-semibold">
             MATERIAL PALETTE SWATCHES
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {active.colors.map((c) => (
-              <div key={c.name} className="p-3 rounded border border-border bg-surface shadow-xs">
+              <div key={c.name} className="p-3 rounded border border-slate-200 bg-white shadow-xs">
                 <div
-                  className="w-full h-12 rounded border border-border-subtle mb-2 shadow-inner"
+                  className="w-full h-12 rounded border border-slate-100 mb-2 shadow-inner"
                   style={{ backgroundColor: c.hex }}
                 />
-                <div className="text-xs font-medium text-ink-primary font-sans">{c.name}</div>
-                <div className="text-[10px] font-mono text-ink-muted">{c.hex}</div>
-                <div className="text-[10px] text-ink-muted mt-1 leading-tight">{c.role}</div>
+                <div className="text-xs font-medium text-slate-900 font-sans">{c.name}</div>
+                <div className="text-[10px] font-mono text-slate-500">{c.hex}</div>
+                <div className="text-[10px] text-slate-500 mt-1 leading-tight">{c.role}</div>
               </div>
             ))}
           </div>
@@ -261,31 +261,31 @@ export const DesignLabView: React.FC = () => {
 
         {/* Typography System */}
         <div>
-          <h4 className="text-xs font-mono uppercase tracking-widest text-ink-muted mb-3 font-semibold">
+          <h4 className="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3 font-semibold">
             TYPOGRAPHIC PAIRING
           </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded bg-canvas-subtle border border-border-subtle text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded bg-slate-50 border border-slate-100 text-xs">
             <div>
-              <span className="text-ink-muted block text-[10px] font-mono uppercase">Editorial Display:</span>
-              <span className="font-semibold text-ink-primary font-serif text-base">{active.typography.display}</span>
+              <span className="text-slate-500 block text-[10px] font-mono uppercase">Editorial Display:</span>
+              <span className="font-semibold text-slate-900 font-sans font-semibold text-base">{active.typography.display}</span>
             </div>
             <div>
-              <span className="text-ink-muted block text-[10px] font-mono uppercase">Interface UI:</span>
-              <span className="font-semibold text-ink-primary font-sans text-sm">{active.typography.interface}</span>
+              <span className="text-slate-500 block text-[10px] font-mono uppercase">Interface UI:</span>
+              <span className="font-semibold text-slate-900 font-sans text-sm">{active.typography.interface}</span>
             </div>
             <div>
-              <span className="text-ink-muted block text-[10px] font-mono uppercase">Data & Lineage:</span>
-              <span className="font-semibold text-ink-primary font-mono text-xs">{active.typography.metrics}</span>
+              <span className="text-slate-500 block text-[10px] font-mono uppercase">Data & Lineage:</span>
+              <span className="font-semibold text-slate-900 font-mono text-xs">{active.typography.metrics}</span>
             </div>
           </div>
         </div>
 
         {/* Component Previews */}
         <div>
-          <h4 className="text-xs font-mono uppercase tracking-widest text-ink-muted mb-3 font-semibold">
+          <h4 className="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3 font-semibold">
             EXAMPLE COMPONENT SPECIMENS
           </h4>
-          <div className="p-5 rounded bg-canvas border border-border space-y-4">
+          <div className="p-5 rounded bg-canvas border border-slate-200 space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status="SAFE" />
               <StatusBadge status="WATCH" />
@@ -296,12 +296,12 @@ export const DesignLabView: React.FC = () => {
               <ProvenanceTag provenance="SIMULATED" />
             </div>
 
-            <div className="p-4 rounded bg-surface border border-border flex items-center justify-between">
+            <div className="p-4 rounded bg-white border border-slate-200 flex items-center justify-between">
               <div>
-                <span className="text-xs text-ink-muted font-mono uppercase">BATTERY BANK SOC</span>
-                <div className="text-2xl font-serif font-bold text-ink-primary">68.4 <span className="text-xs font-mono font-normal text-ink-muted">%</span></div>
+                <span className="text-xs text-slate-500 font-mono uppercase">BATTERY BANK SOC</span>
+                <div className="text-2xl font-sans font-bold text-slate-900">68.4 <span className="text-xs font-mono font-normal text-slate-500">%</span></div>
               </div>
-              <button className="px-3 py-1.5 rounded bg-copper text-ink-inverse text-xs font-mono font-medium hover:bg-copper-dark transition-colors">
+              <button className="px-3 py-1.5 rounded bg-sky-600 text-white text-xs font-mono font-medium hover:bg-sky-600-dark transition-colors">
                 Inspect Battery Horizon →
               </button>
             </div>
@@ -310,16 +310,16 @@ export const DesignLabView: React.FC = () => {
 
         {/* Qualitative Evaluation Ledger */}
         <div>
-          <h4 className="text-xs font-mono uppercase tracking-widest text-ink-muted mb-3 font-semibold">
+          <h4 className="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3 font-semibold">
             QUALITATIVE EVALUATION SCORECARD
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             {Object.entries(active.evaluation).map(([k, v]) => (
-              <div key={k} className="p-3 rounded bg-canvas-subtle border border-border-subtle">
-                <span className="font-mono text-copper font-medium uppercase text-[11px] block mb-0.5">
+              <div key={k} className="p-3 rounded bg-slate-50 border border-slate-100">
+                <span className="font-mono text-sky-600 font-medium uppercase text-[11px] block mb-0.5">
                   {k.replace(/([A-Z])/g, ' $1')}:
                 </span>
-                <span className="text-ink-secondary leading-relaxed font-sans">{v}</span>
+                <span className="text-slate-600 leading-relaxed font-sans">{v}</span>
               </div>
             ))}
           </div>

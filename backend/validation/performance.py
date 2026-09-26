@@ -32,8 +32,9 @@ class PerformanceBenchmark:
         self.forecast_adapter = ForecastAPIAdapter()
         self.explainer = get_model_explainer()
         self.opt_benchmark = get_optimizer_benchmark()
+        self._latency_cache: Dict[str, Dict[str, Dict[str, float]]] = {}
 
-    def benchmark_component_latencies(self, station_id: str = "BHARATI", n_iterations: int = 3) -> Dict[str, Dict[str, float]]:
+    def benchmark_component_latencies(self, station_id: str = "BHARATI", n_iterations: int = 2) -> Dict[str, Dict[str, float]]:
         """
         Executes controlled timing benchmarks for:
         1. forecast_inference
@@ -44,6 +45,8 @@ class PerformanceBenchmark:
         """
         from backend.api.schemas.forecast import ForecastRequestSchema
         sid = station_id.upper()
+        if sid in self._latency_cache:
+            return self._latency_cache[sid]
         timings: Dict[str, List[float]] = {
             "forecast_inference_ms": [],
             "tree_shap_explainability_ms": [],
@@ -89,6 +92,7 @@ class PerformanceBenchmark:
                 "samples": len(arr)
             }
 
+        self._latency_cache[sid] = summary
         return summary
 
 
