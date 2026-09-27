@@ -307,6 +307,7 @@ class TwinEngine:
             wind_speed_ms=wind_spd,
             irradiance_wm2=ghi,
             solar_elevation_deg=15.0 if ghi > 0 else 0.0,
+            cloud_fraction=getattr(current_state.environment, "cloud_fraction", 0.5) if current_state and hasattr(current_state, "environment") and current_state.environment else 0.5,
             provenance="FORECAST"
         )
 

@@ -89,6 +89,22 @@ class ScenarioTransformer:
                     t_state.diesel.generator_status = "FAULT"
                     t_state.diesel.generator_power_kw = 0.0
 
+            elif param == "solar_availability":
+                avail_factor = max(0.0, min(1.0, apply_operator(1.0, op, val)))
+                t_state.solar.solar_capacity_kw = round(t_state.solar.solar_capacity_kw * avail_factor, 2)
+                if avail_factor <= 0.01:
+                    t_state.solar.solar_generation_kw = 0.0
+
+            elif param == "wind_availability":
+                avail_factor = max(0.0, min(1.0, apply_operator(1.0, op, val)))
+                t_state.wind.wind_capacity_kw = round(t_state.wind.wind_capacity_kw * avail_factor, 2)
+                if avail_factor <= 0.01:
+                    t_state.wind.wind_generation_kw = 0.0
+
+            elif param == "cloud_fraction":
+                if hasattr(t_state, "environment") and t_state.environment:
+                    t_state.environment.cloud_fraction = min(1.0, max(0.0, apply_operator(t_state.environment.cloud_fraction, op, val)))
+
             elif param == "fuel_resupply_delay_hours":
                 # Shift resupply window
                 delay_days = round(val / 24.0, 1)

@@ -28,6 +28,7 @@ from backend.scenarios.registry import ScenarioRegistry
 from backend.scenarios.transformations import ScenarioTransformer
 from backend.policy.engine import PolicyEngine
 from backend.optimizer.engine import OptimizerEngine
+from backend.optimizer.schema import OptimizationMode
 
 
 @dataclass
@@ -233,6 +234,16 @@ class LiveTwinSession:
         working_state = copy.deepcopy(self.current_twin_state)
         working_input = copy.deepcopy(input_step)
 
+        # Anchor hardware and logistics capacities to baseline profile to prevent compounding multipliers
+        working_state.battery.capacity_kwh = float(self.profile.electrical.battery_capacity_kwh)
+        working_state.battery.usable_capacity_kwh = float(self.profile.electrical.battery_capacity_kwh * 0.9)
+        working_state.diesel.generator_max_power_kw = float(self.profile.electrical.diesel_generator_kw_rated)
+        working_state.resupply.resupply_window_days = int(self.profile.default_resupply_window_days)
+        working_state.solar.solar_capacity_kw = float(self.profile.electrical.solar_pv_kw_peak)
+        working_state.wind.wind_capacity_kw = float(self.profile.electrical.wind_turbine_kw_rated)
+        if hasattr(working_state, "environment") and working_state.environment:
+            working_state.environment.cloud_fraction = 0.5
+
         if self.active_scenario:
             try:
                 scen_def = self.scenario_registry.get(self.active_scenario)
@@ -356,27 +367,78 @@ class LiveTwinSession:
 
     def approve_auto_recommendation(self) -> Dict[str, Any]:
         """
-        Simulates operator approval of Phase 6 optimizer advisory recommendation.
-        Calculates optimal dispatch and applies it authoritatively.
+        Executes Phase 6 OptimizerEngine (HiGHS MILP) over 24h lookahead horizon,
+        derives optimal unit commitment & dispatch recommendation, and applies it authoritatively.
         """
         sim_ts = self.current_simulation_iso()
         wall_ts = self.current_wall_clock_iso()
+        sim_dt = self.simulation_base_time + timedelta(seconds=self.simulation_elapsed_seconds)
 
-        # Optimizer recommendation evaluation:
-        # Check current balance and optimize clean renewable utilization
-        surplus_renewable = (self.current_twin_state.solar.solar_generation_kw + 
-                             self.current_twin_state.wind.wind_generation_kw) > self.current_twin_state.loads.total_load_kw
+        # 1. Synthesize 24-hour forward lookahead trajectory from astronomical environment & load profiles
+        forward_trajectory: List[TwinInputStep] = []
+        nominal_kw = sum(d.nominal_power_kw for d in self.profile.devices if d.category == "CRITICAL")
+        
+        for h in range(1, 25):
+            step_dt = sim_dt + timedelta(hours=h)
+            amb_temp, wind_spd, ghi, _ = self.calculate_astronomical_environment(step_dt, h * 3600.0)
+            hour_float = step_dt.hour + step_dt.minute / 60.0 + step_dt.second / 3600.0
+            step_load_kw = round(nominal_kw * (1.15 if (7 <= hour_float <= 9 or 18 <= hour_float <= 21) else 0.95), 1)
+            
+            step_iso = step_dt.isoformat().replace("+00:00", "Z")
+            forward_trajectory.append(TwinInputStep(
+                timestamp=step_iso,
+                horizon_h=h,
+                ambient_temp_c=amb_temp,
+                wind_speed_m_per_s=wind_spd,
+                ghi_w_per_m2=ghi,
+                load_kw=step_load_kw,
+                solar_kw=0.0,
+                wind_kw=0.0,
+                mode="EXPECTED",
+                provenance="FORECAST"
+            ))
 
-        if surplus_renewable and self.current_twin_state.diesel.generator_power_kw > 0.1:
-            # Recommend shutting down diesel and absorbing surplus in battery
-            self.active_controls["diesel_power_override_kw"] = 0.0
-            rec_what = "Shut down diesel generator DG-1 and maximize renewable storage"
-            rec_why = "Renewable potential exceeds station demand; fuel savings achievable without violating reserve"
+        # 2. Retrieve active scenario definition if perturbed
+        scen_def = None
+        if self.active_scenario:
+            try:
+                scen_def = self.scenario_registry.get(self.active_scenario)
+            except Exception:
+                pass
+
+        # 3. ACTUALLY INVOKE Phase 6 OptimizerEngine (Pyomo + HiGHS)
+        opt_result = self.optimizer_engine.optimize(
+            initial_state=self.current_twin_state,
+            trajectory=forward_trajectory,
+            scenario=scen_def,
+            mode=OptimizationMode.EXPECTED
+        )
+
+        # 4. Extract first-timestep optimal decision
+        first_dec = opt_result.decision_schedule[0] if (opt_result.decision_schedule and len(opt_result.decision_schedule) > 0) else None
+        
+        if first_dec and opt_result.solver_status.value in ("OPTIMAL", "FEASIBLE"):
+            optimal_diesel_kw = first_dec.diesel_total_kw
+            optimal_bess_charge_kw = first_dec.battery_charge_kw
+            optimal_bess_dischg_kw = first_dec.battery_discharge_kw
+            
+            if optimal_diesel_kw > 0.1:
+                self.active_controls["diesel_power_override_kw"] = optimal_diesel_kw
+                rec_what = f"Dispatch DG-1 at {optimal_diesel_kw:.1f} kW to maintain spinning reserve"
+                rec_why = f"HiGHS MILP solved in {opt_result.solver_time_seconds:.3f}s: min-load satisfied, objective {opt_result.summary.objective_value:.1f}"
+            else:
+                self.active_controls["diesel_power_override_kw"] = 0.0
+                rec_what = "Shut down diesel generator DG-1 and dispatch renewable + BESS reserves"
+                rec_why = f"HiGHS MILP identified zero diesel requirement: objective {opt_result.summary.objective_value:.1f}, fuel savings prioritized"
+                
+            if optimal_bess_charge_kw > 0.1:
+                self.active_controls["battery_charge_force_kw"] = optimal_bess_charge_kw
+            elif optimal_bess_dischg_kw > 0.1 and "battery_charge_force_kw" in self.active_controls:
+                del self.active_controls["battery_charge_force_kw"]
         else:
-            # Clear artificial manual overrides to return to optimal baseline policy
             self.active_controls.clear()
-            rec_what = "Engage optimal dispatch (Priority: Renewables -> Battery -> Diesel)"
-            rec_why = "Power balance engine continuously balances minimum LCOE and resilience constraints"
+            rec_what = "Engage safe default baseline dispatch (HiGHS fallback)"
+            rec_why = f"Solver status {opt_result.solver_status.value}: safe fallback active"
 
         self.operating_mode = "LIVE_AUTO"
         new_state = self.advance_clock(force_elapsed_seconds=1.0)
@@ -385,6 +447,16 @@ class LiveTwinSession:
             "timestamp": sim_ts,
             "wall_clock": wall_ts,
             "event": "AUTO_RECOMMENDATION_APPROVED",
+            "optimizer_class": "OptimizerEngine",
+            "solver": "HiGHS",
+            "run_id": opt_result.run_id,
+            "optimizer_run_id": opt_result.run_id,
+            "solver_status": opt_result.solver_status.value,
+            "solver_time_sec": opt_result.solver_time_seconds,
+            "horizon_hours": opt_result.horizon_hours,
+            "objective_value": opt_result.summary.objective_value if opt_result.summary else 0.0,
+            "total_fuel_consumed_liters": opt_result.summary.total_fuel_consumed_liters if opt_result.summary else 0.0,
+            "twin_replay_valid": opt_result.is_valid,
             "what": rec_what,
             "why": rec_why,
             "resulting_power_kw": {
@@ -398,6 +470,16 @@ class LiveTwinSession:
 
         return {
             "status": "APPROVED",
+            "optimizer_class": "OptimizerEngine",
+            "solver": "HiGHS",
+            "run_id": opt_result.run_id,
+            "solver_status": opt_result.solver_status.value,
+            "solver_time_sec": opt_result.solver_time_seconds,
+            "horizon_hours": opt_result.horizon_hours,
+            "objective_value": opt_result.summary.objective_value if opt_result.summary else 0.0,
+            "total_fuel_consumed_liters": opt_result.summary.total_fuel_consumed_liters if opt_result.summary else 0.0,
+            "twin_replay_valid": opt_result.is_valid,
+            "validation_messages": opt_result.validation_messages,
             "recommendation": rec_what,
             "rationale": rec_why,
             "state": new_state.to_dict(),
@@ -442,18 +524,32 @@ class LiveTwinSession:
         """Clears active scenario perturbation and recalculates baseline twin state."""
         prev = self.active_scenario
         self.active_scenario = None
+
+        # Explicitly restore baseline hardware and logistics capacities
+        self.current_twin_state.battery.capacity_kwh = float(self.profile.electrical.battery_capacity_kwh)
+        self.current_twin_state.battery.usable_capacity_kwh = float(self.profile.electrical.battery_capacity_kwh * 0.9)
+        self.current_twin_state.diesel.generator_max_power_kw = float(self.profile.electrical.diesel_generator_kw_rated)
+        self.current_twin_state.resupply.resupply_window_days = int(self.profile.default_resupply_window_days)
+        self.current_twin_state.resupply.resupply_event_active = False
+        self.current_twin_state.solar.solar_capacity_kw = float(self.profile.electrical.solar_pv_kw_peak)
+        self.current_twin_state.wind.wind_capacity_kw = float(self.profile.electrical.wind_turbine_kw_rated)
+        if hasattr(self.current_twin_state, "environment") and self.current_twin_state.environment:
+            self.current_twin_state.environment.cloud_fraction = 0.5
+
         new_state = self.advance_clock(force_elapsed_seconds=1.0)
         
         trace_entry = {
             "timestamp": self.current_simulation_iso(),
             "wall_clock": self.current_wall_clock_iso(),
             "event": "SCENARIO_CLEARED",
-            "cleared_scenario_id": prev
+            "cleared_scenario_id": prev,
+            "status": "BASELINE_RESTORED"
         }
         self.trace_history.append(trace_entry)
 
         return {
             "status": "CLEARED",
+            "active_scenario": None,
             "previous_scenario": prev,
             "state": new_state.to_dict(),
             "trace": trace_entry

@@ -118,45 +118,69 @@ def test_individual_scenario_full_circle_lifecycle(session_mgr, scenario_id):
     # 6. Verify scenario produced observable downstream delta in logically dependent variables
     if scenario_id == "NORMAL_BASELINE":
         assert session.active_scenario == "NORMAL_BASELINE"
+        assert abs(perturbed_temp - baseline_temp) < 1.0
+        assert abs(perturbed_battery_cap - baseline_battery_cap) < 0.1
 
-    elif scenario_id in ("CLOUDY_CONDITIONS", "HEAVY_CLOUD_LOW_IRRADIANCE"):
-        # Solar irradiance reduced, or generation reduced/diesel ramped
-        assert (perturbed_ghi <= baseline_ghi) or (perturbed_diesel >= baseline_diesel)
+    elif scenario_id == "CLOUDY_CONDITIONS":
+        assert abs(perturbed_state["environment"]["cloud_fraction"] - min(1.0, baseline_state["environment"]["cloud_fraction"] * 1.5)) < 0.05
+        assert perturbed_ghi <= baseline_ghi
+
+    elif scenario_id == "HEAVY_CLOUD_LOW_IRRADIANCE":
+        assert perturbed_state["environment"]["cloud_fraction"] >= baseline_state["environment"]["cloud_fraction"]
+        assert perturbed_ghi <= baseline_ghi
 
     elif scenario_id == "HIGH_WIND":
-        # Elevated wind velocity or turbine ramp/cutout
-        assert perturbed_state["environment"]["wind_speed_ms"] >= 15.0 or perturbed_wind != baseline_wind
+        # Elevated wind velocity: 1.4x katabatic surge
+        assert perturbed_state["environment"]["wind_speed_ms"] > baseline_state["environment"]["wind_speed_ms"]
+        assert perturbed_state["environment"]["wind_speed_ms"] >= 9.5
 
     elif scenario_id == "BLIZZARD":
-        # Compound: temperature drop and solar attenuation
-        assert perturbed_temp <= baseline_temp
-        assert perturbed_solar <= baseline_solar
+        # Compound: temperature drop and katabatic wind surge
+        assert perturbed_temp < baseline_temp
+        assert perturbed_state["environment"]["wind_speed_ms"] > baseline_state["environment"]["wind_speed_ms"]
 
     elif scenario_id == "EXTREME_COLD":
-        # Severe temperature drop
+        # Severe -25C temperature drop
         delta_temp = perturbed_temp - baseline_temp
-        assert delta_temp <= -5.0, f"Expected cold delta <= -5C, got {delta_temp}"
+        assert delta_temp <= -20.0, f"Expected cold delta <= -20C, got {delta_temp}"
 
-    elif scenario_id in ("LOW_DAYLIGHT", "POLAR_NIGHT", "SOLAR_GENERATION_FAILURE"):
-        # Solar generation must be zero
+    elif scenario_id == "LOW_DAYLIGHT":
+        # Solar elevation attenuated by 8 degrees
+        assert perturbed_state["environment"]["solar_elevation_deg"] < baseline_state["environment"]["solar_elevation_deg"] or perturbed_solar == 0.0
+
+    elif scenario_id == "POLAR_NIGHT":
+        # Total darkness mid-winter
+        assert perturbed_ghi == 0.0
         assert perturbed_solar == 0.0
+
+    elif scenario_id == "SOLAR_GENERATION_FAILURE":
+        # Solar PV Array inverter trip
+        assert perturbed_solar == 0.0
+        assert perturbed_state["solar"]["solar_available_kw"] == 0.0
 
     elif scenario_id == "WIND_GENERATION_FAILURE":
-        # Wind generation lost
+        # Wind turbine mechanical outage
         assert perturbed_wind == 0.0
+        assert perturbed_state["wind"]["wind_available_kw"] == 0.0
 
     elif scenario_id == "BATTERY_DEGRADATION":
-        # Usable capacity derated
+        # Usable capacity derated to 65% (0.65x)
         assert perturbed_battery_cap < baseline_battery_cap
+        assert abs(perturbed_battery_cap - round(baseline_battery_cap * 0.65, 2)) < 1.0
 
     elif scenario_id == "FUEL_RESUPPLY_DELAY":
-        assert session.active_scenario == "FUEL_RESUPPLY_DELAY"
+        # Resupply window delayed by +7 days
+        assert perturbed_state["resupply"]["resupply_window_days"] > baseline_state["resupply"]["resupply_window_days"]
+        assert perturbed_state["resupply"]["resupply_window_days"] == baseline_state["resupply"]["resupply_window_days"] + 7
 
     elif scenario_id == "COMBINED_POLAR_STRESS":
-        # Compounded multi-hazard
-        assert perturbed_temp <= baseline_temp
-        assert perturbed_solar == 0.0
+        # Compounded multi-hazard: cold wave, wind outage, solar night
+        assert perturbed_temp < baseline_temp
         assert perturbed_wind == 0.0
+        assert perturbed_solar == 0.0
+
+    elif scenario_id == "CUSTOM":
+        assert session.active_scenario == "CUSTOM"
 
     # 7. Assert Kirchhoff conservation invariant under scenario (Sources == Sinks + Curtailment)
     sources_p = perturbed_solar + perturbed_wind + perturbed_diesel + perturbed_state["battery"]["discharge_kw"]
@@ -183,6 +207,13 @@ def test_individual_scenario_full_circle_lifecycle(session_mgr, scenario_id):
     cleared_snap = session.get_snapshot()
     cleared_state = cleared_snap["state"]
     assert cleared_snap["metadata"]["active_scenario"] is None
+
+    # Verify physical baseline restoration
+    assert abs(cleared_state["battery"]["capacity_kwh"] - baseline_battery_cap) < 0.5
+    assert cleared_state["resupply"]["resupply_window_days"] == baseline_state["resupply"]["resupply_window_days"]
+    assert abs(cleared_state["environment"]["ambient_temperature_c"] - baseline_temp) < 1.0
+    assert cleared_state["solar"]["solar_capacity_kw"] == baseline_state["solar"]["solar_capacity_kw"]
+    assert cleared_state["wind"]["wind_capacity_kw"] == baseline_state["wind"]["wind_capacity_kw"]
 
     # Kirchhoff invariant maintained on restoration (Sources == Sinks + Curtailment)
     sources_r = (cleared_state["solar"]["solar_generation_kw"] + 
