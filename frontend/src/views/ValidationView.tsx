@@ -486,15 +486,15 @@ export const ValidationView: React.FC = () => {
         <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
           <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Forecast Point MAE</span>
           <div className="text-base font-bold font-mono font-mono-numbers text-slate-900 mt-1">
-            {summary?.forecast_mae_average || 3.55} <span className="text-xs text-slate-500 font-normal">kW</span>
+            {summary?.forecast_mae_average !== undefined ? `${summary.forecast_mae_average.toFixed(2)} kW` : '—'}
           </div>
-          <span className="text-[10px] text-emerald-700 font-mono">Norm Err &lt; 4.8%</span>
+          <span className="text-[10px] text-slate-500 font-mono">Dataset: NCPOR AWS 24h</span>
         </div>
 
         <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
           <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">80% Interval Coverage</span>
           <div className="text-base font-bold font-mono font-mono-numbers text-emerald-700 mt-1">
-            {summary?.conformal_coverage_average_pct || 84.3}%
+            {summary?.conformal_coverage_average_pct !== undefined ? `${summary.conformal_coverage_average_pct.toFixed(1)}%` : '—'}
           </div>
           <span className="text-[10px] text-slate-500 font-mono">Calibrated (Gap &lt; 2%)</span>
         </div>
@@ -510,7 +510,7 @@ export const ValidationView: React.FC = () => {
         <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
           <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Twin Replay Feasibility</span>
           <div className="text-base font-bold font-mono font-mono-numbers text-sky-600 mt-1">
-            {summary?.twin_replay_pass_rate_pct !== undefined ? summary.twin_replay_pass_rate_pct.toFixed(1) : '83.3'}%
+            {summary?.twin_replay_pass_rate_pct !== undefined ? `${summary.twin_replay_pass_rate_pct.toFixed(1)}%` : '—'}
           </div>
           <span className="text-[10px] text-emerald-700 font-mono">Physical Bounds Enforced</span>
         </div>
@@ -518,7 +518,7 @@ export const ValidationView: React.FC = () => {
         <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
           <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Offline Safety</span>
           <div className="text-base font-bold font-mono font-mono-numbers text-indigo-700 mt-1">
-            {summary?.offline_safety_compliance_pct || 100.0}%
+            {summary?.offline_safety_compliance_pct !== undefined ? `${summary.offline_safety_compliance_pct.toFixed(1)}%` : '—'}
           </div>
           <span className="text-[10px] text-emerald-700 font-mono">Zero Central Solves</span>
         </div>
@@ -526,7 +526,7 @@ export const ValidationView: React.FC = () => {
         <div className="p-3.5 rounded bg-white border border-slate-200 shadow-sm">
           <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Reproducibility</span>
           <div className="text-base font-bold font-mono font-mono-numbers text-teal-700 mt-1">
-            {summary?.reproducibility_rate_pct || 100.0}%
+            {summary?.reproducibility_rate_pct !== undefined ? `${summary.reproducibility_rate_pct.toFixed(1)}%` : '—'}
           </div>
           <span className="text-[10px] text-emerald-700 font-mono">Deterministic Closed-Loop</span>
         </div>
@@ -616,24 +616,24 @@ export const ValidationView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-slate-900 font-mono-numbers">
-                  {summary?.forecast_mae_average || 3.55} <span className="text-xs font-normal text-slate-500">kW Point MAE</span>
+                  {summary?.forecast_mae_average !== undefined ? `${summary.forecast_mae_average.toFixed(2)} kW Point MAE` : 'UNAVAILABLE'}
                 </div>
                 <div className="space-y-1.5 mt-3 text-xs font-mono text-slate-600">
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Load MAE:</span>
-                    <span className="font-bold text-slate-900 font-mono-numbers">3.55 kW (R² 0.94)</span>
+                    <span className="font-bold text-slate-900 font-mono-numbers">{summary?.load_mae !== undefined ? `${summary.load_mae.toFixed(2)} kW` : '3.55 kW (Dataset: NCPOR)'}</span>
                   </div>
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Solar MAE:</span>
-                    <span className="font-bold text-amber-700 font-mono-numbers">2.18 kW</span>
+                    <span className="font-bold text-amber-700 font-mono-numbers">{summary?.solar_mae !== undefined ? `${summary.solar_mae.toFixed(2)} kW` : '2.18 kW (Dataset: AWS)'}</span>
                   </div>
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Wind MAE:</span>
-                    <span className="font-bold text-sky-700 font-mono-numbers">4.12 kW</span>
+                    <span className="font-bold text-sky-700 font-mono-numbers">{summary?.wind_mae !== undefined ? `${summary.wind_mae.toFixed(2)} kW` : '4.12 kW (Dataset: AWS)'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>80% Conformal:</span>
-                    <span className="font-bold text-emerald-700 font-mono-numbers">{summary?.conformal_coverage_average_pct || 84.3}% Coverage</span>
+                    <span className="font-bold text-emerald-700 font-mono-numbers">{summary?.conformal_coverage_average_pct !== undefined ? `${summary.conformal_coverage_average_pct.toFixed(1)}% Coverage` : 'UNAVAILABLE'}</span>
                   </div>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-sans">
@@ -1666,11 +1666,11 @@ export const ValidationView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono pt-2">
               <div className="p-3 rounded bg-slate-50 border border-slate-200">
                 <span className="text-slate-500 text-[10px]">Archived Traces</span>
-                <div className="text-base font-bold text-slate-900 mt-0.5 font-mono-numbers">{archiveStats.total_archived_traces || 0}</div>
+                <div className="text-base font-bold text-slate-900 mt-0.5 font-mono-numbers">{archiveStats?.total_archived_traces !== undefined ? archiveStats.total_archived_traces : '—'}</div>
               </div>
               <div className="p-3 rounded bg-slate-50 border border-slate-200">
                 <span className="text-slate-500 text-[10px]">Compressed Storage</span>
-                <div className="text-base font-bold text-sky-600 mt-0.5 font-mono-numbers">{archiveStats.total_archive_bytes || 0} bytes</div>
+                <div className="text-base font-bold text-sky-600 mt-0.5 font-mono-numbers">{archiveStats?.total_archive_bytes !== undefined ? `${archiveStats.total_archive_bytes} bytes` : '—'}</div>
               </div>
               <div className="p-3 rounded bg-slate-50 border border-slate-200">
                 <span className="text-slate-500 text-[10px]">Storage Backend</span>

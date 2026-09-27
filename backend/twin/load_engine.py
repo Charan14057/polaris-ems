@@ -78,6 +78,7 @@ class LoadEngine:
         calculated_total = round(therm_kw + crit_kw + imp_kw + oper_kw + flex_kw + maint_kw, 2)
 
         # If anchored by Phase 3 forecast, reconcile residual operational demand
+        # Physical thermal heating surges under sub-zero extremes must be reflected
         if forecast_total_load_kw is not None:
             final_total = round(float(forecast_total_load_kw), 2)
         else:

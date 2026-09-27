@@ -1018,8 +1018,27 @@ export const STATION_SPATIAL_3D_PROFILES: Record<string, StationSpatial3DProfile
         realWorldContext: 'Rooftop and ground solar panels taking advantage of 24h Arctic summer polar day'
       },
       {
+        id: 'hm_obj_wind',
+        name: 'Arctic Wind Turbine (10 kW)',
+        category: 'SOURCE',
+        zone: 'hm_ground_deck',
+        position: [-20, 5.0, 10],
+        dimensions: [2, 8, 2],
+        elevation: 5.0,
+        deviceId: 'wind_turbine_1',
+        circuitId: 'c_gen_wind',
+        importance: 'OPERATIONAL',
+        nominalPowerKw: 10.0,
+        status: 'ONLINE',
+        provenance: 'CONFIGURED',
+        selectable: true,
+        color: '#0284c7',
+        meshType: 'turbine',
+        realWorldContext: 'Compact high-latitude wind generator for Arctic coastal fjord breezes'
+      },
+      {
         id: 'hm_obj_district_grid',
-        name: 'Settlement Grid / Diesel Feed (50 kW)',
+        name: 'Settlement Grid / Diesel Backup (2x45 kW)',
         category: 'SOURCE',
         zone: 'hm_ground_deck',
         position: [-16, 1.5, 4],
@@ -1028,7 +1047,7 @@ export const STATION_SPATIAL_3D_PROFILES: Record<string, StationSpatial3DProfile
         deviceId: 'diesel_generator_1',
         circuitId: 'c_gen_diesel',
         importance: 'CRITICAL',
-        nominalPowerKw: 50.0,
+        nominalPowerKw: 45.0,
         status: 'STANDBY',
         provenance: 'CONFIGURED',
         selectable: true,
@@ -1038,7 +1057,7 @@ export const STATION_SPATIAL_3D_PROFILES: Record<string, StationSpatial3DProfile
       },
       {
         id: 'hm_obj_battery',
-        name: 'Station BESS Buffer (60 kWh)',
+        name: 'Station BESS Buffer (50 kWh)',
         category: 'STORAGE',
         zone: 'hm_ground_deck',
         position: [-10, 1.2, 4],
@@ -1047,7 +1066,7 @@ export const STATION_SPATIAL_3D_PROFILES: Record<string, StationSpatial3DProfile
         deviceId: 'bess_bank_1',
         circuitId: 'c_gen_bess',
         importance: 'CRITICAL',
-        nominalPowerKw: 25.0,
+        nominalPowerKw: 20.0,
         status: 'ONLINE',
         provenance: 'CONFIGURED',
         selectable: true,
@@ -1247,8 +1266,9 @@ export const STATION_SPATIAL_3D_PROFILES: Record<string, StationSpatial3DProfile
     ],
     powerFlowPaths: [
       { id: 'hm_flow_solar', name: 'Solar PV Feed', fromId: 'hm_obj_solar', toId: 'hm_obj_main_bus', circuitId: 'c_gen_solar', type: 'SOURCE_FEED', points: [[-18, 0.5, -8], [-8, 1.2, -4], [-4, 1.5, 0]], defaultActive: true, nominalKw: 12.0 },
-      { id: 'hm_flow_grid', name: 'Settlement Grid / Diesel Feed', fromId: 'hm_obj_district_grid', toId: 'hm_obj_main_bus', circuitId: 'c_gen_diesel', type: 'SOURCE_FEED', points: [[-16, 1.5, 4], [-4, 1.5, 0]], defaultActive: true, nominalKw: 50.0 },
-      { id: 'hm_flow_bess', name: 'BESS Battery Feed', fromId: 'hm_obj_battery', toId: 'hm_obj_main_bus', circuitId: 'c_gen_bess', type: 'SOURCE_FEED', points: [[-10, 1.2, 4], [-4, 1.5, 0]], defaultActive: false, nominalKw: 25.0 },
+      { id: 'hm_flow_wind', name: 'Arctic Wind Turbine Feed', fromId: 'hm_obj_wind', toId: 'hm_obj_main_bus', circuitId: 'c_gen_wind', type: 'SOURCE_FEED', points: [[-20, 5.0, 10], [-10, 2.0, 5], [-4, 1.5, 0]], defaultActive: true, nominalKw: 10.0 },
+      { id: 'hm_flow_grid', name: 'Settlement Grid / Diesel Backup Feed', fromId: 'hm_obj_district_grid', toId: 'hm_obj_main_bus', circuitId: 'c_gen_diesel', type: 'SOURCE_FEED', points: [[-16, 1.5, 4], [-4, 1.5, 0]], defaultActive: true, nominalKw: 45.0 },
+      { id: 'hm_flow_bess', name: 'BESS Battery Feed', fromId: 'hm_obj_battery', toId: 'hm_obj_main_bus', circuitId: 'c_gen_bess', type: 'SOURCE_FEED', points: [[-10, 1.2, 4], [-4, 1.5, 0]], defaultActive: false, nominalKw: 20.0 },
       { id: 'hm_flow_feeder_lab', name: 'Feeder F1 (Lab & Heating)', fromId: 'hm_obj_main_bus', toId: 'hm_obj_panel_lab', circuitId: 'c_feeder_lab', type: 'FEEDER', points: [[-4, 1.5, 0], [2, 1.2, -4]], defaultActive: true, nominalKw: 35.0 },
       { id: 'hm_flow_feeder_upper', name: 'Feeder F2 (Upper Floor)', fromId: 'hm_obj_main_bus', toId: 'hm_obj_panel_upper', circuitId: 'c_feeder_upper', type: 'FEEDER', points: [[-4, 1.5, 0], [0, 4.2, 2], [2, 4.2, 2]], defaultActive: true, nominalKw: 25.0 }
     ]

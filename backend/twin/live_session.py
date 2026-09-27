@@ -486,12 +486,43 @@ class LiveTwinSession:
             "trace": trace_entry
         }
 
-    def apply_scenario(self, scenario_id: str) -> Dict[str, Any]:
+    def apply_scenario(
+        self,
+        scenario_id: str,
+        custom_parameters: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Injects a scenario perturbation into the live session and recalculates state immediately.
+        Supports parameter injection for CUSTOM scenarios.
         """
         sid = scenario_id.upper()
-        scen_def = self.scenario_registry.get(sid)
+        if sid == "CUSTOM" and custom_parameters:
+            from backend.scenarios.schema import ScenarioDefinition, ParameterTransform, TransformOperator, ScenarioCategory
+            t_list = []
+            for param_key, param_val in custom_parameters.items():
+                t_list.append(ParameterTransform(
+                    parameter=param_key,
+                    operator=TransformOperator.SET,
+                    value=float(param_val) if isinstance(param_val, (int, float)) else 0.0,
+                    unit="custom",
+                    rationale=f"User-specified custom parameter override for {param_key}"
+                ))
+            custom_def = ScenarioDefinition(
+                scenario_id="CUSTOM",
+                name="Custom Scenario Exploration",
+                description="User-defined validated scenario with customizable parameter overrides.",
+                category=ScenarioCategory.CUSTOM,
+                duration_hours=48,
+                transforms=t_list,
+                active_effects=["custom_override"],
+                provenance="SIMULATED",
+                rationale="User-controlled what-if stress exploration."
+            )
+            self.scenario_registry.register(custom_def)
+            scen_def = custom_def
+        else:
+            scen_def = self.scenario_registry.get(sid)
+
         self.active_scenario = sid
         
         sim_ts = self.current_simulation_iso()
@@ -524,6 +555,20 @@ class LiveTwinSession:
         """Clears active scenario perturbation and recalculates baseline twin state."""
         prev = self.active_scenario
         self.active_scenario = None
+
+        if prev == "CUSTOM":
+            from backend.scenarios.schema import ScenarioDefinition, ScenarioCategory
+            self.scenario_registry.register(ScenarioDefinition(
+                scenario_id="CUSTOM",
+                name="Custom Scenario Exploration",
+                description="User-defined validated scenario with customizable parameter overrides.",
+                category=ScenarioCategory.CUSTOM,
+                duration_hours=48,
+                transforms=[],
+                active_effects=["custom_exploration"],
+                provenance="CONFIGURED",
+                rationale="User-controlled what-if stress exploration."
+            ))
 
         # Explicitly restore baseline hardware and logistics capacities
         self.current_twin_state.battery.capacity_kwh = float(self.profile.electrical.battery_capacity_kwh)

@@ -89,7 +89,7 @@
 - **Input:** Solar availability $= 0.0$ (inverter trip).
 - **Expected:** $P_{\text{solar}} = 0.0\text{ kW}$, $P_{\text{solar\_available}} = 0.0\text{ kW}$.
 - **Observed:** $P_{\text{solar}} = 0.00\text{ kW}$, $P_{\text{solar\_available}} = 0.00\text{ kW}$, 2D SLD breaker opens.
-- **Baseline Restoration:** Inverter re-energized; available solar restored to $60.0\text{ kW}$ rated peak.
+- **Baseline Restoration:** Inverter re-energized; available solar restored to $30.0\text{ kW}$ rated peak.
 - **Verdict:** **PASS**
 
 ### 10. `WIND_GENERATION_FAILURE`

@@ -48,7 +48,8 @@ class AutoApproveRequest(BaseModel):
 
 class ScenarioApplyRequest(BaseModel):
     station_id: str = Field(..., description="Target station")
-    scenario_id: str = Field(..., description="Locked scenario ID e.g. BLIZZARD, GEN_FAILURE_BLIZZARD")
+    scenario_id: str = Field(..., description="Locked scenario ID e.g. BLIZZARD, GEN_FAILURE_BLIZZARD, CUSTOM")
+    custom_parameters: Optional[Dict[str, Any]] = Field(default=None, description="Custom parameter overrides for CUSTOM scenario")
 
 
 class ScenarioClearRequest(BaseModel):
@@ -207,7 +208,7 @@ async def apply_live_scenario(
     req_id = getattr(request.state, "request_id", "req-twin-scen-apply") if request else "req-twin-scen-apply"
     session = live_twin_manager.get_session(payload.station_id)
     try:
-        result = session.apply_scenario(payload.scenario_id)
+        result = session.apply_scenario(payload.scenario_id, custom_parameters=payload.custom_parameters)
     except KeyError:
         from backend.api.errors import ScenarioNotFoundException
         raise ScenarioNotFoundException(payload.scenario_id)

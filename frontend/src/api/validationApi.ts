@@ -169,6 +169,9 @@ export interface BenchmarkSuiteSummary {
   reproducibility_rate_pct: number;
   leakage_audit_clean: boolean;
   total_benchmarks_executed: number;
+  load_mae?: number;
+  solar_mae?: number;
+  wind_mae?: number;
 }
 
 export const validationApi = {

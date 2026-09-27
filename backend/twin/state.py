@@ -225,6 +225,8 @@ class TwinState:
     operational: OperationalState
     constraints: List[ConstraintEvaluation] = field(default_factory=list)
     resilience: Optional[ResilienceState] = None
+    curtailment_kw: float = 0.0
+    balance_residual_kw: float = 0.0
     dispatch_policy: str = "BASELINE_SIMULATION_DISPATCH"
     provenance: ProvenanceTier = "SIMULATED"
 

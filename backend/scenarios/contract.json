@@ -1,0 +1,598 @@
+{
+  "NORMAL_BASELINE": {
+    "scenario_id": "NORMAL_BASELINE",
+    "name": "Normal Operational Baseline",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {},
+    "expected_state_changes": [
+      "environment.ambient_temperature_c",
+      "solar.solar_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "ONLINE",
+      "wind": "ONLINE",
+      "diesel": "STANDBY_OR_ONLINE"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false,
+      "load_served_nominal": true
+    },
+    "expected_energy_changes": {
+      "renewable_dominant": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_active": true,
+      "capacity_derated": false
+    },
+    "expected_fuel_changes": {
+      "nominal_burn": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "NORMAL",
+        "ADVISORY"
+      ]
+    },
+    "expected_policy_changes": {
+      "load_shedding_active": false
+    },
+    "expected_visual_changes": {
+      "solar_color": "active",
+      "wind_spinning": true,
+      "diesel_glow": false
+    }
+  },
+  "CLOUDY_CONDITIONS": {
+    "scenario_id": "CLOUDY_CONDITIONS",
+    "name": "Cloudy Weather Conditions",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "cloud_fraction": 1.5,
+      "irradiance_wm2": 0.65
+    },
+    "expected_state_changes": [
+      "environment.cloud_fraction",
+      "environment.irradiance_wm2",
+      "solar.solar_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "ATTENUATED"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "solar_reduction_pct_min": 25.0,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_support_increased": true
+    },
+    "expected_fuel_changes": {
+      "diesel_dispatch_candidate": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "NORMAL",
+        "ADVISORY"
+      ]
+    },
+    "expected_policy_changes": {
+      "load_shedding_active": false
+    },
+    "expected_visual_changes": {
+      "solar_color": "attenuated",
+      "cloud_cover": "elevated"
+    }
+  },
+  "HEAVY_CLOUD_LOW_IRRADIANCE": {
+    "scenario_id": "HEAVY_CLOUD_LOW_IRRADIANCE",
+    "name": "Heavy Cloud & Low Irradiance",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "cloud_fraction": 2.0,
+      "irradiance_wm2": 0.25
+    },
+    "expected_state_changes": [
+      "environment.cloud_fraction",
+      "environment.irradiance_wm2",
+      "solar.solar_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "SUPPRESSED"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "solar_generation_suppressed": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_discharge_increased": true
+    },
+    "expected_fuel_changes": {
+      "diesel_spin_recommended": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "ADVISORY",
+        "WARNING"
+      ]
+    },
+    "expected_policy_changes": {
+      "load_shedding_active": false
+    },
+    "expected_visual_changes": {
+      "solar_color": "dark_gold",
+      "cloud_cover": "dense"
+    }
+  },
+  "HIGH_WIND": {
+    "scenario_id": "HIGH_WIND",
+    "name": "High Wind & Katabatic Gusts",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "wind_speed_ms": 1.4
+    },
+    "expected_state_changes": [
+      "environment.wind_speed_ms",
+      "wind.wind_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "wind": "RAMPED_TO_RATED"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "wind_generation_surge": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_charge_candidate": true
+    },
+    "expected_fuel_changes": {
+      "diesel_curtailed": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "NORMAL",
+        "ADVISORY"
+      ]
+    },
+    "expected_policy_changes": {
+      "curtailment_mode": "ACTIVE_IF_SURPLUS"
+    },
+    "expected_visual_changes": {
+      "wind_particles_fast": true,
+      "turbine_spin_speed": "HIGH"
+    }
+  },
+  "BLIZZARD": {
+    "scenario_id": "BLIZZARD",
+    "name": "Polar Blizzard Storm",
+    "category": "COMPOUND",
+    "direct_inputs": {
+      "ambient_temperature_c": -10.0,
+      "wind_speed_ms": 2.0,
+      "cloud_fraction": 1.0,
+      "irradiance_wm2": 0.0
+    },
+    "expected_state_changes": [
+      "environment.ambient_temperature_c",
+      "environment.wind_speed_ms",
+      "loads.total_load_kw",
+      "diesel.generator_power_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "ZERO",
+      "diesel": "ONLINE",
+      "wind": "GALE_OPERATION"
+    },
+    "expected_load_changes": {
+      "heating_surge_pct_min": 15.0
+    },
+    "expected_energy_changes": {
+      "thermal_load_surge": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_discharge_active": true
+    },
+    "expected_fuel_changes": {
+      "fuel_burn_rate_increased": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "WARNING",
+        "CRITICAL"
+      ]
+    },
+    "expected_policy_changes": {
+      "flexible_shed_candidate": true
+    },
+    "expected_visual_changes": {
+      "snow_particles_dense": true,
+      "station_heating_red": true
+    }
+  },
+  "EXTREME_COLD": {
+    "scenario_id": "EXTREME_COLD",
+    "name": "Extreme Cold Wave",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "ambient_temperature_c": -20.0
+    },
+    "expected_state_changes": [
+      "environment.ambient_temperature_c",
+      "loads.total_load_kw",
+      "thermal.heating_demand_kw"
+    ],
+    "expected_asset_changes": {
+      "diesel": "ONLINE"
+    },
+    "expected_load_changes": {
+      "heating_demand_surge_kw_min": 10.0
+    },
+    "expected_energy_changes": {
+      "thermal_peak": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_cold_derating_active": true
+    },
+    "expected_fuel_changes": {
+      "high_fuel_burn": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "WARNING",
+        "CRITICAL"
+      ]
+    },
+    "expected_policy_changes": {
+      "prioritize_life_support": true
+    },
+    "expected_visual_changes": {
+      "frost_shader_active": true,
+      "thermal_glow_high": true
+    }
+  },
+  "LOW_DAYLIGHT": {
+    "scenario_id": "LOW_DAYLIGHT",
+    "name": "Low Daylight Exposure",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "irradiance_wm2": 0.3,
+      "solar_availability": 0.4
+    },
+    "expected_state_changes": [
+      "environment.irradiance_wm2",
+      "solar.solar_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "LOW_DAYLIGHT_ATTENUATED"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "solar_generation_reduced": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "bess_cycle_active": true
+    },
+    "expected_fuel_changes": {
+      "diesel_spin_standby": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "NORMAL",
+        "ADVISORY"
+      ]
+    },
+    "expected_policy_changes": {
+      "solar_priority_preserved": true
+    },
+    "expected_visual_changes": {
+      "low_sun_haze": true
+    }
+  },
+  "POLAR_NIGHT": {
+    "scenario_id": "POLAR_NIGHT",
+    "name": "Astronomical Polar Night",
+    "category": "ENVIRONMENTAL",
+    "direct_inputs": {
+      "irradiance_wm2": 0.0,
+      "solar_elevation_deg": -5.0
+    },
+    "expected_state_changes": [
+      "environment.irradiance_wm2",
+      "solar.solar_generation_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "ZERO",
+      "diesel": "DISPATCHED_OR_BESS"
+    },
+    "expected_load_changes": {
+      "heating_continuous": true
+    },
+    "expected_energy_changes": {
+      "zero_solar": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "bess_deep_cycling": true
+    },
+    "expected_fuel_changes": {
+      "diesel_sustained_burn": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "ADVISORY",
+        "WARNING"
+      ]
+    },
+    "expected_policy_changes": {
+      "fuel_conservation_mode": true
+    },
+    "expected_visual_changes": {
+      "dark_sky": true,
+      "aurora_active": true,
+      "solar_pv_dormant": true
+    }
+  },
+  "SOLAR_GENERATION_FAILURE": {
+    "scenario_id": "SOLAR_GENERATION_FAILURE",
+    "name": "Solar PV System Trip",
+    "category": "ASSET_FAILURE",
+    "direct_inputs": {
+      "solar_availability": 0.0
+    },
+    "expected_state_changes": [
+      "solar.solar_generation_kw",
+      "solar.solar_available_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "FAULT"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "solar_generation_zero": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_takeover": true
+    },
+    "expected_fuel_changes": {
+      "diesel_backup_spin": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "ADVISORY",
+        "WARNING"
+      ]
+    },
+    "expected_policy_changes": {
+      "alarm_raised": true
+    },
+    "expected_visual_changes": {
+      "solar_array_red_fault": true,
+      "sld_pv_breaker_open": true
+    }
+  },
+  "WIND_GENERATION_FAILURE": {
+    "scenario_id": "WIND_GENERATION_FAILURE",
+    "name": "Wind Turbine Mechanical Trip",
+    "category": "ASSET_FAILURE",
+    "direct_inputs": {
+      "wind_availability": 0.0
+    },
+    "expected_state_changes": [
+      "wind.wind_generation_kw",
+      "wind.wind_available_kw"
+    ],
+    "expected_asset_changes": {
+      "wind": "FAULT"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "wind_generation_zero": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "battery_support_active": true
+    },
+    "expected_fuel_changes": {
+      "diesel_start_triggered": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "ADVISORY",
+        "WARNING"
+      ]
+    },
+    "expected_policy_changes": {
+      "reserve_defended": true
+    },
+    "expected_visual_changes": {
+      "turbine_stopped": true,
+      "sld_wind_breaker_open": true
+    }
+  },
+  "BATTERY_DEGRADATION": {
+    "scenario_id": "BATTERY_DEGRADATION",
+    "name": "Battery Capacity Degradation",
+    "category": "ASSET_FAILURE",
+    "direct_inputs": {
+      "battery_capacity": 0.65
+    },
+    "expected_state_changes": [
+      "battery.capacity_kwh",
+      "battery.usable_capacity_kwh"
+    ],
+    "expected_asset_changes": {
+      "battery": "DERATED_65_PCT"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "capacity_derated_to_65_pct": true
+    },
+    "expected_fuel_changes": {
+      "diesel_runtime_extended": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "ADVISORY",
+        "WARNING"
+      ]
+    },
+    "expected_policy_changes": {
+      "bess_buffer_constrained": true
+    },
+    "expected_visual_changes": {
+      "bess_container_warning": true
+    }
+  },
+  "FUEL_RESUPPLY_DELAY": {
+    "scenario_id": "FUEL_RESUPPLY_DELAY",
+    "name": "Fuel Resupply Delay (7 Days)",
+    "category": "LOGISTICS",
+    "direct_inputs": {
+      "fuel_resupply_delay_hours": 168.0
+    },
+    "expected_state_changes": [
+      "resupply.resupply_window_days"
+    ],
+    "expected_asset_changes": {
+      "resupply": "WINDOW_EXTENDED_7D"
+    },
+    "expected_load_changes": {
+      "thermal_surge": false
+    },
+    "expected_energy_changes": {
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "preserve_soc": true
+    },
+    "expected_fuel_changes": {
+      "autonomy_margin_compressed": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "WARNING",
+        "CRITICAL"
+      ]
+    },
+    "expected_policy_changes": {
+      "fuel_conservation_mode_mandatory": true
+    },
+    "expected_visual_changes": {
+      "resupply_calendar_red_shift": true
+    }
+  },
+  "COMBINED_POLAR_STRESS": {
+    "scenario_id": "COMBINED_POLAR_STRESS",
+    "name": "Combined Polar Stress Disaster",
+    "category": "COMPOUND",
+    "direct_inputs": {
+      "ambient_temperature_c": -15.0,
+      "wind_speed_ms": 30.0,
+      "cloud_fraction": 1.0,
+      "irradiance_wm2": 0.0,
+      "solar_availability": 0.0,
+      "fuel_resupply_delay_hours": 168.0
+    },
+    "expected_state_changes": [
+      "environment.ambient_temperature_c",
+      "solar.solar_generation_kw",
+      "wind.wind_generation_kw",
+      "loads.total_load_kw",
+      "diesel.generator_power_kw"
+    ],
+    "expected_asset_changes": {
+      "solar": "ZERO",
+      "wind": "STORM_CUTOUT",
+      "diesel": "ONLINE_EMERGENCY"
+    },
+    "expected_load_changes": {
+      "thermal_surge_high": true
+    },
+    "expected_energy_changes": {
+      "renewables_zero": true,
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "deep_discharge": true
+    },
+    "expected_fuel_changes": {
+      "rapid_depletion_risk": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "CRITICAL"
+      ]
+    },
+    "expected_policy_changes": {
+      "p1_p8_shed_flexible_mandatory": true
+    },
+    "expected_visual_changes": {
+      "extreme_storm_whiteout": true,
+      "station_emergency_flashing": true
+    }
+  },
+  "CUSTOM": {
+    "scenario_id": "CUSTOM",
+    "name": "Custom Scenario Exploration",
+    "category": "CUSTOM",
+    "direct_inputs": {
+      "ambient_temperature_c": -30.0,
+      "wind_speed_ms": 22.0
+    },
+    "expected_state_changes": [
+      "environment.ambient_temperature_c",
+      "environment.wind_speed_ms",
+      "loads.total_load_kw"
+    ],
+    "expected_asset_changes": {
+      "custom_override": true
+    },
+    "expected_load_changes": {
+      "heating_load_increased": true
+    },
+    "expected_energy_changes": {
+      "power_balance_residual_max": 0.05
+    },
+    "expected_storage_changes": {
+      "custom_dispatch": true
+    },
+    "expected_fuel_changes": {
+      "fuel_burn_responsive": true
+    },
+    "expected_resilience_changes": {
+      "threat_state": [
+        "WARNING",
+        "CRITICAL"
+      ]
+    },
+    "expected_policy_changes": {
+      "custom_policy_applied": true
+    },
+    "expected_visual_changes": {
+      "custom_parameters_reflected": true
+    }
+  }
+}

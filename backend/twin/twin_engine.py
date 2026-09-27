@@ -432,6 +432,8 @@ class TwinEngine:
             fuel=fuel_state,
             resupply=current_state.resupply,
             operational=current_state.operational,
+            curtailment_kw=round(dispatch.curtailment_kw, 2),
+            balance_residual_kw=round(dispatch.balance_error_kw, 6),
             dispatch_policy="BASELINE_SIMULATION_DISPATCH",
             provenance="SIMULATED"
         )
