@@ -58,7 +58,7 @@ export const TwinInspector: React.FC<TwinInspectorProps> = ({
       title: `${device.name} Telemetry & Dispatch Evidence`,
       value: `${device.currentPowerKw} kW (${device.currentAmps !== null ? device.currentAmps + ' A' : '—'})`,
       unit: 'kW',
-      source: 'Digital Twin Replay (Phase 4 Authority)',
+      source: 'Digital Twin Replay Engine (Authoritative)',
       provenance: device.provenance,
       timestamp: new Date().toISOString(),
       station: 'BHARATI',

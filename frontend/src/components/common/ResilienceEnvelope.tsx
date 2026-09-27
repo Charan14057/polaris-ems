@@ -112,7 +112,7 @@ export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
             inspectEvidence({
               title: 'Resilience Binding Constraint',
               value: '84.0 hours (Fuel Bound)',
-              source: 'Polaris Resilience State Machine (Phase 7)',
+              source: 'Polaris Resilience State Machine',
               provenance: 'SIMULATED',
               station: stationId,
               modelOrSubsystem: 'Multi-Horizon Survival Calculus',

@@ -2,9 +2,9 @@
  * POLARIS-EMS — 3D Spatial Digital Twin Canvas
  * Phase 18: Operational 3D Digital Twin Engine
  * 
- * High-performance, lightweight WebGL / Three.js 3D spatial microgrid visualizer.
- * Renders representative polar station geometry (Bharati, Maitri, Himadri),
- * directional 3D power flow streams, equipment models, and circuit lineage.
+ * High-performance, photorealistic WebGL / Three.js 3D spatial microgrid visualizer.
+ * Renders reference-aligned polar station architecture (Bharati, Maitri, Himadri),
+ * directional 3D power flow conduits, equipment models, and circuit lineage.
  * 
  * STRICT EPISTEMIC CLASSIFICATION:
  * GEOMETRY BASIS: CONFIGURED / REPRESENTATIVE
@@ -24,7 +24,9 @@ import {
   Info, 
   Compass,
   Box,
-  Activity
+  Activity,
+  Sliders,
+  Focus
 } from 'lucide-react';
 import { TwinViewModel, TwinDeviceFilter } from '../model/twinTypes';
 import { 
@@ -33,6 +35,12 @@ import {
   SpatialObject3D, 
   PowerFlowPath3D 
 } from '../model/spatialProfiles3D';
+import { 
+  buildBharatiStation, 
+  buildMaitriStation, 
+  buildHimadriStation 
+} from '../model/stationMeshBuilders';
+import { ReferenceComparisonModal } from './ReferenceComparisonModal';
 
 interface TwinCanvas3DProps {
   viewModel: TwinViewModel;
@@ -71,57 +79,8 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   const [cameraMode, setCameraMode] = useState<'ISOMETRIC' | 'TOP' | 'FRONT'>('ISOMETRIC');
   const [wireframeOnly, setWireframeOnly] = useState<boolean>(false);
   const [webGlAvailable, setWebGlAvailable] = useState<boolean>(true);
-  const [showReferenceComparison, setShowReferenceComparison] = useState<boolean>(false);
-
-  // Authoritative real-world station reference specifications
-  const refData = {
-    BHARATI: {
-      title: 'Bharati Antarctic Station (Real Reference)',
-      location: 'Larsemann Hills, East Antarctica (69°24′S, 76°11′E)',
-      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
-      spec: 'Elevated aerodynamic structure on 24 heavy-duty stilts to prevent snow drift accumulation.',
-      decks: [
-        'Deck 0 / Ground: Seawater intake & fuel storage farm base context',
-        'Deck 1 (Engineering): Generator bays, BESS battery bank, HVAC and water utilities',
-        'Deck 2 (Habitation): Living modules, galley, operations & communications bridge',
-        'Deck 3 (Observation): Core atmospheric and environmental science laboratories'
-      ],
-      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
-    },
-    MAITRI: {
-      title: 'Maitri Antarctic Station (Real Reference)',
-      location: 'Schirmacher Oasis, Queen Maud Land (70°46′S, 11°44′E)',
-      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
-      spec: 'Central enclosed heated corridor spine connecting modular living, utility, and laboratory blocks.',
-      decks: [
-        'Central Spine: Heated transit and electrical distribution corridor connecting modules',
-        'Main Block: Habitation quarters, medical ward, communications center',
-        'Power House: Tri-diesel generators and central thermal boilers',
-        'Water Pump House: Lake Priyadarshini water pipeline intake and pump station'
-      ],
-      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
-    },
-    HIMADRI: {
-      title: 'Himadri Arctic Station (Real Reference)',
-      location: 'Ny-Ålesund, Spitsbergen, Svalbard (78°55′N, 11°56′E)',
-      basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
-      spec: 'Two-storey insulated timber Nordic research station with ground wet labs and upper living quarters.',
-      decks: [
-        'Ground Floor: Scientific laboratories, sample freezers, operational prep bay',
-        'Upper Floor: Scientist residential suites, computing desks, communications room',
-        'Settlement Link: 400V grid interconnection with Ny-Ålesund central utility hub',
-        'Roof Array: Atmospheric sampling masts and satellite communications link'
-      ],
-      disclaimer: 'Representative spatial reconstruction. Live computational state from Phase 4 TwinEngine is projected onto the 3D model.'
-    }
-  }[viewModel.stationId.toUpperCase()] || {
-    title: 'Polar Station Reference',
-    location: 'Polar Research Station',
-    basis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
-    spec: 'Standard Polar Research Microgrid Enclosure',
-    decks: ['Lower Engineering', 'Upper Habitation'],
-    disclaimer: 'Representative spatial reconstruction.'
-  };
+  const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
+  const [twinSnapshotUrl, setTwinSnapshotUrl] = useState<string | null>(null);
 
   // Active 3D profile for the current station
   const stationProfile3D: StationSpatial3DProfile = 
@@ -133,20 +92,26 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const meshesRef = useRef<Map<string, THREE.Object3D>>(new Map());
-  const flowLinesRef = useRef<THREE.Line[]>([]);
-  const flowParticlesRef = useRef<{ line: THREE.Line; points: THREE.Vector3[]; progress: number; speed: number; mesh: THREE.Mesh }[]>([]);
-  const turbinesRef = useRef<THREE.Group[]>([]);
+  const flowLinesRef = useRef<THREE.Object3D[]>([]);
+  const flowParticlesRef = useRef<{ 
+    line: THREE.Object3D; 
+    points: THREE.Vector3[]; 
+    progress: number; 
+    speed: number; 
+    mesh: THREE.Mesh 
+  }[]>([]);
+  const turbinesRef = useRef<{ rotorGroup: THREE.Group; speedMultiplier: number }[]>([]);
   const animFrameIdRef = useRef<number | null>(null);
 
-  // Mouse interaction state
+  // Mouse orbit & camera position state
   const isDraggingRef = useRef<boolean>(false);
   const previousMousePositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const cameraSphericalRef = useRef<{ radius: number; theta: number; phi: number }>({
-    radius: 48,
+    radius: 54,
     theta: Math.PI / 4,
-    phi: Math.PI / 3
+    phi: Math.PI / 3.2
   });
-  const cameraTargetRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 4, 0));
+  const cameraTargetRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 4.5, 0));
 
   // Initialize Three.js Scene
   useEffect(() => {
@@ -160,8 +125,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
       // 1. Scene
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf8fafc); // Slate-50 background
-      scene.fog = new THREE.FogExp2(0xf8fafc, 0.008);
+      // Realistic Polar Atmosphere (Slate-900 high-latitude twilight or daylight)
+      scene.background = new THREE.Color(0x0a0f1d); // Deep calm arctic navy/slate
+      scene.fog = new THREE.FogExp2(0x0a0f1d, 0.007);
       sceneRef.current = scene;
 
       // 2. Camera
@@ -169,11 +135,12 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       cameraRef.current = camera;
       updateCameraPosition();
 
-      // 3. Renderer
+      // 3. Renderer with soft PCF shadows and preserved drawing buffer for reference comparison
       const renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: true,
         alpha: false,
+        preserveDrawingBuffer: true,
         powerPreference: 'high-performance'
       });
       renderer.setSize(width, height);
@@ -182,42 +149,34 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       rendererRef.current = renderer;
 
-      // 4. Lighting (Clean Industrial Control Room Daylight)
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      // 4. Lighting: Product-grade Polar Daylight with Natural Fill
+      // Soft ambient light simulating polar diffuse sky reflection
+      const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.65);
       scene.add(ambientLight);
 
-      const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.1);
-      sunLight.position.set(30, 60, 40);
+      // Warm low-angle Antarctic sunlight
+      const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.35);
+      sunLight.position.set(38, 55, 30);
       sunLight.castShadow = true;
-      sunLight.shadow.mapSize.width = 1024;
-      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
       sunLight.shadow.camera.near = 10;
-      sunLight.shadow.camera.far = 150;
-      sunLight.shadow.camera.left = -40;
-      sunLight.shadow.camera.right = 40;
-      sunLight.shadow.camera.top = 40;
-      sunLight.shadow.camera.bottom = -40;
+      sunLight.shadow.camera.far = 160;
+      sunLight.shadow.camera.left = -50;
+      sunLight.shadow.camera.right = 50;
+      sunLight.shadow.camera.top = 50;
+      sunLight.shadow.camera.bottom = -50;
+      sunLight.shadow.bias = -0.0005;
       scene.add(sunLight);
 
-      const fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.4);
-      fillLight.position.set(-30, 20, -30);
+      // Cool glacial blue fill light
+      const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
+      fillLight.position.set(-35, 25, -35);
       scene.add(fillLight);
 
-      // 5. Polar Ground Plane & Grid
-      const groundGeo = new THREE.PlaneGeometry(160, 160);
-      const groundMat = new THREE.MeshLambertMaterial({ 
-        color: new THREE.Color(stationProfile3D.groundColor),
-        side: THREE.DoubleSide 
-      });
-      const ground = new THREE.Mesh(groundGeo, groundMat);
-      ground.rotation.x = -Math.PI / 2;
-      ground.position.y = -0.05;
-      ground.receiveShadow = true;
-      scene.add(ground);
-
-      const gridHelper = new THREE.GridHelper(120, 60, 0x94a3b8, 0xe2e8f0);
-      gridHelper.position.y = 0.01;
-      scene.add(gridHelper);
+      // Subtle upward ground bounce light
+      const groundBounce = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.5);
+      scene.add(groundBounce);
 
       // Handle Resize
       const handleResize = () => {
@@ -240,10 +199,10 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         renderer.dispose();
       };
     } catch (e) {
-      console.warn('WebGL init advisory:', e);
+      console.warn('WebGL initialization advisory:', e);
       setWebGlAvailable(false);
     }
-  }, [stationProfile3D.groundColor]);
+  }, [stationProfile3D.stationId]);
 
   // Update Camera Matrix from Spherical coordinates
   const updateCameraPosition = useCallback(() => {
@@ -259,7 +218,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     cameraRef.current.lookAt(target);
   }, []);
 
-  // Build / Rebuild 3D Meshes for Station Decks, Devices, and Flow Lines
+  // Build / Rebuild 3D Meshes for Station Architecture, Devices, and Power Flow
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -275,73 +234,32 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     flowParticlesRef.current.forEach(p => scene.remove(p.mesh));
     flowParticlesRef.current = [];
 
-    // 1. Render Station Decks (Architectural Volumes)
-    stationProfile3D.decks.forEach(deck => {
-      const b = deck.bounds;
-      const width = b.maxX - b.minX;
-      const depth = b.maxZ - b.minZ;
-      const height = 0.4;
-      const centerX = (b.minX + b.maxX) / 2;
-      const centerZ = (b.minZ + b.maxZ) / 2;
+    // 1. Render Reference-Aligned Procedural Station Architecture & Terrain
+    const stationId = viewModel.stationId.toUpperCase();
+    let stationResult;
 
-      // In ARCHITECTURE layer, decks are more prominent; in ENERGY/IMPACT they are subtle backdrops
-      const deckOpacity = activeLayer === 'ARCHITECTURE' 
-        ? Math.min(0.85, deck.opacity * 1.5) 
-        : deck.opacity * 0.7;
+    if (stationId === 'MAITRI') {
+      stationResult = buildMaitriStation(activeLayer, wireframeOnly);
+    } else if (stationId === 'HIMADRI') {
+      stationResult = buildHimadriStation(activeLayer, wireframeOnly);
+    } else {
+      stationResult = buildBharatiStation(activeLayer, wireframeOnly);
+    }
 
-      // Deck Slab
-      const slabGeo = new THREE.BoxGeometry(width, height, depth);
-      const slabMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(deck.color),
-        transparent: true,
-        opacity: deckOpacity,
-        roughness: 0.6,
-        wireframe: wireframeOnly
-      });
-      const slabMesh = new THREE.Mesh(slabGeo, slabMat);
-      slabMesh.position.set(centerX, deck.elevation + height / 2, centerZ);
-      slabMesh.receiveShadow = true;
-      scene.add(slabMesh);
-      meshesRef.current.set(`deck_${deck.id}`, slabMesh);
+    scene.add(stationResult.terrainMesh);
+    meshesRef.current.set('station_terrain', stationResult.terrainMesh);
 
-      // Deck Perimeter Edges (Outline)
-      const edgeGeo = new THREE.EdgesGeometry(slabGeo);
-      const edgeMat = new THREE.LineBasicMaterial({ 
-        color: activeLayer === 'ARCHITECTURE' ? 0x64748b : 0x94a3b8, 
-        linewidth: 1 
-      });
-      const edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
-      edgeLine.position.copy(slabMesh.position);
-      scene.add(edgeLine);
-      meshesRef.current.set(`deck_edges_${deck.id}`, edgeLine);
+    scene.add(stationResult.architectureGroup);
+    meshesRef.current.set('station_architecture', stationResult.architectureGroup);
 
-      // If elevated deck (Bharati stilts), render structural steel pilings
-      if (deck.elevation > 1.0 && stationProfile3D.stationId === 'BHARATI') {
-        const pillarGeo = new THREE.CylinderGeometry(0.35, 0.35, deck.elevation, 8);
-        const pillarMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.6, roughness: 0.4 });
+    turbinesRef.current = stationResult.turbines;
 
-        const pillarPositions = [
-          [b.minX + 2, b.minZ + 2],
-          [b.maxX - 2, b.minZ + 2],
-          [b.minX + 2, b.maxZ - 2],
-          [b.maxX - 2, b.maxZ - 2],
-          [centerX, b.minZ + 2],
-          [centerX, b.maxZ - 2],
-          [b.minX + 2, centerZ],
-          [b.maxX - 2, centerZ]
-        ];
-
-        pillarPositions.forEach(([px, pz], idx) => {
-          const pillar = new THREE.Mesh(pillarGeo, pillarMat);
-          pillar.position.set(px, deck.elevation / 2, pz);
-          pillar.castShadow = true;
-          scene.add(pillar);
-          meshesRef.current.set(`pillar_${deck.id}_${idx}`, pillar);
-        });
-      }
+    // Register interactive equipment meshes
+    stationResult.interactiveMeshes.forEach((mesh, devId) => {
+      meshesRef.current.set(`interactive_${devId}`, mesh);
     });
 
-    // 2. Render Station Equipment & Spatial Objects
+    // 2. Render Station Equipment & Spatial Objects from Spatial Profile
     stationProfile3D.objects.forEach(obj => {
       // Filter out if category is filtered
       if (activeFilter === 'CRITICAL' && obj.importance !== 'CRITICAL') return;
@@ -357,55 +275,11 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       if (obj.status === 'STANDBY') hexColor = 0x94a3b8;
 
       const isSelected = selectedDeviceId && (obj.deviceId === selectedDeviceId || obj.id === selectedDeviceId);
-      
-      // Determine if object is part of active trace
       const isTraceActive = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
       const isRelatedToSelection = isSelected || (selectedDeviceId && obj.circuitId && obj.circuitId.includes(selectedDeviceId));
       const objectOpacity = (isTraceActive && !isRelatedToSelection && selectedDeviceId) ? 0.25 : 1.0;
 
-      if (obj.meshType === 'turbine') {
-        // Wind Turbine: Mast + Nacelle + 3-Blade Rotor
-        const mastGeo = new THREE.CylinderGeometry(0.3, 0.5, obj.dimensions[1], 12);
-        const mastMat = new THREE.MeshStandardMaterial({ 
-          color: 0xe2e8f0, 
-          roughness: 0.3,
-          transparent: objectOpacity < 1.0,
-          opacity: objectOpacity
-        });
-        const mast = new THREE.Mesh(mastGeo, mastMat);
-        mast.position.y = 0;
-        mast.castShadow = true;
-        group.add(mast);
-
-        // Nacelle
-        const nacelleGeo = new THREE.BoxGeometry(1.2, 0.8, 2.0);
-        const nacelle = new THREE.Mesh(nacelleGeo, mastMat);
-        nacelle.position.set(0, obj.dimensions[1] / 2, 0);
-        group.add(nacelle);
-
-        // Rotor Blades Group (Animated in RAF)
-        const rotorGroup = new THREE.Group();
-        rotorGroup.position.set(0, obj.dimensions[1] / 2, 1.1);
-
-        const bladeGeo = new THREE.BoxGeometry(0.2, 3.8, 0.08);
-        const bladeMat = new THREE.MeshStandardMaterial({ 
-          color: 0x38bdf8,
-          transparent: objectOpacity < 1.0,
-          opacity: objectOpacity
-        });
-
-        for (let i = 0; i < 3; i++) {
-          const blade = new THREE.Mesh(bladeGeo, bladeMat);
-          blade.rotation.z = (i * Math.PI * 2) / 3;
-          blade.position.y = 1.6 * Math.cos((i * Math.PI * 2) / 3);
-          blade.position.x = 1.6 * Math.sin((i * Math.PI * 2) / 3);
-          rotorGroup.add(blade);
-        }
-        group.add(rotorGroup);
-        turbinesRef.current.push(rotorGroup);
-
-      } else if (obj.meshType === 'cylinder') {
-        // Tank / Radome / Cylinder
+      if (obj.meshType === 'cylinder') {
         const geo = new THREE.CylinderGeometry(obj.dimensions[0] / 2, obj.dimensions[0] / 2, obj.dimensions[1], 16);
         const mat = new THREE.MeshStandardMaterial({
           color: hexColor,
@@ -418,16 +292,15 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         group.add(mesh);
-
-      } else {
-        // Box / Architectural Module / Panel / Generator
+      } else if (obj.meshType !== 'turbine') {
+        // Equipment Box / Control Panel / Bus
         const geo = new THREE.BoxGeometry(obj.dimensions[0], obj.dimensions[1], obj.dimensions[2]);
         const mat = new THREE.MeshStandardMaterial({
           color: hexColor,
           roughness: 0.5,
           wireframe: wireframeOnly,
-          emissive: isSelected ? new THREE.Color(0x0284c7) : new THREE.Color(0x000000),
-          emissiveIntensity: isSelected ? 0.35 : 0.0,
+          emissive: isSelected ? new THREE.Color(0x38bdf8) : new THREE.Color(0x000000),
+          emissiveIntensity: isSelected ? 0.45 : 0.0,
           transparent: objectOpacity < 1.0,
           opacity: objectOpacity
         });
@@ -439,7 +312,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         // Edges
         const edgeGeo = new THREE.EdgesGeometry(geo);
         const edgeMat = new THREE.LineBasicMaterial({
-          color: isSelected ? 0x0284c7 : 0x475569,
+          color: isSelected ? 0x38bdf8 : 0x475569,
           linewidth: isSelected ? 2 : 1,
           transparent: objectOpacity < 1.0,
           opacity: objectOpacity
@@ -468,11 +341,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
       const vPoints = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
       const curve = new THREE.CatmullRomCurve3(vPoints);
-      const points = curve.getPoints(50);
-      const geo = new THREE.BufferGeometry().setFromPoints(points);
 
-      // Determine power flow color based on circuit
-      let lineColor = 0x0284c7; // Default sky-600
+      // Determine power flow color and dynamic state based on circuit telemetry
+      let lineColor = 0x38bdf8; // Sky blue
       let activeFlow = path.defaultActive;
       let powerKw = path.nominalKw;
 
@@ -481,7 +352,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         activeFlow = viewModel.powerSummary.solarGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.solarGenerationKw;
       } else if (path.circuitId.includes('wind')) {
-        lineColor = 0x0284c7; // Blue
+        lineColor = 0x0284c7; // Deep blue
         activeFlow = viewModel.powerSummary.windGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.windGenerationKw;
       } else if (path.circuitId.includes('diesel')) {
@@ -489,46 +360,56 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         activeFlow = viewModel.powerSummary.dieselGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.dieselGenerationKw;
       } else if (path.circuitId.includes('bess')) {
-        lineColor = 0x059669; // Emerald
+        lineColor = 0x10b981; // Emerald
         activeFlow = Math.abs(viewModel.powerSummary.batteryPowerKw) > 0.1;
         powerKw = Math.abs(viewModel.powerSummary.batteryPowerKw);
       }
 
-      // Dim unrelated circuits during Trace Power / Trace Impact or Impact layer
       const isTraceMode = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
       const isRelevantCircuit = !selectedDeviceId || path.circuitId.includes(selectedDeviceId) || path.fromId.includes(selectedDeviceId) || path.toId.includes(selectedDeviceId);
       
-      let pathOpacity = activeFlow ? 0.85 : 0.2;
+      let pathOpacity = activeFlow ? 0.85 : 0.15;
       if (activeLayer === 'ARCHITECTURE') {
-        pathOpacity = activeFlow ? 0.35 : 0.08;
+        pathOpacity = activeFlow ? 0.35 : 0.05;
       } else if (isTraceMode) {
-        pathOpacity = isRelevantCircuit ? (activeFlow ? 0.95 : 0.4) : 0.08;
+        pathOpacity = isRelevantCircuit ? (activeFlow ? 0.95 : 0.4) : 0.06;
       }
 
-      const mat = new THREE.LineBasicMaterial({
-        color: activeFlow ? lineColor : 0x94a3b8,
+      // 3D Tube for Power Conduits
+      const tubeRadius = Math.max(0.08, Math.min(0.24, 0.08 + (powerKw / 250) * 0.16));
+      const tubeGeo = new THREE.TubeGeometry(curve, 32, tubeRadius, 8, false);
+      const tubeMat = new THREE.MeshStandardMaterial({
+        color: activeFlow ? lineColor : 0x475569,
+        emissive: activeFlow ? new THREE.Color(lineColor) : new THREE.Color(0x000000),
+        emissiveIntensity: activeFlow ? 0.6 : 0.0,
+        roughness: 0.3,
+        metalness: 0.5,
         transparent: true,
-        opacity: pathOpacity,
-        linewidth: Math.max(1, Math.min(4, Math.round(powerKw / 10)))
+        opacity: pathOpacity
       });
 
-      const line = new THREE.Line(geo, mat);
-      scene.add(line);
-      flowLinesRef.current.push(line);
+      const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+      scene.add(tubeMesh);
+      flowLinesRef.current.push(tubeMesh);
 
-      // Active energy stream particle marker along flow path (only if activeFlow and not dimmed away)
+      // Active energy stream pulse particles along conduit
       if (activeFlow && (!isTraceMode || isRelevantCircuit)) {
-        const particleGeo = new THREE.SphereGeometry(activeLayer === 'ENERGY' ? 0.3 : 0.22, 8, 8);
+        const points = curve.getPoints(50);
+        const particleGeo = new THREE.SphereGeometry(activeLayer === 'ENERGY' ? 0.32 : 0.22, 8, 8);
         const particleMat = new THREE.MeshBasicMaterial({ color: lineColor });
         const particle = new THREE.Mesh(particleGeo, particleMat);
         particle.position.copy(points[0]);
         scene.add(particle);
 
+        // Direction: If battery is charging, reverse particle flow direction!
+        const isBessCharging = path.circuitId.includes('bess') && viewModel.powerSummary.batteryPowerKw < -0.1;
+        const speed = (0.008 + Math.min(0.02, powerKw / 800)) * (isBessCharging ? -1 : 1);
+
         flowParticlesRef.current.push({
-          line,
+          line: tubeMesh,
           points,
           progress: Math.random(),
-          speed: 0.006 + Math.min(0.015, powerKw / 1000),
+          speed,
           mesh: particle
         });
       }
@@ -548,7 +429,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     viewModel.powerSummary.batteryPowerKw
   ]);
 
-  // Animation Loop (Rotors, Energy Flow Particles, Camera Smoothing)
+  // Animation Loop (Rotors, Dynamic Energy Particles, Render Loop)
   useEffect(() => {
     const scene = sceneRef.current;
     const renderer = rendererRef.current;
@@ -556,17 +437,19 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     if (!scene || !renderer || !camera) return;
 
     const animate = () => {
-      // 1. Animate Wind Turbine Rotors (RPM scales with wind generation)
+      // 1. Animate Wind Turbine Rotors (Rotational speed scales with wind generation kW)
       const windActive = viewModel.powerSummary.windGenerationKw > 0.1;
-      const rotorSpeed = windActive ? 0.045 : 0.005;
-      turbinesRef.current.forEach(rotor => {
-        rotor.rotation.z += rotorSpeed;
+      const baseRotorSpeed = windActive ? 0.045 : 0.004;
+
+      turbinesRef.current.forEach(t => {
+        t.rotorGroup.rotation.z += baseRotorSpeed * t.speedMultiplier;
       });
 
       // 2. Animate Power Flow Particles along Circuit Lines
       flowParticlesRef.current.forEach(p => {
         p.progress += p.speed;
         if (p.progress >= 1.0) p.progress = 0.0;
+        if (p.progress < 0.0) p.progress = 1.0;
 
         const idx = Math.floor(p.progress * (p.points.length - 1));
         const nextIdx = Math.min(idx + 1, p.points.length - 1);
@@ -618,7 +501,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         );
       } else if (e.buttons === 2 || e.shiftKey) {
         // Right button or Shift+Left: Pan Target
-        const panSpeed = 0.05;
+        const panSpeed = 0.06;
         cameraTargetRef.current.x -= deltaX * panSpeed;
         cameraTargetRef.current.z += deltaY * panSpeed;
       }
@@ -641,7 +524,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
       if (intersects.length > 0) {
         let parent = intersects[0].object;
-        while (parent && !parent.userData?.spatialObject && parent.parent) {
+        while (parent && !parent.userData?.spatialObject && !parent.userData?.deviceId && parent.parent) {
           parent = parent.parent;
         }
 
@@ -649,6 +532,14 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           setHoveredObject(parent.userData.spatialObject);
           canvas.style.cursor = 'pointer';
           return;
+        } else if (parent?.userData?.deviceId) {
+          // Find matching spatial object
+          const found = stationProfile3D.objects.find(o => o.deviceId === parent?.userData?.deviceId);
+          if (found) {
+            setHoveredObject(found);
+            canvas.style.cursor = 'pointer';
+            return;
+          }
         }
       }
       setHoveredObject(null);
@@ -662,15 +553,15 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    const zoomFactor = e.deltaY * 0.03;
+    const zoomFactor = e.deltaY * 0.035;
     cameraSphericalRef.current.radius = Math.max(
-      12,
-      Math.min(100, cameraSphericalRef.current.radius + zoomFactor)
+      14,
+      Math.min(110, cameraSphericalRef.current.radius + zoomFactor)
     );
     updateCameraPosition();
   };
 
-  // Click to Select Device
+  // Click to Select Device & Focus Camera
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     const camera = cameraRef.current;
@@ -690,7 +581,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
     if (intersects.length > 0) {
       let parent = intersects[0].object;
-      while (parent && !parent.userData?.spatialObject && parent.parent) {
+      while (parent && !parent.userData?.spatialObject && !parent.userData?.deviceId && parent.parent) {
         parent = parent.parent;
       }
 
@@ -700,35 +591,70 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           onSelectDevice(obj.deviceId || obj.id);
           if (onSelectNode) onSelectNode(obj.id);
         }
+      } else if (parent?.userData?.deviceId) {
+        onSelectDevice(parent.userData.deviceId);
       }
     }
   };
 
-  // View Presets
+  // Camera Presets
   const setCameraPreset = (preset: 'ISOMETRIC' | 'TOP' | 'FRONT') => {
     setCameraMode(preset);
-    cameraTargetRef.current.set(0, 4, 0);
+    cameraTargetRef.current.set(0, 4.5, 0);
 
     if (preset === 'ISOMETRIC') {
-      cameraSphericalRef.current = { radius: 48, theta: Math.PI / 4, phi: Math.PI / 3 };
+      cameraSphericalRef.current = { radius: 54, theta: Math.PI / 4, phi: Math.PI / 3.2 };
     } else if (preset === 'TOP') {
-      cameraSphericalRef.current = { radius: 52, theta: 0, phi: 0.1 };
+      cameraSphericalRef.current = { radius: 58, theta: 0, phi: 0.1 };
     } else if (preset === 'FRONT') {
-      cameraSphericalRef.current = { radius: 45, theta: 0, phi: Math.PI / 2 - 0.1 };
+      cameraSphericalRef.current = { radius: 48, theta: 0, phi: Math.PI / 2 - 0.1 };
     }
     updateCameraPosition();
+  };
+
+  // Focus on Selected Asset
+  const focusSelection = () => {
+    if (!selectedDeviceId) return;
+    const selectedObj = stationProfile3D.objects.find(
+      o => o.deviceId === selectedDeviceId || o.id === selectedDeviceId
+    );
+    if (selectedObj) {
+      cameraTargetRef.current.set(
+        selectedObj.position[0],
+        selectedObj.position[1],
+        selectedObj.position[2]
+      );
+      cameraSphericalRef.current.radius = 24;
+      cameraSphericalRef.current.phi = Math.PI / 3.5;
+      updateCameraPosition();
+    }
   };
 
   const resetView = () => {
     setCameraPreset('ISOMETRIC');
   };
 
+  // Open Reference Comparison Modal and snapshot current 3D frame
+  const handleOpenReferenceModal = () => {
+    if (canvasRef.current) {
+      try {
+        const dataUrl = canvasRef.current.toDataURL('image/png');
+        setTwinSnapshotUrl(dataUrl);
+      } catch {
+        setTwinSnapshotUrl(null);
+      }
+    }
+    setShowReferenceModal(true);
+  };
+
   if (!webGlAvailable) {
     return (
-      <div className="bg-slate-100 rounded-lg p-8 border border-slate-200 text-center text-slate-600">
-        <ShieldAlert className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+      <div className="bg-slate-900 rounded-lg p-8 border border-slate-800 text-center text-slate-300">
+        <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto mb-2" />
         <p className="font-semibold text-sm">WebGL Acceleration Unavailable</p>
-        <p className="text-xs text-slate-500 mt-1">Please use the 2D Architectural schematic or Accessible Table view.</p>
+        <p className="text-xs text-slate-400 mt-1">
+          Please use the 2D Architectural schematic or Accessible Table view.
+        </p>
       </div>
     );
   }
@@ -736,7 +662,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full h-[640px] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden select-none shadow-xs"
+      className="relative w-full h-[640px] bg-slate-950 rounded-lg border border-slate-800 overflow-hidden select-none shadow-2xl"
     >
       {/* Three.js Canvas */}
       <canvas
@@ -750,32 +676,32 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         className="w-full h-full block cursor-grab active:cursor-grabbing"
       />
 
-      {/* Top Left: Station & Representative Model Disclaimer */}
+      {/* Top Left: Station & Architectural Specification Tag */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5 font-mono text-[10px] pointer-events-none">
-        <div className="flex items-center space-x-2 bg-white/95 px-3 py-1.5 rounded-md border border-slate-200 shadow-xs pointer-events-auto">
-          <Compass className="w-3.5 h-3.5 text-sky-600" />
-          <span className="font-bold text-slate-900 uppercase">
+        <div className="flex items-center space-x-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-md border border-slate-700/80 shadow-md pointer-events-auto">
+          <Compass className="w-3.5 h-3.5 text-sky-400" />
+          <span className="font-bold text-white uppercase tracking-wider">
             {stationProfile3D.name}
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="text-sky-700 font-semibold">{stationProfile3D.geometryBasis}</span>
+          <span className="text-slate-600">•</span>
+          <span className="text-sky-400 font-semibold">{stationProfile3D.geometryBasis}</span>
         </div>
-        <div className="bg-white/90 px-2.5 py-1 rounded text-slate-500 text-[9px] border border-slate-200 max-w-sm">
+        <div className="bg-slate-900/85 backdrop-blur px-2.5 py-1 rounded text-slate-300 text-[9px] border border-slate-800 max-w-sm">
           {stationProfile3D.architectureDescription}
         </div>
       </div>
 
-      {/* Top Right: Camera Presets, Layer Selector & View Controls */}
-      <div className="absolute top-4 right-4 z-10 flex items-center space-x-1.5 bg-white/95 p-1 rounded-md border border-slate-200 shadow-xs font-mono text-[10px]">
+      {/* Top Right: Camera Presets, Layer Selector & Comparison Modal Trigger */}
+      <div className="absolute top-4 right-4 z-10 flex items-center space-x-1.5 bg-slate-900/90 backdrop-blur-md p-1 rounded-md border border-slate-700/80 shadow-md font-mono text-[10px]">
         {/* Layer Selector */}
-        <div className="flex items-center rounded bg-slate-100 p-0.5 mr-1">
+        <div className="flex items-center rounded bg-slate-800/90 p-0.5 mr-1">
           <button
             type="button"
             onClick={() => setLayer('ARCHITECTURE')}
             className={`px-2 py-0.5 rounded transition-colors ${
-              activeLayer === 'ARCHITECTURE' ? 'bg-white text-slate-900 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+              activeLayer === 'ARCHITECTURE' ? 'bg-white text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
             }`}
-            title="Structural Architecture Focus"
+            title="Focus Structural Architecture & Envelope"
           >
             ARCH
           </button>
@@ -783,9 +709,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
             type="button"
             onClick={() => setLayer('ENERGY')}
             className={`px-2 py-0.5 rounded transition-colors ${
-              activeLayer === 'ENERGY' ? 'bg-sky-600 text-white font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+              activeLayer === 'ENERGY' ? 'bg-sky-500 text-white font-bold shadow' : 'text-slate-400 hover:text-white'
             }`}
-            title="Electrical Power Flow Focus"
+            title="Focus Electrical Microgrid Power Flow"
           >
             ENERGY
           </button>
@@ -793,166 +719,153 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
             type="button"
             onClick={() => setLayer('IMPACT')}
             className={`px-2 py-0.5 rounded transition-colors ${
-              activeLayer === 'IMPACT' ? 'bg-amber-600 text-white font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+              activeLayer === 'IMPACT' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
             }`}
-            title="Downstream Network Impact Focus"
+            title="Focus Circuit Downstream Impact & Trips"
           >
             IMPACT
           </button>
         </div>
-        <div className="w-[1px] h-4 bg-slate-200" />
+
+        <div className="w-[1px] h-4 bg-slate-700" />
+
         <button
           type="button"
           onClick={() => setCameraPreset('ISOMETRIC')}
           className={`px-2 py-1 rounded transition-colors ${
-            cameraMode === 'ISOMETRIC' ? 'bg-sky-600 text-white font-bold' : 'text-slate-600 hover:bg-slate-100'
+            cameraMode === 'ISOMETRIC' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
           }`}
           title="Isometric 3D Perspective"
         >
           3D ISO
         </button>
+
         <button
           type="button"
           onClick={() => setCameraPreset('TOP')}
           className={`px-2 py-1 rounded transition-colors ${
-            cameraMode === 'TOP' ? 'bg-sky-600 text-white font-bold' : 'text-slate-600 hover:bg-slate-100'
+            cameraMode === 'TOP' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
           }`}
           title="Top-Down Plan View"
         >
           TOP
         </button>
+
         <button
           type="button"
           onClick={() => setCameraPreset('FRONT')}
           className={`px-2 py-1 rounded transition-colors ${
-            cameraMode === 'FRONT' ? 'bg-sky-600 text-white font-bold' : 'text-slate-600 hover:bg-slate-100'
+            cameraMode === 'FRONT' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
           }`}
           title="Front Elevation View"
         >
           ELEVATION
         </button>
-        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+
+        {selectedDeviceId && (
+          <button
+            type="button"
+            onClick={focusSelection}
+            className="flex items-center gap-1 px-2 py-1 rounded bg-sky-950 text-sky-300 border border-sky-700 hover:bg-sky-900 transition-colors"
+            title="Focus Camera on Selected Asset"
+          >
+            <Focus className="w-3 h-3" />
+            <span>FOCUS</span>
+          </button>
+        )}
+
+        <div className="w-[1px] h-4 bg-slate-700 mx-1" />
+
         <button
           type="button"
-          onClick={() => setShowReferenceComparison(!showReferenceComparison)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors ${
-            showReferenceComparison 
-              ? 'bg-indigo-600 text-white font-bold shadow-xs' 
-              : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100 font-semibold'
-          }`}
-          title="Toggle Real Reference vs 3D Digital Twin Comparison Mode"
+          onClick={handleOpenReferenceModal}
+          className="flex items-center space-x-1 px-2.5 py-1 rounded text-xs transition-colors bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-xs"
+          title="Open Side-by-Side Real Reference vs 3D Digital Twin Viewer"
         >
           <Layers className="w-3.5 h-3.5" />
           <span>REFERENCE ↔ TWIN</span>
         </button>
-        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+
+        <div className="w-[1px] h-4 bg-slate-700 mx-1" />
+
         <button
           type="button"
           onClick={() => setWireframeOnly(!wireframeOnly)}
-          className={`p-1 rounded text-slate-600 hover:text-slate-900 transition-colors ${wireframeOnly ? 'bg-slate-200' : ''}`}
-          title="Toggle Wireframe Architecture"
+          className={`p-1 rounded text-slate-400 hover:text-white transition-colors ${wireframeOnly ? 'bg-slate-700 text-white' : ''}`}
+          title="Toggle Wireframe Shell"
         >
           <Box className="w-3.5 h-3.5" />
         </button>
+
         <button
           type="button"
           onClick={resetView}
-          className="p-1 rounded text-slate-600 hover:text-slate-900 transition-colors"
-          title="Reset Camera Target"
+          className="p-1 rounded text-slate-400 hover:text-white transition-colors"
+          title="Reset Camera View"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Real Reference vs 3D Digital Twin Comparison Panel */}
-      {showReferenceComparison && (
-        <div className="absolute top-16 left-4 bottom-14 z-20 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-lg border border-indigo-200 p-4 shadow-xl flex flex-col justify-between overflow-y-auto font-sans">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
-              <div className="flex items-center space-x-1.5 text-xs font-mono font-bold text-indigo-900">
-                <Layers className="w-4 h-4 text-indigo-600" />
-                <span>ARCHITECTURAL REFERENCE</span>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setShowReferenceComparison(false)}
-                className="text-xs text-slate-400 hover:text-slate-700 px-1 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">{refData.title}</h3>
-              <p className="text-[11px] text-slate-500 font-mono">{refData.location}</p>
-              <div className="mt-1 inline-block text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                {refData.basis}
-              </div>
-            </div>
-
-            <div className="bg-slate-50 rounded p-2.5 border border-slate-200 text-xs text-slate-700 space-y-1">
-              <span className="font-bold text-[10px] font-mono text-slate-400 block uppercase">STRUCTURAL PROFILE</span>
-              <p className="text-[11px] leading-relaxed">{refData.spec}</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="font-bold text-[10px] font-mono text-slate-400 block uppercase">DECK &amp; UTILITY SCHEMATIC</span>
-              {refData.decks.map((deck, idx) => (
-                <div key={idx} className="flex items-start space-x-2 text-[11px] text-slate-700 bg-white p-1.5 rounded border border-slate-100">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                  <span>{deck}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-indigo-100 mt-3 text-[10px] text-slate-500 font-sans">
-            <div className="font-bold text-slate-700 font-mono mb-0.5">PRESENTATION PERSPECTIVE:</div>
-            <p className="italic">{refData.disclaimer}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Bottom Left: Navigation Hints */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center space-x-2 text-[10px] font-mono text-slate-400 bg-white/90 px-2.5 py-1 rounded border border-slate-200 pointer-events-none">
-        <span>LEFT-DRAG: Rotate</span>
+      {/* Bottom Left: Navigation & Provenance Hints */}
+      <div className="absolute bottom-4 left-4 z-10 flex items-center space-x-2 text-[10px] font-mono text-slate-400 bg-slate-900/85 backdrop-blur px-2.5 py-1 rounded border border-slate-800 pointer-events-none">
+        <span>LEFT-DRAG: Orbit</span>
         <span>•</span>
         <span>RIGHT-DRAG: Pan</span>
         <span>•</span>
-        <span>SCROLL: Zoom</span>
+        <span>WHEEL: Zoom</span>
         <span>•</span>
-        <span>CLICK: Inspect Asset</span>
+        <span>CLICK: Inspect Equipment</span>
       </div>
 
-      {/* Floating Hover HUD Card */}
+      {/* Floating Hover HUD Card with Provenance Inspector */}
       {hoveredObject && (
-        <div className="absolute bottom-4 right-4 z-10 w-72 bg-white/95 rounded-lg border border-slate-200 p-3 shadow-lg font-sans pointer-events-none">
-          <div className="flex items-center justify-between text-xs font-mono pb-1 border-b border-slate-100">
-            <span className="font-bold text-slate-900 truncate">{hoveredObject.name}</span>
+        <div className="absolute bottom-4 right-4 z-10 w-80 bg-slate-900/95 backdrop-blur-md rounded-lg border border-slate-700 p-3.5 shadow-2xl font-sans pointer-events-none text-slate-200 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-xs font-mono pb-1.5 border-b border-slate-800">
+            <span className="font-bold text-white truncate">{hoveredObject.name}</span>
             <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
-              hoveredObject.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700' :
-              hoveredObject.status === 'FAULT' ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-600'
+              hoveredObject.status === 'ONLINE' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+              hoveredObject.status === 'FAULT' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-slate-800 text-slate-400'
             }`}>
               {hoveredObject.status}
             </span>
           </div>
+
           <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] font-mono">
             <div>
               <span className="text-[9px] text-slate-400 block uppercase">IMPORTANCE</span>
-              <span className="font-bold text-slate-800">{hoveredObject.importance}</span>
+              <span className="font-bold text-slate-200">{hoveredObject.importance}</span>
             </div>
             <div>
-              <span className="text-[9px] text-slate-400 block uppercase">NOMINAL POWER</span>
-              <span className="font-bold text-slate-800">{hoveredObject.nominalPowerKw} kW</span>
+              <span className="text-[9px] text-slate-400 block uppercase">POWER RATING</span>
+              <span className="font-bold text-emerald-400">{hoveredObject.nominalPowerKw} kW</span>
             </div>
           </div>
+
+          {/* Value Provenance Inspection (Prompt Rule 14) */}
+          <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span className="flex items-center gap-1 text-sky-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+              {hoveredObject.provenance}
+            </span>
+            <span>MODEL: TwinEngine</span>
+          </div>
+
           {hoveredObject.realWorldContext && (
-            <p className="text-[10px] text-slate-500 mt-2 font-sans leading-tight">
+            <p className="text-[10px] text-slate-400 mt-1.5 font-sans leading-relaxed">
               {hoveredObject.realWorldContext}
             </p>
           )}
         </div>
       )}
+
+      {/* Interactive Reference ↔ Digital Twin Comparison Modal */}
+      <ReferenceComparisonModal
+        stationId={viewModel.stationId}
+        isOpen={showReferenceModal}
+        onClose={() => setShowReferenceModal(false)}
+        renderedTwinCanvasUrl={twinSnapshotUrl}
+      />
     </div>
   );
 };

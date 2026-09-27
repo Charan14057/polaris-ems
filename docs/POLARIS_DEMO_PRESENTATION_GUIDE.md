@@ -1,85 +1,108 @@
-# POLARIS-EMS — DEMO PRESENTATION & OPERATOR PLAYBOOK
-**Document Version:** 2.0.0 (Production Verified)
-**Target Timeframes:** 5-Minute Executive Walkthrough • 15-Minute Technical Deep Dive • 30-Minute Architecture Review
-**Operational Status:** Software Simulation (PHYSICAL_CONNECTIVITY = DISCONNECTED)
+# POLARIS-EMS — 60-SECOND PRODUCT DEMONSTRATION & PRESENTATION GUIDE
+**Prompt ID**: 61853 / Phase 18 Final Launch Quality Gate  
+**Presenter Objective**: Demonstrate an operational, connected, and physically believable polar microgrid digital twin in under 60-90 seconds.
 
 ---
 
-## 1. Five-Minute Executive Walkthrough
+## The 60-Second Product Narrative
 
-### 00:00 — Mission Overview (/)
-- **What to Click:** Ensure Bharati station is selected. Point to Mission Demand (kW) and Clean Renewable Share (%).
-- **What Should Appear:** Overview dashboard with cool neutral workspace, 3-tier system flow architecture, and clean 400V bus status.
-- **What It Means:** Polaris-EMS provides instantaneous situational awareness of energy health in isolated polar environments.
-- **What to Say:** Welcome to Polaris-EMS, the intelligent energy management and resilience advisory system developed for extreme polar microgrids like India's Bharati, Maitri, and Himadri research stations. In Antarctica, heating failure is an existential threat; this dashboard monitors total generation, battery survival runway, and critical life-support status.
-- **What NOT to Claim:** Do not claim this is live physical satellite telemetry. State clearly: This is running in real-time simulation under our physical air-gap protocol.
-
----
-
-### 00:45 — Operational 3D Spatial Digital Twin (/energy)
-- **What to Click:** Click Launch Spatial Digital Twin or select Energy in left navigation sidebar. Keep default mode: LIVE. Toggle between 3D ISO, TOP, and ELEVATION camera presets. Cycle through visualization layers: ARCH -> ENERGY -> IMPACT.
-- **What Should Appear:** Reference-aligned 3D station model of Bharati on elevated steel stilts. Directional power flow particles moving from solar array and katabatic wind turbines toward main 400V switchboard and into life-support heating.
-- **What It Means:** Real-time Kirchhoff energy conservation translated into an intuitive 3D operational spatial representation.
-- **What to Say:** Here is our flagship 3D Operational Digital Twin. Notice that the station is visibly elevated on aerodynamic piles matching Bharati's real-world Larsemann Hills architecture. The colored conduits represent actual computed power flow: gold for solar, blue for katabatic wind, and green for our battery storage bank. In our ENERGY layer, flow density scales directly with computed kilowatts.
-- **What NOT to Claim:** Do not claim the 3D model is an exact millimeter BIM survey; state that it is reference-aligned representative geometry.
+1. **This is the station.** (Bharati Antarctic Research Station, Larsemann Hills).
+2. **This is its current energy state.** (Live simulation session streaming in real-time).
+3. **These are the sources.** (Solar PV, Katabatic wind turbines, Battery BESS, and Diesel backup).
+4. **This is where power is going.** (Topologically flowing through the 400V AC main switchboard into station feeders).
+5. **This is what matters most.** (Life Support and Satellite Communications are protected by priority 1 policies).
+6. **This is what the weather predicts.** (48-hour neural ensemble forecast warns of approaching blizzard conditions).
+7. **This is what happens under stress.** (Applying a Blizzard scenario reduces solar to zero, trips high wind, and drops temperature).
+8. **This is what the system recommends.** (Phase 6 MILP optimizer recommends starting DG-1 and pre-charging BESS).
+9. **This is what happens when the operator approves.** (Approved setpoints immediately apply to the live simulation session).
+10. **This is the resulting system state.** (3D Twin reflects the new diesel generation stream, battery charges, and balance is restored).
+11. **This is the trace proving what happened.** (Cryptographic decision trace explains the mathematical rationale and policy authorization).
 
 ---
 
-### 02:00 — Forward Weather Drivers & System Effect (/energy)
-- **What to Click:** Scroll to Forward Weather Drivers card. Click Next 6h, 12h, and 24h horizon tabs.
-- **What Should Appear:** Wind speed (m/s), solar irradiance (W/m2), ambient temperature (-24C), and expected system effects.
-- **What It Means:** Demonstrates how the system looks forward in time using machine learning weather models to anticipate operational consequences.
-- **What to Say:** Polaris-EMS doesn't just react to current readings; it connects Phase 3 machine learning weather models directly to microgrid physics. Looking ahead to the Next 12h, we see anticipated katabatic wind increases paired with dropping solar irradiance as polar night approaches, predicting a shift toward battery buffer utilization.
-- **What NOT to Claim:** Do not claim weather forecasts are 100% infallible; explain that conformal prediction quantiles bound the uncertainty.
+## Step-by-Step Clean Demonstration Script
 
----
+### STEP 1: Launch & Overview
+- Navigate to http://127.0.0.1:3000/.
+- Overview loads cleanly. Point out the live telemetry metrics (Total Demand, Generation, BESS SOC, and Fuel Days).
+- Highlight that every number originates from the authoritative backend simulation session, not client-side timers.
 
-### 02:45 — Stress Testing & Scenarios (/scenarios)
-- **What to Click:** Navigate to Scenarios in left sidebar. Click Katabatic Storm (Wind Cut-Out) preset. Click Run Simulation.
-- **What Should Appear:** Simulation trajectory showing high-wind turbine cut-out, BESS discharge surge, and automated advisory recommendation.
-- **What It Means:** Validates system resilience under severe polar disturbances without endangering physical equipment.
-- **What to Say:** When hurricane-force katabatic winds exceed 25 m/s, wind turbines must feather their blades to prevent structural failure. In this simulated disturbance, Polaris-EMS immediately detects the generation drop, evaluates our survival runway, and initiates automated advisory protection.
-- **What NOT to Claim:** Do not claim hardware breakers are physically opened in Antarctica; emphasize the digital twin sandbox.
+### STEP 2: Open Energy Twin
+- Click **Energy** on the sidebar.
+- Observe the recognizable architectural model of Bharati Station:
+  - Aerodynamic white hull envelope with orange expedition identification stripe.
+  - 24 heavy-duty structural steel stilts with diagonal cross-braces mounted on bedrock.
+  - Tilted solar PV racks, rotating wind turbines, bulk fuel storage farm, and shoreline seawater intake pipeline.
+  - Natural polar terrain (undulating snow and bedrock knolls with soft polar daylight shadows).
 
----
+### STEP 3: Verify Live Simulation Session
+- Point to the green LIVE SIMULATION badge in the summary strip.
+- Show that the simulation timestamp is continuously advancing tick-by-tick based on actual wall-clock execution.
+- Show Server-Sent Events (SSE) updates arriving at 1000ms intervals.
 
-### 03:30 — AUTO Mode Advisory & Operator Approval (/energy)
-- **What to Click:** Return to Energy. Under Operating Mode, observe AUTO mode with advisory card: OPTIMIZER ADVISORY: Cold-soak prevention warm-up. Click Simulate Operator Approval.
-- **What Should Appear:** Simulation recalculates state; battery discharge ramps and generator standby posture activates. Real-time status bar updates with new timestamp.
-- **What It Means:** Demonstrates that AUTO mode acts as an automated advisory solver through existing Phase 6 MILP authority, strictly maintaining human-in-the-loop governance.
-- **What to Say:** Notice that AUTO mode is an advisory optimizer, not an unchecked physical actuator. It presents an optimal dispatch plan and requires supervisory approval. When we simulate approval, the digital twin recalculates all node equations, updating our generation mix in real time.
-- **What NOT to Claim:** Never say autonomous physical autopilot; say automated advisory decision-support with human approval.
+### STEP 4: Inspect Key Equipment
+- Click the **Solar Array** in the 3D scene: Inspector opens showing current kW generation and SIMULATED provenance.
+- Click the **Battery Bank (BESS)**: Observe live SOC percentage and bidirectional charge/discharge power.
+- Click **Life Support & HVAC**: Observe nominal power rating and priority rank 1 protection.
 
----
+### STEP 5: Trace Upstream Power Lineage
+- With Life Support selected, click **TRACE POWER**.
+- The 3D canvas immediately dims unrelated circuits and illuminates the exact upstream circuit lineage:
+  [Solar / Wind / Diesel] -> [Main 400V AC Switchboard] -> [DB-1 Utilities Feeder] -> [Life Support]
+- The Inspector displays the exact percentage contribution of each active power source.
 
-### 04:15 — MANUAL Simulation & Impact Review (/energy)
-- **What to Click:** Switch Operating Mode to MANUAL. Select Action: dg1_start (Start Diesel Genset 1 to 40 kW). Review impact card (Reserve +40 kW, Fuel burn +8.4 L/h). Click Simulate Action.
-- **What Should Appear:** Diesel generator icon changes to ONLINE, amber power flow stream energizes from powerhouse to main bus, and battery begins charging.
-- **What It Means:** Operators can safely test manual decisions inside the physics engine before executing them in the field.
-- **What to Say:** In MANUAL mode, station engineers can test operational actions before touching equipment. When we simulate starting Genset 1, the digital twin updates the electrical bus balance, showing surplus generation flowing into battery charging.
+### STEP 6: Weather & Expected Mode
+- Click the **Weather Influence** card: Distinguish between **CURRENT** environment conditions and **+6H / +12H / +24H** predicted trends.
+- Switch viewing mode to **EXPECTED**: Observe predicted renewable potential across the forecast horizon.
 
----
+### STEP 7: Apply a Polar Stress Scenario
+- Switch mode to **IMPACT** or navigate to **Scenarios** and select **BLIZZARD**.
+- Click **Execute Scenario**:
+  - Solar generation drops to 0.0 kW (dense cloud whiteout).
+  - Ambient temperature plunges by 10°C, increasing building thermal loss.
+  - The entire system responds: Net generation deficit triggers battery discharge and flags DG-1 auto-start requirement.
+  - The 3D Twin reflects the storm: Fault indicators pulse on affected systems.
 
-### 04:45 — Trace Power, Trace Impact & Conclusion (/energy)
-- **What to Click:** In 3D canvas, click Life Support & Heat module. In side inspector, click Trace My Power Route. Toggle Trace Disturbance Impact.
-- **What Should Appear:** Unrelated circuits dim to 8% opacity. Illuminated path traces directly from Wind Turbine 1 through Main Switchboard SWB-1 to Life Support HVAC heater.
-- **What It Means:** Complete spatial circuit explainability.
-- **What to Say:** Finally, our Trace Power and Trace Impact tools allow operators to isolate circuit lineages instantly. Here, we see exactly how katabatic wind energy is routed into life-support heating. In summary, Polaris-EMS delivers sovereign, explainable, and resilient energy management for the most extreme environments on Earth.
+### STEP 8: Trace Downstream Impact
+- In the 3D Twin or Inspector, click **TRACE IMPACT** on the Primary Diesel Generator.
+- The system traverses the electrical topology and displays:
+  - Downstream affected load kW.
+  - Battery capacity remaining to cover the deficit.
+  - Policy recommendations to prevent blackout.
 
----
+### STEP 9: Test Manual Operator Action
+- Open the **Manual Control** drawer.
+- Select **Simulate Start DG-1** at 60.0 kW.
+- Click **Simulate Action**:
+  - The request is validated by the backend safety engine.
+  - Diesel generation turns on, the generator LED turns emerald green, and an amber diesel power flow conduit appears in 3D.
+  - Surplus generation flows into the battery storage bank.
 
-## 2. Fifteen-Minute Technical Walkthrough
-1. 00:00 – 03:00: Overview & 3D Spatial Digital Twin architecture (Three.js WebGL rendering, station profiles).
-2. 03:00 – 06:00: Physics-Informed Forecasting (/forecast) — Conformal quantiles, P10–P90 uncertainty envelopes.
-3. 06:00 – 09:00: MILP Dispatch Optimization (/optimization) — Objective formulation, fuel efficiency curves, battery degradation constraints.
-4. 09:00 – 12:00: Decision Traceability & DAG Explainability (/decisions) — 7-stage lineage, counterfactual delta diffing, reason codes.
-5. 12:00 – 15:00: Physics Verification & Epistemic Governance (/validation & /policy) — Kirchhoff residual proofs (|err| < 1e-4 kW), lexicographical priority order.
+### STEP 10: Test Autonomous Optimization (Auto Mode)
+- Switch to **AUTO** mode.
+- The system evaluates the Phase 6 MILP optimizer against the active scenario and current state.
+- A recommendation card appears with explicit mathematical rationale:
+  - Optimal dispatch setpoints for Solar, Wind, Battery, and Diesel.
+  - Expected fuel savings and guaranteed spinning reserve margin.
+- Click **Approve & Execute Setpoints**:
+  - The backend immediately updates simulation setpoints.
+  - The 3D Twin and power flow conduits adjust to match the approved schedule.
 
----
+### STEP 11: Switch Stations (Maitri & Himadri)
+- Select **MAITRI** from the top bar:
+  - The entire 3D scene transforms to the Schirmacher Oasis rocky permafrost terrain.
+  - The iconic central heated spine corridor, modular living blocks, separate powerhouse with exhaust stacks, and Lake Priyadarshini water pump house render cleanly.
+  - Telemetry and live session re-sync to Maitri specs.
+- Select **HIMADRI** from the top bar:
+  - Scene transforms to Ny-Alesund Arctic coastal tundra.
+  - The classic two-storey Nordic red timber station with pitched gable roof, tundra boardwalk, and settlement district energy tie-in renders cleanly.
 
-## 3. Thirty-Minute Architecture Deep Dive
-- Detailed mathematical formulations (Mixed-Integer Linear Programming equations).
-- Spatial coordinate systems and Three.js scene graph hierarchies.
-- Microgrid air-gap boundary enforcement and serial HIL bridge protocols.
-- Conformal prediction mathematical proofs and coverage calibration diagnostics.
-- Failure injection analysis across all 12 Phase 5 polar disturbance scenarios.
+### STEP 12: Reference vs Digital Twin Comparison
+- In the 3D toolbar, click **REFERENCE <-> TWIN**.
+- The comparison modal opens showing the official NCPOR architectural survey elevation blueprint beside the live 3D reconstruction.
+- Drag the **Wipe Slider** across the screen (0% to 100%) to demonstrate architectural fidelity.
+- Point out the honest epistemic disclaimer: REFERENCE IMAGE ASSET REQUIRED ensures complete factual transparency.
+
+### STEP 13: Presentation / Demo Mode
+- Click the **DEMO MODE** button in the header.
+- Secondary technical panels collapse cleanly, presenting an expansive, clutter-free 3D digital twin presentation stage ready for high-level executive demonstrations.

@@ -62,7 +62,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
             Station Microgrid Circuit & Asset Inventory
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Structured high-contrast list for keyboard navigation and screen readers. All values computed by Phase 4 TwinEngine.
+            Structured high-contrast list for keyboard navigation and screen readers. All values computed by TwinEngine.
           </p>
         </div>
         <div className="flex items-center gap-2">

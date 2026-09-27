@@ -625,7 +625,7 @@ export const EnergyTwinView: React.FC = () => {
         title="Spatial Digital Twin Physics & Flow Mechanics"
         whatAmILookingAt="Spatial virtual twin of the polar research station. Maps physical rooms, generation assets (solar, wind, diesel, BESS), distribution switchboards, and electrical loads to monitor power flow in real-time simulation."
         whyIsItImportant="During severe polar storms (-40°C), physical outdoor inspection is life-threatening. The Digital Twin provides immediate insight into circuit health, branch loading, and fuel burn."
-        howIsItCalculated="Driven by the authoritative Phase 4 Digital Twin physics engine. Energy balances follow exact Kirchhoff conservation laws: Sum(P_gen) = Total Load + Battery Delta with zero fabricated SCADA readings."
+        howIsItCalculated="Driven by the authoritative Digital Twin physics engine. Energy balances follow exact Kirchhoff conservation laws: Sum(P_gen) = Total Load + Battery Delta with zero fabricated SCADA readings."
         technicalEvidence="Governing formulation: Exact Kirchhoff Node Conservation: Sum(I_in) = Sum(I_out) with residual |err| < 1e-4 kW across 400V 3-phase bus. Simulation air-gap enforced."
       />
 

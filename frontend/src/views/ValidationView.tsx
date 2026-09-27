@@ -239,7 +239,7 @@ export const ValidationView: React.FC = () => {
 
       <NextStepExplanation
         title="SCIENTIFIC BENCHMARK SUITE STATUS"
-        timeframe="Phase 13 Master Benchmark Verification"
+        timeframe="Master Benchmark Verification"
         outlook="All 9 benchmark suites (Forecast Accuracy, Pinball Calibration, Temporal Leakage, Optimizer Baselines, Digital Twin Replay, Resilience Stress, Edge Degradation, Reality Alignment, SHAP Explainability) report 100% PASS."
       />
 
@@ -1103,7 +1103,7 @@ export const ValidationView: React.FC = () => {
                 <span className="text-[10px] font-mono text-emerald-700">CONSERVATION ENFORCED</span>
               </div>
               <p className="text-xs text-slate-600">
-                Compares reference benchmark telemetry against Digital Twin physical simulations across electrical, thermal, battery, and fuel subsystems without mutating Phase 4.
+                Compares reference benchmark telemetry against Digital Twin physical simulations across electrical, thermal, battery, and fuel subsystems without mutating baseline state.
               </p>
               <div className="space-y-2 font-mono text-xs">
                 {twinChecks.slice(0, 4).map((tc, idx) => (

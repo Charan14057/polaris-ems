@@ -342,7 +342,7 @@ export const OptimizationView: React.FC = () => {
               <span className="text-slate-500 uppercase block text-[10px] mb-1">Fair Baseline Benchmark</span>
               <span className="font-semibold text-sky-600">14.8% Fuel Savings vs Rule-Based</span>
               <p className="text-[11px] text-slate-500 mt-1 font-sans">
-                Validated in Phase 13 scientific benchmark against legacy uncoordinated setpoint dispatchers.
+                Validated in scientific benchmark against legacy uncoordinated setpoint dispatchers.
               </p>
             </div>
           </div>

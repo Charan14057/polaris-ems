@@ -116,6 +116,10 @@ class LiveTwinSession:
         current_sim_dt = self.simulation_base_time + timedelta(seconds=self.simulation_elapsed_seconds)
         return current_sim_dt.isoformat().replace("+00:00", "Z")
 
+    def step(self, force_elapsed_seconds: Optional[float] = 60.0) -> TwinState:
+        """Alias for advance_clock for convenient step-based testing."""
+        return self.advance_clock(force_elapsed_seconds=force_elapsed_seconds)
+
     def advance_clock(self, force_elapsed_seconds: Optional[float] = None) -> TwinState:
         """
         Advances the simulation clock according to actual wall-clock execution or explicit step.
