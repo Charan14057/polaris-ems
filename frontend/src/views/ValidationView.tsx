@@ -432,7 +432,9 @@ export const ValidationView: React.FC = () => {
     }
   };
 
-
+  const loadMetric = forecastMetrics.find(m => m.target.toLowerCase().includes('load'));
+  const solarMetric = forecastMetrics.find(m => m.target.toLowerCase().includes('solar'));
+  const windMetric = forecastMetrics.find(m => m.target.toLowerCase().includes('wind'));
 
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
@@ -454,7 +456,7 @@ export const ValidationView: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-mono px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
-            SUITE STATUS: {summary?.overall_outcome || 'PASS'}
+            SUITE STATUS: {summary?.overall_outcome ? summary.overall_outcome : '—'}
           </span>
           <button
             onClick={loadAllData}
@@ -616,24 +618,32 @@ export const ValidationView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-slate-900 font-mono-numbers">
-                  {summary?.forecast_mae_average !== undefined ? `${summary.forecast_mae_average.toFixed(2)} kW Point MAE` : 'UNAVAILABLE'}
+                  {summary?.forecast_mae_average !== undefined ? `${summary.forecast_mae_average.toFixed(2)} kW Point MAE` : '—'}
                 </div>
                 <div className="space-y-1.5 mt-3 text-xs font-mono text-slate-600">
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Load MAE:</span>
-                    <span className="font-bold text-slate-900 font-mono-numbers">{summary?.load_mae !== undefined ? `${summary.load_mae.toFixed(2)} kW` : '3.55 kW (Dataset: NCPOR)'}</span>
+                    <span className="font-bold text-slate-900 font-mono-numbers">
+                      {loadMetric ? `${loadMetric.mae.toFixed(2)} kW` : (summary?.load_mae !== undefined ? `${summary.load_mae.toFixed(2)} kW` : '—')}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Solar MAE:</span>
-                    <span className="font-bold text-amber-700 font-mono-numbers">{summary?.solar_mae !== undefined ? `${summary.solar_mae.toFixed(2)} kW` : '2.18 kW (Dataset: AWS)'}</span>
+                    <span className="font-bold text-amber-700 font-mono-numbers">
+                      {solarMetric ? `${solarMetric.mae.toFixed(2)} kW` : (summary?.solar_mae !== undefined ? `${summary.solar_mae.toFixed(2)} kW` : '—')}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-slate-100 pb-1">
                     <span>Wind MAE:</span>
-                    <span className="font-bold text-sky-700 font-mono-numbers">{summary?.wind_mae !== undefined ? `${summary.wind_mae.toFixed(2)} kW` : '4.12 kW (Dataset: AWS)'}</span>
+                    <span className="font-bold text-sky-700 font-mono-numbers">
+                      {windMetric ? `${windMetric.mae.toFixed(2)} kW` : (summary?.wind_mae !== undefined ? `${summary.wind_mae.toFixed(2)} kW` : '—')}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>80% Conformal:</span>
-                    <span className="font-bold text-emerald-700 font-mono-numbers">{summary?.conformal_coverage_average_pct !== undefined ? `${summary.conformal_coverage_average_pct.toFixed(1)}% Coverage` : 'UNAVAILABLE'}</span>
+                    <span className="font-bold text-emerald-700 font-mono-numbers">
+                      {summary?.conformal_coverage_average_pct !== undefined ? `${summary.conformal_coverage_average_pct.toFixed(1)}% Coverage` : '—'}
+                    </span>
                   </div>
                 </div>
                 <div className="mt-3 text-[11px] text-slate-500 font-sans">
@@ -769,7 +779,7 @@ export const ValidationView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-indigo-700 font-mono-numbers">
-                  14.8% <span className="text-xs font-normal text-slate-500">Fuel Reduction</span>
+                  {summary?.optimizer_average_fuel_savings_pct !== undefined ? `${summary.optimizer_average_fuel_savings_pct.toFixed(1)}%` : '—'} <span className="text-xs font-normal text-slate-500">Fuel Reduction</span>
                 </div>
                 <div className="space-y-1.5 mt-3 text-xs font-mono text-slate-600">
                   <div className="flex justify-between border-b border-slate-100 pb-1">
@@ -871,7 +881,7 @@ export const ValidationView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-sky-700 font-mono-numbers">
-                  100.0% <span className="text-xs font-normal text-slate-500">Bitwise Match</span>
+                  {summary?.reproducibility_rate_pct !== undefined ? `${summary.reproducibility_rate_pct.toFixed(1)}%` : '—'} <span className="text-xs font-normal text-slate-500">Bitwise Match</span>
                 </div>
                 <div className="space-y-1.5 mt-3 text-xs font-mono text-slate-600">
                   <div className="flex justify-between border-b border-slate-100 pb-1">
@@ -1245,7 +1255,9 @@ export const ValidationView: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded bg-white border border-slate-200 shadow-sm">
               <span className="text-xs font-mono text-slate-500">80% Nominal Band (P10–P90)</span>
-              <div className="text-2xl font-bold font-mono font-mono-numbers text-sky-600 mt-1">84.3%</div>
+              <div className="text-2xl font-bold font-mono font-mono-numbers text-sky-600 mt-1">
+                {summary?.conformal_coverage_average_pct !== undefined ? `${summary.conformal_coverage_average_pct.toFixed(1)}%` : '—'}
+              </div>
               <p className="text-[11px] text-emerald-700 mt-1">Nominal gap +4.3% (Conservative safety buffer)</p>
             </div>
 

@@ -311,7 +311,7 @@ class LiveTwinSession:
             self.active_controls["diesel_power_override_kw"] = 0.0
             description = "Operator stopped DG-1 generator"
             expected_change = "Diesel off, battery covers residual deficit, zero fuel burn"
-        elif aid == "bess_charge_force":
+        elif aid in ("bess_charge_force", "bess_force_charge"):
             chg_kw = float(params.get("charge_kw", 15.0))
             self.active_controls["battery_charge_force_kw"] = chg_kw
             description = f"Operator forced battery charging at {chg_kw:.1f} kW"
@@ -321,7 +321,7 @@ class LiveTwinSession:
             self.active_controls["shed_load_kw"] = shed_kw
             description = f"Operator shed flexible loads ({shed_kw:.1f} kW)"
             expected_change = "Total demand reduced, non-critical subloads curtailed"
-        elif aid == "restore_all_loads":
+        elif aid in ("restore_all_loads", "restore_loads"):
             self.active_controls.pop("shed_load_kw", None)
             description = "Operator restored all shed loads to standard schedule"
             expected_change = "Full operational load restored to baseline nominal"

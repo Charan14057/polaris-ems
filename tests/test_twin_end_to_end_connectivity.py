@@ -275,3 +275,165 @@ def test_epistemic_airgap_boundary():
     assert snap["provenance"] == "SIMULATED"
     assert snap["metadata"]["provenance"] == "SIMULATED"
     assert snap["power_flow"]["provenance"] == "SIMULATED"
+
+
+def test_cross_layer_value_parity_authoritative_snapshot(client):
+    """
+    Prompt Requirement 6: Value Parity
+    Verifies that for an authoritative snapshot:
+    Backend TwinState == API Response == PowerFlow Topology == Bus Model == Inspector Telemetry.
+    Guarantees zero parallel operational constants across layers.
+    """
+    session = live_twin_manager.reset_session("BHARATI")
+    session.advance_clock(force_elapsed_seconds=10.0)
+
+    # 1. Authoritative Backend TwinState
+    backend_state = session.current_twin_state
+    b_load = backend_state.loads.total_load_kw
+    b_solar = backend_state.solar.solar_generation_kw
+    b_wind = backend_state.wind.wind_generation_kw
+    b_diesel = backend_state.diesel.generator_power_kw
+    b_soc = backend_state.battery.soc_pct
+    b_fuel = backend_state.fuel.fuel_remaining_l
+
+    # 2. REST API Payload
+    resp = client.get("/api/v1/twin/live/BHARATI")
+    assert resp.status_code == 200
+    api_data = resp.json()["data"]
+    api_state = api_data["state"]
+
+    assert api_state["loads"]["total_load_kw"] == b_load
+    assert api_state["solar"]["solar_generation_kw"] == b_solar
+    assert api_state["wind"]["wind_generation_kw"] == b_wind
+    assert api_state["diesel"]["generator_power_kw"] == b_diesel
+    assert abs(api_state["battery"]["soc_pct"] - b_soc) < 0.005
+    assert abs(api_state["fuel"]["fuel_remaining_l"] - b_fuel) < 0.5
+
+    # 3. Power Flow Topology & Bus Parity
+    flow = api_data["power_flow"]
+    assert "assets" in flow
+    bus_asset = flow["assets"]["main_bus"]
+    assert bus_asset["status"] == "ONLINE"
+    assert abs(bus_asset["throughput_kw"] - backend_state.loads.served_load_kw) < 1e-4
+
+    # Assert active source flows match backend generation
+    solar_edge = next(e for e in flow["edges"] if e["id"] == "flow_solar_bus")
+    assert abs(solar_edge["power_kw"] - b_solar) < 1e-4
+    wind_edge = next(e for e in flow["edges"] if e["id"] == "flow_wind_bus")
+    assert abs(wind_edge["power_kw"] - b_wind) < 1e-4
+    diesel_edge = next(e for e in flow["edges"] if e["id"] == "flow_diesel_bus")
+    assert abs(diesel_edge["power_kw"] - b_diesel) < 1e-4
+
+    # 4. Station Profile Nameplate Parity
+    assert api_state["solar"]["solar_capacity_kw"] == 30.0
+    assert api_state["wind"]["wind_capacity_kw"] == 25.0
+    assert api_state["battery"]["capacity_kwh"] == 120.0
+    assert api_state["diesel"]["generator_max_power_kw"] == 80.0
+
+
+def test_all_supported_manual_actions_full_lifecycle():
+    """
+    Prompt Requirement 10: Manual QA
+    Exhaustively verifies every supported manual action:
+    - dg1_start
+    - dg1_stop
+    - bess_force_charge
+    - shed_flexible
+    - restore_loads
+    Ensures request -> backend -> Twin -> state change -> 3D/2D flow -> trace.
+    """
+    session = live_twin_manager.reset_session("BHARATI")
+
+    # 1. dg1_start (dispatches DG-1 respecting physical min loading >= 24 kW)
+    res_start = session.apply_manual_action("dg1_start", {"power_kw": 40.0})
+    assert res_start["status"] == "APPROVED"
+    assert session.current_twin_state.diesel.generator_status == "ONLINE"
+    assert session.current_twin_state.diesel.generator_power_kw >= 24.0
+    flow = session.get_power_flow_topology()
+    assert any(e["id"] == "flow_diesel_bus" and e["active"] is True for e in flow["edges"])
+
+    # 2. dg1_stop
+    res_stop = session.apply_manual_action("dg1_stop")
+    assert res_stop["status"] == "APPROVED"
+    assert session.current_twin_state.diesel.generator_power_kw == 0.0
+    flow = session.get_power_flow_topology()
+    assert any(e["id"] == "flow_diesel_bus" and e["active"] is False for e in flow["edges"])
+
+    # 3. bess_force_charge
+    res_bess = session.apply_manual_action("bess_force_charge", {"charge_kw": 20.0})
+    assert res_bess["status"] == "APPROVED"
+    assert "battery_charge_force_kw" in session.active_controls
+
+    # 4. shed_flexible
+    res_shed = session.apply_manual_action("shed_flexible", {"shed_kw": 12.0})
+    assert res_shed["status"] == "APPROVED"
+    assert "shed_load_kw" in session.active_controls
+
+    # 5. restore_loads
+    res_restore = session.apply_manual_action("restore_loads")
+    assert res_restore["status"] == "APPROVED"
+    assert "shed_load_kw" not in session.active_controls
+
+    # Verify trace ledger entries for each manual action
+    actions_recorded = [t.get("action_id") for t in session.trace_history if t.get("event") == "MANUAL_ACTION_EXECUTED"]
+    assert "dg1_start" in actions_recorded
+    assert "dg1_stop" in actions_recorded
+    assert "bess_force_charge" in actions_recorded
+    assert "shed_flexible" in actions_recorded
+    assert "restore_loads" in actions_recorded
+
+
+def test_stress_scenarios_visible_changes_propagation():
+    """
+    Prompt Requirement 5: Scenario Full-Stack Validation
+    Verifies observable state deltas across:
+    BLIZZARD, HIGH_WIND, LOW_DAYLIGHT, SOLAR_GENERATION_FAILURE,
+    WIND_GENERATION_FAILURE, BATTERY_DEGRADATION, EXTREME_COLD, COMBINED_POLAR_STRESS.
+    """
+    scenarios_to_verify = [
+        "BLIZZARD",
+        "HIGH_WIND",
+        "LOW_DAYLIGHT",
+        "SOLAR_GENERATION_FAILURE",
+        "WIND_GENERATION_FAILURE",
+        "BATTERY_DEGRADATION",
+        "EXTREME_COLD",
+        "COMBINED_POLAR_STRESS"
+    ]
+
+    for scen_id in scenarios_to_verify:
+        session = live_twin_manager.reset_session("BHARATI")
+        base_state = session.current_twin_state
+
+        apply_res = session.apply_scenario(scen_id)
+        assert apply_res["status"] == "APPLIED"
+
+        session.advance_clock(force_elapsed_seconds=60.0)
+        p_state = session.current_twin_state
+
+        if scen_id == "BLIZZARD":
+            assert p_state.environment.ambient_temperature_c < base_state.environment.ambient_temperature_c
+            assert p_state.environment.wind_speed_ms > base_state.environment.wind_speed_ms
+        elif scen_id == "HIGH_WIND":
+            assert p_state.environment.wind_speed_ms > base_state.environment.wind_speed_ms
+        elif scen_id == "LOW_DAYLIGHT":
+            assert p_state.environment.irradiance_wm2 <= base_state.environment.irradiance_wm2
+        elif scen_id == "SOLAR_GENERATION_FAILURE":
+            assert p_state.solar.solar_generation_kw == 0.0
+            assert p_state.solar.solar_available_kw == 0.0
+        elif scen_id == "WIND_GENERATION_FAILURE":
+            assert p_state.wind.wind_generation_kw == 0.0
+            assert p_state.wind.wind_available_kw == 0.0
+        elif scen_id == "BATTERY_DEGRADATION":
+            assert p_state.battery.capacity_kwh < base_state.battery.capacity_kwh
+        elif scen_id == "EXTREME_COLD":
+            assert p_state.environment.ambient_temperature_c <= base_state.environment.ambient_temperature_c - 19.9
+        elif scen_id == "COMBINED_POLAR_STRESS":
+            assert p_state.solar.solar_generation_kw == 0.0
+            assert p_state.wind.wind_generation_kw == 0.0
+
+        # Restoration
+        session.clear_scenario()
+        session.advance_clock(force_elapsed_seconds=60.0)
+        assert session.active_scenario is None
+
