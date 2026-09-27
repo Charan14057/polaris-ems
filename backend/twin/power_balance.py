@@ -121,6 +121,16 @@ class PowerBalanceEngine:
                     p_bat_chg += chg_absorb
                     p_curt += (p_diesel - chg_absorb)
 
+            # Enforce physical mutual exclusivity of electrochemical charge and discharge
+            if p_bat_chg > 0.0 and p_bat_dis > 0.0:
+                net_bat = p_bat_chg - p_bat_dis
+                if net_bat >= 0.0:
+                    p_bat_chg = round(net_bat, 4)
+                    p_bat_dis = 0.0
+                else:
+                    p_bat_dis = round(-net_bat, 4)
+                    p_bat_chg = 0.0
+
             p_served = p_load - p_unserved
 
         # Honest subload allocation: served power covers critical load first

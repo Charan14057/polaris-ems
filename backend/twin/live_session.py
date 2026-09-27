@@ -12,6 +12,7 @@ Maintains backend-owned, stateful real-time Digital Twin sessions with:
 """
 
 import time
+import math
 import uuid
 import copy
 from datetime import datetime, timezone, timedelta
@@ -42,6 +43,7 @@ class LiveSessionMetadata:
     active_controls: Dict[str, Any]
     session_status: str  # "ACTIVE" | "PAUSED" | "RECONNECTING"
     last_update: str
+    data_mode: str = "LIVE"  # "LIVE" | "HISTORICAL" | "REPLAY"
     provenance: str = "SIMULATED"
 
 
@@ -58,7 +60,8 @@ class LiveTwinSession:
         safety_registry: Optional[SafetyThresholdRegistry] = None,
         scenario_registry: Optional[ScenarioRegistry] = None,
         time_acceleration: float = 1.0,
-        start_simulation_time: str = "2026-06-01T12:00:00Z"
+        start_simulation_time: Optional[str] = None,
+        data_mode: str = "LIVE"
     ):
         self.station_id = station_id.upper()
         self.session_id = f"twin-session-{self.station_id.lower()}-{uuid.uuid4().hex[:8]}"
@@ -83,6 +86,13 @@ class LiveTwinSession:
         self.time_acceleration = max(0.1, float(time_acceleration))
         self.wall_clock_start = time.time()
         self.last_wall_tick = self.wall_clock_start
+        self.data_mode = data_mode.upper() if data_mode in ("LIVE", "HISTORICAL", "REPLAY") else "LIVE"
+
+        # Anchor to real-world current UTC date/time unless explicitly overridden
+        if start_simulation_time is None:
+            now_utc = datetime.now(timezone.utc)
+            start_simulation_time = now_utc.isoformat().replace("+00:00", "Z")
+
         self.simulation_base_time = datetime.fromisoformat(start_simulation_time.replace("Z", "+00:00"))
         self.simulation_elapsed_seconds = 0.0
 
@@ -106,7 +116,8 @@ class LiveTwinSession:
             "event": "SESSION_INITIALIZED",
             "station_id": self.station_id,
             "session_id": self.session_id,
-            "details": f"Digital Twin initialized under baseline {self.station_id} profile"
+            "data_mode": self.data_mode,
+            "details": f"Digital Twin initialized under baseline {self.station_id} profile anchored at {start_simulation_time}"
         }]
 
     def current_wall_clock_iso(self) -> str:
@@ -119,6 +130,65 @@ class LiveTwinSession:
     def step(self, force_elapsed_seconds: Optional[float] = 60.0) -> TwinState:
         """Alias for advance_clock for convenient step-based testing."""
         return self.advance_clock(force_elapsed_seconds=force_elapsed_seconds)
+
+    def calculate_astronomical_environment(
+        self, sim_dt: datetime, elapsed_seconds: float
+    ) -> tuple[float, float, float, float]:
+        """
+        Computes real-world astronomical solar elevation, seasonal ambient temperature,
+        and polar wind conditions based on station latitude, longitude, day of year, and UTC time.
+        """
+        if self.station_id == "BHARATI":
+            lat_deg, lon_deg = -69.41, 76.19
+        elif self.station_id == "MAITRI":
+            lat_deg, lon_deg = -70.77, 11.73
+        else:  # HIMADRI
+            lat_deg, lon_deg = 78.92, 11.92
+
+        day_of_year = sim_dt.timetuple().tm_yday
+        utc_hour = sim_dt.hour + sim_dt.minute / 60.0 + sim_dt.second / 3600.0
+
+        # Solar declination angle (Cooper formulation)
+        declination_rad = math.radians(23.45 * math.sin(math.radians(360.0 / 365.0 * (day_of_year - 81))))
+        lat_rad = math.radians(lat_deg)
+
+        # Local solar time: LST = UTC + lon / 15
+        lst_hour = (utc_hour + lon_deg / 15.0) % 24.0
+        hour_angle_rad = math.radians(15.0 * (lst_hour - 12.0))
+
+        # Solar elevation angle: sin(alpha) = sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(H)
+        sin_elev = math.sin(lat_rad) * math.sin(declination_rad) + math.cos(lat_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad)
+        elev_deg = math.degrees(math.asin(max(-1.0, min(1.0, sin_elev))))
+
+        # Irradiance based on real elevation
+        if elev_deg <= 0.0:
+            ghi = 0.0
+        else:
+            air_mass = 1.0 / max(0.08, math.sin(math.radians(max(0.5, elev_deg))))
+            dni = 1050.0 * (0.72 ** (air_mass ** 0.678))
+            sin_e = math.sin(math.radians(elev_deg))
+            ghi = round(dni * sin_e + 45.0 * sin_e, 1)
+            ghi = max(0.0, min(1000.0, ghi))
+
+        # Seasonal temperature model
+        if lat_deg < 0:  # Southern Hemisphere (Bharati, Maitri)
+            season_offset = math.cos(math.radians(360.0 / 365.0 * (day_of_year - 15)))
+            base_station_t = -18.0 if self.station_id == "BHARATI" else -21.0
+            seasonal_t = base_station_t + 13.0 * season_offset
+        else:  # Northern Hemisphere (Himadri)
+            season_offset = math.cos(math.radians(360.0 / 365.0 * (day_of_year - 197)))
+            base_station_t = -5.0
+            seasonal_t = base_station_t + 11.0 * season_offset
+
+        # Diurnal temperature cycle
+        diurnal = 2.0 * math.sin(math.radians(15.0 * (lst_hour - 9.0)))
+        amb_temp = round(seasonal_t + diurnal, 2)
+
+        # Wind variations
+        base_wind = 8.5
+        wind_spd = round(base_wind + 2.0 * ((int(elapsed_seconds // 30) % 5) - 2) * 0.4, 2)
+
+        return amb_temp, wind_spd, ghi, elev_deg
 
     def advance_clock(self, force_elapsed_seconds: Optional[float] = None) -> TwinState:
         """
@@ -138,26 +208,11 @@ class LiveTwinSession:
         sim_timestamp = self.current_simulation_iso()
         dt_hours = max(0.001, delta_sim_seconds / 3600.0) if delta_sim_seconds > 0 else 1.0 / 3600.0
 
-        # Build baseline environmental input step based on station and time-of-day
+        # Build baseline environmental input step based on station, calendar date, and season
         sim_dt = self.simulation_base_time + timedelta(seconds=self.simulation_elapsed_seconds)
+        amb_temp, wind_spd, ghi, elev_deg = self.calculate_astronomical_environment(sim_dt, self.simulation_elapsed_seconds)
+
         hour_float = sim_dt.hour + sim_dt.minute / 60.0 + sim_dt.second / 3600.0
-
-        base_amb_temp = -22.0 if self.station_id != "HIMADRI" else -5.0
-        # Mild diurnal temperature swing
-        amb_temp = round(base_amb_temp + 2.5 * -((hour_float - 14.0) / 6.0) ** 2 + 1.2, 2)
-        
-        # Wind diurnal variation
-        base_wind = 8.5
-        wind_spd = round(base_wind + 2.0 * ((int(self.simulation_elapsed_seconds // 30) % 5) - 2) * 0.4, 2)
-
-        # Solar irradiance
-        is_polar_day = (self.station_id == "HIMADRI")
-        if is_polar_day:
-            ghi = round(160.0 + 90.0 * max(0.0, 1.0 - abs(hour_float - 12.0) / 8.0), 1)
-        else:
-            ghi = round(240.0 * max(0.0, 1.0 - abs(hour_float - 12.0) / 6.0), 1) if 6 <= hour_float <= 18 else 0.0
-
-        # Base load requirement from devices
         nominal_kw = sum(d.nominal_power_kw for d in self.profile.devices if d.category == "CRITICAL")
         load_kw = round(nominal_kw * (1.15 if (7 <= hour_float <= 9 or 18 <= hour_float <= 21) else 0.95), 1)
 
@@ -671,6 +726,55 @@ class LiveTwinSession:
             "provenance": "SIMULATED"
         }
 
+    def configure_session(
+        self,
+        data_mode: str = "LIVE",
+        simulation_time: Optional[str] = None,
+        time_acceleration: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Configures session mode (LIVE vs HISTORICAL vs REPLAY) and simulation anchor time.
+        """
+        mode = data_mode.upper()
+        if mode in ("LIVE", "HISTORICAL", "REPLAY"):
+            self.data_mode = mode
+
+        if time_acceleration is not None:
+            self.time_acceleration = max(0.1, float(time_acceleration))
+
+        if self.data_mode == "LIVE":
+            self.simulation_base_time = datetime.now(timezone.utc)
+            self.simulation_elapsed_seconds = 0.0
+            self.wall_clock_start = time.time()
+            self.last_wall_tick = self.wall_clock_start
+        elif self.data_mode == "HISTORICAL":
+            if simulation_time:
+                self.simulation_base_time = datetime.fromisoformat(simulation_time.replace("Z", "+00:00"))
+            self.simulation_elapsed_seconds = 0.0
+            self.wall_clock_start = time.time()
+            self.last_wall_tick = self.wall_clock_start
+
+        # Advance clock to calculate immediate state under configured date/season
+        new_state = self.advance_clock(force_elapsed_seconds=1.0)
+
+        trace_entry = {
+            "timestamp": self.current_simulation_iso(),
+            "wall_clock": self.current_wall_clock_iso(),
+            "event": "SESSION_CONFIGURED",
+            "data_mode": self.data_mode,
+            "simulation_time": self.current_simulation_iso(),
+            "details": f"Session configured to {self.data_mode} mode anchored at {self.current_simulation_iso()}"
+        }
+        self.trace_history.append(trace_entry)
+
+        return {
+            "status": "CONFIGURED",
+            "data_mode": self.data_mode,
+            "simulation_time": self.current_simulation_iso(),
+            "snapshot": self.get_snapshot(),
+            "trace": trace_entry
+        }
+
     def get_snapshot(self) -> Dict[str, Any]:
         """Returns complete serializable snapshot of the live session."""
         return {
@@ -686,6 +790,7 @@ class LiveTwinSession:
                 active_controls=self.active_controls,
                 session_status=self.session_status,
                 last_update=self.last_update,
+                data_mode=self.data_mode,
                 provenance="SIMULATED"
             )),
             "state": self.current_twin_state.to_dict(),

@@ -170,9 +170,20 @@ export const api = {
       body: JSON.stringify(params),
     }),
 
-  // Phase 18 Production Live Twin Session & Streaming
+  // Production Live Twin Session & Streaming
   getLiveTwinSnapshot: (stationId: StationId | string) =>
     apiRequest<Record<string, any>>(`/api/v1/twin/live/${stationId.toUpperCase()}`),
+
+  configureTwinSession: (params: { station_id: StationId | string; mode: string; simulation_time?: string; time_acceleration?: number }) =>
+    apiRequest<Record<string, any>>('/api/v1/twin/session/configure', {
+      method: 'POST',
+      body: JSON.stringify({
+        station_id: params.station_id.toUpperCase(),
+        mode: params.mode,
+        simulation_time: params.simulation_time,
+        time_acceleration: params.time_acceleration ?? 1.0,
+      }),
+    }),
 
   dispatchManualControl: (params: { station_id: StationId | string; action_id: string; parameters?: Record<string, any> }) =>
     apiRequest<Record<string, any>>('/api/v1/twin/control/manual', {

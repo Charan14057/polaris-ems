@@ -50,7 +50,10 @@ import {
   Table,
   Cpu,
   Layers,
-  Sparkles
+  Sparkles,
+  Calendar,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 export const EnergyTwinView: React.FC = () => {
@@ -66,6 +69,10 @@ export const EnergyTwinView: React.FC = () => {
   
   // Master Display Mode: LIVE (Real-Time Simulation) is default; REPLAY is secondary
   const [twinDisplayMode, setTwinDisplayMode] = useState<'LIVE' | 'REPLAY'>('LIVE');
+  const [sessionDataMode, setSessionDataMode] = useState<'LIVE' | 'HISTORICAL' | 'REPLAY'>('LIVE');
+  const [simulationTimestamp, setSimulationTimestamp] = useState<string | null>(null);
+  const [isHistoricalPickerOpen, setIsHistoricalPickerOpen] = useState<boolean>(false);
+  const [historicalDateInput, setHistoricalDateInput] = useState<string>('2024-07-15T12:00:00Z');
   const [liveState, setLiveState] = useState<Record<string, any> | null>(null);
   const [lastLiveUpdate, setLastLiveUpdate] = useState<string>(new Date().toISOString());
   const [recalculating, setRecalculating] = useState<boolean>(false);
@@ -180,6 +187,12 @@ export const EnergyTwinView: React.FC = () => {
             if (payload.metadata?.wall_clock_timestamp) {
               setLastLiveUpdate(payload.metadata.wall_clock_timestamp);
             }
+            if (payload.metadata?.simulation_timestamp) {
+              setSimulationTimestamp(payload.metadata.simulation_timestamp);
+            }
+            if (payload.metadata?.data_mode) {
+              setSessionDataMode(payload.metadata.data_mode);
+            }
           }
         } catch {
           // Permissive handling for transient chunk
@@ -253,6 +266,53 @@ export const EnergyTwinView: React.FC = () => {
       }
     } catch (e) {
       console.warn('Auto recommendation approval advisory:', e);
+    } finally {
+      setRecalculating(false);
+    }
+  };
+
+  // Mode & Real-world Date handlers
+  const handleSelectLiveNow = async () => {
+    setTwinDisplayMode('LIVE');
+    setSessionDataMode('LIVE');
+    setIsHistoricalPickerOpen(false);
+    setRecalculating(true);
+    try {
+      const res = await api.configureTwinSession({
+        station_id: currentStation,
+        mode: 'LIVE'
+      });
+      if (res?.data?.snapshot?.state) {
+        setLiveState(res.data.snapshot.state);
+        setSimulationTimestamp(res.data.snapshot.metadata?.simulation_timestamp || null);
+        setLastLiveUpdate(new Date().toISOString());
+      }
+    } catch (e) {
+      console.warn('Configure live session advisory:', e);
+    } finally {
+      setRecalculating(false);
+    }
+  };
+
+  const handleSelectHistoricalDate = async (targetDate: string) => {
+    setTwinDisplayMode('LIVE');
+    setSessionDataMode('HISTORICAL');
+    setHistoricalDateInput(targetDate);
+    setIsHistoricalPickerOpen(false);
+    setRecalculating(true);
+    try {
+      const res = await api.configureTwinSession({
+        station_id: currentStation,
+        mode: 'HISTORICAL',
+        simulation_time: targetDate
+      });
+      if (res?.data?.snapshot?.state) {
+        setLiveState(res.data.snapshot.state);
+        setSimulationTimestamp(res.data.snapshot.metadata?.simulation_timestamp || targetDate);
+        setLastLiveUpdate(new Date().toISOString());
+      }
+    } catch (e) {
+      console.warn('Configure historical session advisory:', e);
     } finally {
       setRecalculating(false);
     }
@@ -332,34 +392,133 @@ export const EnergyTwinView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          {/* LIVE vs REPLAY Toggle Pill */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0 relative">
+          {/* LIVE vs HISTORICAL vs REPLAY Toggle Pill */}
           <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
             <button
               type="button"
-              onClick={() => setTwinDisplayMode('LIVE')}
+              onClick={handleSelectLiveNow}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
-                twinDisplayMode === 'LIVE'
+                twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Real-time wall-clock anchored computational twin"
             >
-              <span className={`w-2 h-2 rounded-full ${twinDisplayMode === 'LIVE' ? 'bg-white' : 'bg-emerald-500'} animate-pulse`} />
-              <span>LIVE</span>
+              <span className={`w-2 h-2 rounded-full ${twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE' ? 'bg-white' : 'bg-emerald-500'} animate-pulse`} />
+              <span>LIVE NOW</span>
             </button>
+
             <button
               type="button"
-              onClick={() => setTwinDisplayMode('REPLAY')}
+              onClick={() => setIsHistoricalPickerOpen(!isHistoricalPickerOpen)}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
+                sessionDataMode === 'HISTORICAL'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Anchor simulation to a specific calendar date and seasonal profile"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>HISTORICAL</span>
+              <ChevronDown className="w-3 h-3 ml-0.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTwinDisplayMode('REPLAY');
+                setSessionDataMode('REPLAY');
+                setIsHistoricalPickerOpen(false);
+              }}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
                 twinDisplayMode === 'REPLAY'
                   ? 'bg-sky-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Timeline scrub replay of stored multi-horizon trajectory"
             >
               <RotateCw className="w-3.5 h-3.5" />
               <span>REPLAY</span>
             </button>
           </div>
+
+          {/* Historical Date Picker Dropdown */}
+          {isHistoricalPickerOpen && (
+            <div className="absolute right-0 top-12 z-50 w-72 bg-white rounded-lg border border-slate-200 shadow-xl p-3 space-y-3 font-mono text-xs">
+              <div className="font-bold text-slate-800 text-[11px] uppercase tracking-wider border-b border-slate-100 pb-1.5">
+                Select Simulation Date / Season
+              </div>
+              <div className="space-y-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleSelectHistoricalDate('2024-07-15T12:00:00Z')}
+                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
+                >
+                  <div>
+                    <span className="font-bold text-slate-900 block">Austral Winter (Mid-July)</span>
+                    <span className="text-slate-500 text-[10px]">Polar Night (0 W/m² GHI, -32°C)</span>
+                  </div>
+                  {historicalDateInput.startsWith('2024-07') && <Check className="w-3.5 h-3.5 text-amber-600" />}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectHistoricalDate('2025-01-15T12:00:00Z')}
+                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
+                >
+                  <div>
+                    <span className="font-bold text-slate-900 block">Austral Summer (Mid-January)</span>
+                    <span className="text-slate-500 text-[10px]">24h Polar Day (High Solar PV, -8°C)</span>
+                  </div>
+                  {historicalDateInput.startsWith('2025-01') && <Check className="w-3.5 h-3.5 text-amber-600" />}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectHistoricalDate('2026-09-28T12:00:00Z')}
+                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
+                >
+                  <div>
+                    <span className="font-bold text-slate-900 block">Spring Equinox (Late September)</span>
+                    <span className="text-slate-500 text-[10px]">Sun returning, 12h daylight</span>
+                  </div>
+                  {historicalDateInput.startsWith('2026-09') && <Check className="w-3.5 h-3.5 text-amber-600" />}
+                </button>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100">
+                <label className="text-[10px] text-slate-500 block mb-1">Custom ISO Date/Time:</label>
+                <div className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={historicalDateInput}
+                    onChange={(e) => setHistoricalDateInput(e.target.value)}
+                    className="flex-1 px-2 py-1 text-[11px] rounded border border-slate-200 bg-slate-50 focus:outline-none focus:border-sky-500"
+                    placeholder="YYYY-MM-DDTHH:MM:SSZ"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSelectHistoricalDate(historicalDateInput)}
+                    className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-bold text-[10px]"
+                  >
+                    Set
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Temporal Status Badge */}
+          {sessionDataMode === 'HISTORICAL' ? (
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 font-bold">
+              HISTORICAL SIMULATION: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 16) + ' UTC' : historicalDateInput.slice(0, 10)}
+            </span>
+          ) : (
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
+              SIMULATION: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 19) + ' UTC' : 'SYNCHRONIZED'}
+            </span>
+          )}
 
           <ProvenanceTag provenance={viewModel.provenance} size="sm" />
           <span className="text-xs font-mono px-2 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600 font-semibold">

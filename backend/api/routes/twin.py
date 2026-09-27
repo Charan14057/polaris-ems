@@ -55,6 +55,13 @@ class ScenarioClearRequest(BaseModel):
     station_id: str = Field(..., description="Target station")
 
 
+class SessionConfigureRequest(BaseModel):
+    station_id: str = Field(..., description="Target station (BHARATI, MAITRI, HIMADRI)")
+    mode: str = Field(default="LIVE", description="Session mode: LIVE, HISTORICAL, or REPLAY")
+    simulation_time: Optional[str] = Field(default=None, description="ISO timestamp for historical mode, e.g. 2024-07-15T18:00:00Z")
+    time_acceleration: Optional[float] = Field(default=1.0, description="Clock acceleration factor")
+
+
 def get_twin_adapter(
     profile_reg=Depends(get_profile_registry),
     safety_reg=Depends(get_safety_registry),
@@ -218,6 +225,24 @@ async def clear_live_scenario(
     req_id = getattr(request.state, "request_id", "req-twin-scen-clear") if request else "req-twin-scen-clear"
     session = live_twin_manager.get_session(payload.station_id)
     result = session.clear_scenario()
+    return APIResponse.success(data=result, request_id=req_id, provenance="SIMULATED")
+
+
+@router.post("/session/configure", response_model=APIResponse[Dict[str, Any]])
+async def configure_twin_session(
+    payload: SessionConfigureRequest = Body(...),
+    request: Request = None
+) -> APIResponse[Dict[str, Any]]:
+    """
+    Configures live twin session data mode (LIVE vs HISTORICAL vs REPLAY) and simulation anchor timestamp.
+    """
+    req_id = getattr(request.state, "request_id", "req-twin-session-config") if request else "req-twin-session-config"
+    session = live_twin_manager.get_session(payload.station_id)
+    result = session.configure_session(
+        data_mode=payload.mode,
+        simulation_time=payload.simulation_time,
+        time_acceleration=payload.time_acceleration
+    )
     return APIResponse.success(data=result, request_id=req_id, provenance="SIMULATED")
 
 
