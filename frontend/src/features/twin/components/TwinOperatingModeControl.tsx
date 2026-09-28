@@ -142,8 +142,8 @@ export const TwinOperatingModeControl: React.FC<TwinOperatingModeControlProps> =
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
-            SIMULATION ONLY
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
+            COMPUTATIONAL TWIN
           </span>
           <ProvenanceTag provenance="SIMULATED" size="xs" />
         </div>

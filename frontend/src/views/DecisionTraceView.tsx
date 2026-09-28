@@ -14,7 +14,6 @@ import {
 } from '../api/types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
-import { computeDecisionDelta } from '../features/decision/fallbackTraces';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorCard } from '../components/common/ErrorCard';
 import { WhyThisMatters } from '../components/common/WhyThisMatters';
@@ -152,31 +151,23 @@ export const DecisionTraceView: React.FC = () => {
 
   // Run comparison when compareTraceId is chosen
   const handleCompare = async (targetId: string) => {
-    if (!selectedTraceId || !targetId) return;
+    if (!selectedTraceId || !targetId) {
+      setCompareTraceId(null);
+      setComparisonDelta(null);
+      return;
+    }
+    setCompareTraceId(targetId);
+    setActiveTab('comparison');
     try {
       const res = await api.compareTraces(selectedTraceId, targetId);
       if (res?.data) {
         setComparisonDelta(res.data);
-        setCompareTraceId(targetId);
-        setActiveTab('comparison');
         return;
       }
-    } catch {
-      // Local fallback computation
+    } catch (err) {
+      console.warn('Backend trace comparison query error:', err);
     }
-    const currentT = traceDetail;
-    const targetSummary = traceHistory.find(t => t.decision_trace_id === targetId);
-    if (currentT && targetSummary) {
-      const fbTarget: TraceDetail = {
-        ...currentT,
-        decision_trace_id: targetId,
-        execution_status: targetSummary.execution_status
-      };
-      const delta = computeDecisionDelta(currentT, fbTarget);
-      setComparisonDelta(delta);
-      setCompareTraceId(targetId);
-      setActiveTab('comparison');
-    }
+    setComparisonDelta(null);
   };
 
   // Export trace handler
@@ -844,8 +835,17 @@ export const DecisionTraceView: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center text-slate-400 font-mono text-xs border border-dashed border-slate-200 rounded bg-white">
-                  Select a comparison trace from the dropdown above to compute the factual decision delta.
+                <div className="p-8 text-center text-slate-500 font-mono text-xs border border-dashed border-slate-200 rounded-lg bg-slate-50 space-y-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 mx-auto" />
+                  <div className="font-bold text-slate-800 uppercase tracking-wide">
+                    {compareTraceId ? 'COMPARISON UNAVAILABLE' : 'NO COMPARISON TRACE SELECTED'}
+                  </div>
+                  <div className="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">
+                    {compareTraceId 
+                      ? `Authoritative backend comparison between ${selectedTraceId} and ${compareTraceId} is not available in the operational trace archive. Zero synthetic traces are displayed.`
+                      : 'Select an earlier or baseline decision trace from the dropdown above to compute the factual decision delta.'
+                    }
+                  </div>
                 </div>
               )}
             </div>

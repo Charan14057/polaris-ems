@@ -207,7 +207,7 @@ export const OptimizationView: React.FC = () => {
 
           <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200">
             <span className="text-teal-700 font-bold uppercase text-[10px] block mb-1">
-              02 TWIN SIMULATION REPLAY
+              02 COMPUTATIONAL TWIN REPLAY
             </span>
             <span className="text-slate-900 font-bold block">Kirchhoff Balance Verified</span>
             <span className="text-slate-500 text-[11px] block mt-0.5">

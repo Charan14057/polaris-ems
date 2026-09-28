@@ -491,7 +491,7 @@ describe('Phase 18 Spatial Digital Twin Engine - Components Rendering', () => {
     );
 
     expect(screen.getByText('OPERATING MODE:')).toBeInTheDocument();
-    expect(screen.getByText('SIMULATION ONLY')).toBeInTheDocument();
+    expect(screen.getByText('COMPUTATIONAL TWIN')).toBeInTheDocument();
     expect(screen.getByText('AUTO: RECOMMENDED DISPATCH ACTION')).toBeInTheDocument();
     expect(screen.getByText('APPROVAL REQUIRED')).toBeInTheDocument();
 

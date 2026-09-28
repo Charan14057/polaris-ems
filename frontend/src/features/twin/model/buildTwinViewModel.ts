@@ -65,7 +65,8 @@ export function buildTwinViewModel(params: BuildTwinViewModelParams): TwinViewMo
   const batCharge = Number(twinState?.battery?.charge_kw || 0.0);
   const batDischarge = Number(twinState?.battery?.discharge_kw || 0.0);
   const batPower = batDischarge - batCharge; // positive = net supplier to bus, negative = load
-  const batSoc = Number(twinState?.battery?.soc_pct !== undefined ? twinState?.battery?.soc_pct : 0.65);
+  const rawSoc = twinState?.battery?.soc_pct !== undefined ? Number(twinState.battery.soc_pct) : 0.65;
+  const batSoc = rawSoc <= 1.0 ? rawSoc * 100.0 : rawSoc;
 
   // 2. Build Device Visual Registry
   const stationDevices = stationDetail?.devices || [];
@@ -378,7 +379,7 @@ export function buildTwinViewModel(params: BuildTwinViewModelParams): TwinViewMo
       windGenerationKw: Math.round(windGen * 10) / 10,
       dieselGenerationKw: Math.round(dieselGen * 10) / 10,
       batteryPowerKw: Math.round(batPower * 10) / 10,
-      batterySocPct: Math.round(batSoc * 1000) / 10, // e.g. 65.2%
+      batterySocPct: Math.round(batSoc * 10) / 10, // e.g. 65.2%
       totalLoadKw: Math.round(totalLoad * 10) / 10,
       servedLoadKw: Math.round(servedLoad * 10) / 10,
       unservedLoadKw: Math.round(unservedLoad * 10) / 10,

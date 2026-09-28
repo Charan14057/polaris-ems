@@ -45,7 +45,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
     { name: 'Solar PV Array', type: 'SOLAR', kw: viewModel.powerSummary.solarGenerationKw, status: viewModel.powerSummary.solarGenerationKw > 0.1 ? 'ONLINE' : 'DORMANT' },
     { name: 'Wind Turbine Fleet', type: 'WIND', kw: viewModel.powerSummary.windGenerationKw, status: viewModel.powerSummary.windGenerationKw > 0.1 ? 'ONLINE' : 'DORMANT' },
     { name: 'Diesel Generator Bank', type: 'DIESEL', kw: viewModel.powerSummary.dieselGenerationKw, status: viewModel.powerSummary.dieselGenerationKw > 0.1 ? 'ONLINE' : 'STANDBY' },
-    { name: 'Battery Storage (BESS)', type: 'BATTERY', kw: Math.abs(viewModel.powerSummary.batteryPowerKw), status: `${(viewModel.powerSummary.batterySocPct * 100).toFixed(0)}% SoC` }
+    { name: 'Battery Storage (BESS)', type: 'BATTERY', kw: Math.abs(viewModel.powerSummary.batteryPowerKw), status: `${viewModel.powerSummary.batterySocPct.toFixed(0)}% SoC` }
   ];
 
   return (

@@ -135,8 +135,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobileMenu, onNavigateToPo
             className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-mono font-medium bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200 transition-colors"
             title="Environment & Physical Boundary Status"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-            <span className="hidden sm:inline">SIMULATION</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+            <span className="hidden sm:inline">COMPUTATIONAL TWIN</span>
             <Info className="w-3 h-3 text-slate-400" />
           </button>
 
@@ -147,15 +147,16 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobileMenu, onNavigateToPo
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   Operational Boundary
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-                  Air-Gapped
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200 font-bold">
+                  Physical Air-Gap
                 </span>
               </div>
               <p className="leading-relaxed">
-                Operating in simulation mode. Software models forward station physics and optimizes dispatch plans.
+                Operating as high-fidelity computational twin. Software models forward station physics and optimizes dispatch plans.
               </p>
               <div className="p-2 bg-slate-50 rounded border border-slate-100 text-[11px] font-mono text-slate-500 space-y-1">
-                <div>SCADA Link: <span className="text-slate-700 font-semibold">Disconnected</span></div>
+                <div>PHYSICAL_SCADA_LINK: <span className="text-slate-800 font-semibold font-mono">FALSE</span></div>
+                <div>PHYSICAL_CONNECTIVITY: <span className="text-slate-800 font-semibold font-mono">DISCONNECTED</span></div>
                 <div>Actuation: <span className="text-slate-700 font-semibold">Operator Auth Required</span></div>
                 <div>Provenance: <span className="text-slate-700 font-semibold">6 Locked Tiers</span></div>
               </div>

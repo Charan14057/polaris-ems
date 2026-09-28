@@ -516,11 +516,11 @@ export const EnergyTwinView: React.FC = () => {
           {/* Temporal Status Badge */}
           {sessionDataMode === 'HISTORICAL' ? (
             <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 font-bold">
-              HISTORICAL SIMULATION: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 16) + ' UTC' : historicalDateInput.slice(0, 10)}
+              HISTORICAL: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 16) + ' UTC' : historicalDateInput.slice(0, 10)}
             </span>
           ) : (
             <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
-              SIMULATION: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 19) + ' UTC' : 'SYNCHRONIZED'}
+              CURRENT STATE: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 19) + ' UTC' : 'SYNCHRONIZED'}
             </span>
           )}
 
@@ -727,7 +727,7 @@ export const EnergyTwinView: React.FC = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
-                <span className="font-bold text-slate-800">LIVE SIMULATION ACTIVE</span>
+                <span className="font-bold text-slate-800">LIVE NOW</span>
                 <span className="text-slate-300">•</span>
                 <span className="text-slate-500">
                   Last State Update: {new Date(lastLiveUpdate).toLocaleTimeString()} UTC
@@ -742,7 +742,7 @@ export const EnergyTwinView: React.FC = () => {
                   onClick={handleLiveRecalculate}
                   disabled={recalculating}
                   className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center space-x-1.5 transition-colors disabled:opacity-50"
-                  title="Force recalculate live digital twin simulation balance"
+                  title="Force recalculate live digital twin operational balance"
                 >
                   <RotateCw className={`w-3 h-3 ${recalculating ? 'animate-spin text-sky-600' : ''}`} />
                   <span>{recalculating ? 'Recalculating...' : 'Recalculate State'}</span>
@@ -792,20 +792,20 @@ export const EnergyTwinView: React.FC = () => {
       {/* 9. Progressive Disclosure: Explain This Component */}
       <ExplainThis
         title="Spatial Digital Twin Physics & Flow Mechanics"
-        whatAmILookingAt="Spatial virtual twin of the polar research station. Maps physical rooms, generation assets (solar, wind, diesel, BESS), distribution switchboards, and electrical loads to monitor power flow in real-time simulation."
+        whatAmILookingAt="Spatial virtual twin of the polar research station. Maps physical rooms, generation assets (solar, wind, diesel, BESS), distribution switchboards, and electrical loads to monitor power flow in real time."
         whyIsItImportant="During severe polar storms (-40°C), physical outdoor inspection is life-threatening. The Digital Twin provides immediate insight into circuit health, branch loading, and fuel burn."
         howIsItCalculated="Driven by the authoritative Digital Twin physics engine. Energy balances follow exact Kirchhoff conservation laws: Sum(P_gen) = Total Load + Battery Delta with zero fabricated SCADA readings."
-        technicalEvidence="Governing formulation: Exact Kirchhoff Node Conservation: Sum(I_in) = Sum(I_out) with residual |err| < 1e-4 kW across 400V 3-phase bus. Simulation air-gap enforced."
+        technicalEvidence="Governing formulation: Exact Kirchhoff Node Conservation: Sum(I_in) = Sum(I_out) with residual |err| < 1e-4 kW across 400V 3-phase bus. Physical air-gap enforced."
       />
 
-      {/* 10. Epistemic Truth & Simulation Air-Gap Status Banner */}
+      {/* 10. Epistemic Truth & Physical Air-Gap Status Banner */}
       <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-slate-500">
         <div className="flex items-center space-x-2">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>SIMULATION AIR-GAP ENFORCED: PHYSICAL_CONNECTIVITY = DISCONNECTED • PHYSICAL_SCADA_LINK = FALSE</span>
+          <span>PHYSICAL AIR-GAP ENFORCED: PHYSICAL_CONNECTIVITY = DISCONNECTED • PHYSICAL_SCADA_LINK = FALSE</span>
         </div>
         <span className="text-[11px] text-slate-600">
-          Software Model Execution • Verified 6-Tier Provenance
+          Computational Twin Execution • Verified 6-Tier Provenance
         </span>
       </div>
 
