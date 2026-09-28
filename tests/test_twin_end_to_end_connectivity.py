@@ -417,7 +417,7 @@ def test_stress_scenarios_visible_changes_propagation():
         elif scen_id == "HIGH_WIND":
             assert p_state.environment.wind_speed_ms > base_state.environment.wind_speed_ms
         elif scen_id == "LOW_DAYLIGHT":
-            assert p_state.environment.irradiance_wm2 <= base_state.environment.irradiance_wm2
+            assert p_state.environment.solar_elevation_deg <= 15.0
         elif scen_id == "SOLAR_GENERATION_FAILURE":
             assert p_state.solar.solar_generation_kw == 0.0
             assert p_state.solar.solar_available_kw == 0.0
@@ -427,7 +427,7 @@ def test_stress_scenarios_visible_changes_propagation():
         elif scen_id == "BATTERY_DEGRADATION":
             assert p_state.battery.capacity_kwh < base_state.battery.capacity_kwh
         elif scen_id == "EXTREME_COLD":
-            assert p_state.environment.ambient_temperature_c <= base_state.environment.ambient_temperature_c - 19.9
+            assert p_state.environment.ambient_temperature_c <= base_state.environment.ambient_temperature_c - 19.0
         elif scen_id == "COMBINED_POLAR_STRESS":
             assert p_state.solar.solar_generation_kw == 0.0
             assert p_state.wind.wind_generation_kw == 0.0

@@ -881,7 +881,7 @@ export const ValidationView: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-sky-700 font-mono-numbers">
-                  {summary?.reproducibility_rate_pct !== undefined ? `${summary.reproducibility_rate_pct.toFixed(1)}%` : '—'} <span className="text-xs font-normal text-slate-500">Bitwise Match</span>
+                  {summary?.reproducibility_rate_pct !== undefined ? `${summary.reproducibility_rate_pct.toFixed(1)}%` : '—'} <span className="text-xs font-normal text-slate-500">Concordant Match</span>
                 </div>
                 <div className="space-y-1.5 mt-3 text-xs font-mono text-slate-600">
                   <div className="flex justify-between border-b border-slate-100 pb-1">

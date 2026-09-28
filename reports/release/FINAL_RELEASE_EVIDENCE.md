@@ -5,7 +5,7 @@
 **Final Release Gate Status:** RELEASE CANDIDATE — BROWSER VERIFICATION REMAINING  
 **Physical SCADA Boundary:** `PHYSICAL_CONNECTIVITY = DISCONNECTED` (High-Fidelity Real-Time Computational Digital Twin; NOT Live Physical SCADA, NOT Live Antarctic Telemetry, NOT Physical Autonomous Control)  
 **Browser Automation Tooling Status:** `BROWSER_AUTOMATION = NOT_AVAILABLE` (Remote Playwright binary CDN 404; local browser automation unavailable in execution sandbox)  
-**Automated Component & Engine Tests:** `AUTOMATED COMPONENT TESTS = PASS` (418 backend pytest units + 36 frontend vitest components)  
+**Automated Component & Engine Tests:** `AUTOMATED COMPONENT TESTS = PASS` (421 backend pytest units + 36 frontend vitest components)  
 
 ---
 
@@ -57,7 +57,7 @@
 - **STATUS:** AUTOMATED-ONLY
 
 ### Claim 4: Validation View Fallback Bug Resolved
-- **CLAIM:** Runtime silent fallback patterns (`|| 3.55`, `|| 84.3`, `|| 100.0`, `|| 'PASS'`) are eliminated in `ValidationView.tsx`. When backend benchmark metrics are null or undefined, the UI displays `—` rather than silent fallback defaults. Real backend metrics from `forecastMetrics` and `summary` are consumed without deleting legitimate API data.
+- **CLAIM:** Runtime silent fallback patterns (`|| 3.55`, `|| 84.3`, `|| 100.0`, `|| 'PASS'`) are eliminated in `ValidationView.tsx`. When backend benchmark metrics are null or undefined, the UI displays `—` rather than silent fallback defaults. Real backend metrics from `forecastMetrics` and `summary` are consumed without deleting legitimate API data. Replaced `Bitwise Match` with `Concordant Match`.
 - **SOURCE:** `frontend/src/views/ValidationView.tsx`, `frontend/src/api/validationApi.ts`.
 - **TEST:** `npm run lint` (`tsc --noEmit`), `npm test -- --run`.
 - **RESULT:** Typecheck passes with 0 errors. Fallbacks cleanly render `—` when unloaded; actual MAE values are dynamically sourced from backend `forecastMetrics`.
@@ -83,7 +83,7 @@ $$(P_{\text{solar}} + P_{\text{wind}} + P_{\text{diesel}} + P_{\text{bat\_dischg
 - **CLAIM:** All 14 scenarios execute against a formal machine-readable contract (`backend/scenarios/contract.py` / `contract.json`) verifying 10 facets across the 20-step closed-loop lifecycle (baseline capture $\to$ perturbation $\to$ advance $\to$ causal delta assert $\to$ clear $\to$ restoration).
 - **SOURCE:** `backend/scenarios/contract.py`, `tests/test_scenario_full_circle.py`.
 - **TEST:** `pytest tests/test_scenario_full_circle.py -v`.
-- **RESULT:** 16 passed in $4.11\text{s}$. Zero drift upon restoration.
+- **RESULT:** 16 passed. Zero drift upon restoration.
 - **STATUS:** AUTOMATED-ONLY
 
 ### Claim 8: Custom Scenario Injection & Twin Delta
@@ -127,18 +127,19 @@ Backend TwinState $\equiv$ REST API Response $\equiv$ Power Flow Topology $\equi
 - **SOURCE:** `pytest.ini`, `frontend/vite.config.ts`, `package.json`.
 - **TEST:** `pytest -q`, `npm test -- --run`, `npm run lint`, `npm run build`.
 - **RESULT:**
-  - Backend: 418 passed in pytest suite.
-  - Frontend: 36 passed in vitest suite.
+  - Backend: 421 passed in pytest suite (100%).
+  - Frontend: 36 passed in vitest suite (100%).
   - Lint: 0 errors (`tsc --noEmit`).
-  - Production build: `vite build` completed in $14.26\text{s}$ (`dist/index.html` $1.20\text{ kB}$, `dist/assets/index.js` $1,274.11\text{ kB}$).
+  - Production build: `vite build` completed in $14.26\text{s}$ (`dist/index.html` $1.20\text{ kB}$, `dist/assets/index.js` $1,274.12\text{ kB}$).
 - **STATUS:** VERIFIED
 
 ---
 
 ## 3. Final Release Determination
 
-Because remote Playwright browser binary download is blocked by upstream CDN 404 in this environment, interactive browser session recording could not be executed autonomously. In strict adherence to scientific truth and the release verification rubric:
+Because remote Playwright browser binary download is blocked by upstream CDN 404 in this environment, interactive browser session recording could not be executed autonomously:
 
-- Automated Code & Engine Verification: **100% COMPLETE & PASSING**
+- Automated Code & Engine Verification: **100% COMPLETE & PASSING (421 backend + 36 frontend tests)**
 - Epistemic Language & Boundaries: **STRICTLY ENFORCED**
+- Browser Verification Status: **`BROWSER VERIFICATION = NOT AVAILABLE`**
 - Release Status: **`RELEASE CANDIDATE — BROWSER VERIFICATION REMAINING`**
