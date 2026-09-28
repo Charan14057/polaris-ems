@@ -523,3 +523,67 @@ describe('Phase 18 Spatial Digital Twin Engine - Components Rendering', () => {
   });
 });
 
+describe('Phase 18 Visual Fidelity V2 - Real-World 3D Architectural & Industrial Mesh Builders', () => {
+  it('builds Bharati station with distinct aerodynamic architecture and industrial equipment', async () => {
+    const { buildBharatiStation } = await import('../features/twin/model/stationMeshBuilders');
+    const res = buildBharatiStation('ENERGY', false);
+
+    expect(res.architectureGroup).toBeDefined();
+    expect(res.terrainMesh).toBeDefined();
+    expect(res.interactiveMeshes.has('diesel_generator_1')).toBe(true);
+    expect(res.interactiveMeshes.has('bess_bank_1')).toBe(true);
+    expect(res.interactiveMeshes.has('bh_obj_main_bus')).toBe(true);
+    expect(res.interactiveMeshes.has('solar_pv_array')).toBe(true);
+    expect(res.interactiveMeshes.has('wind_turbine_1')).toBe(true);
+    expect(res.turbines.length).toBe(2);
+    expect(res.statusIndicators && res.statusIndicators.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('builds Maitri station with distributed modular blocks, central spine, and lake pump', async () => {
+    const { buildMaitriStation } = await import('../features/twin/model/stationMeshBuilders');
+    const res = buildMaitriStation('ENERGY', false);
+
+    expect(res.architectureGroup).toBeDefined();
+    expect(res.terrainMesh).toBeDefined();
+    expect(res.interactiveMeshes.has('mt_diesel')).toBe(true);
+    expect(res.interactiveMeshes.has('mt_bess')).toBe(true);
+    expect(res.interactiveMeshes.has('node_mt_main_bus')).toBe(true);
+    expect(res.interactiveMeshes.has('mt_pribarshini_water')).toBe(true);
+    expect(res.turbines.length).toBe(1);
+  });
+
+  it('builds Himadri station with Nordic two-storey lodge and district 400V tie-in', async () => {
+    const { buildHimadriStation } = await import('../features/twin/model/stationMeshBuilders');
+    const res = buildHimadriStation('ENERGY', false);
+
+    expect(res.architectureGroup).toBeDefined();
+    expect(res.terrainMesh).toBeDefined();
+    expect(res.interactiveMeshes.has('node_hm_diesel')).toBe(true);
+    expect(res.interactiveMeshes.has('node_hm_bess')).toBe(true);
+    expect(res.interactiveMeshes.has('node_hm_main_bus')).toBe(true);
+    expect(res.turbines.length).toBe(1);
+  });
+
+  it('verifies PBR material factory creates procedural textures and standard materials', async () => {
+    const { 
+      createInsulatedCladdingMaterial, 
+      createStructuralSteelMaterial,
+      createPhotovoltaicMaterial,
+      createConcreteFoundationMaterial
+    } = await import('../features/twin/model/pbrMaterialFactory');
+
+    const clad = createInsulatedCladdingMaterial(0xf1f5f9);
+    expect(clad.roughness).toBeCloseTo(0.42, 1);
+    expect(clad.metalness).toBeCloseTo(0.35, 1);
+
+    const steel = createStructuralSteelMaterial(0x334155);
+    expect(steel.metalness).toBeCloseTo(0.78, 1);
+
+    const pv = createPhotovoltaicMaterial();
+    expect(pv.map).toBeDefined();
+
+    const concrete = createConcreteFoundationMaterial();
+    expect(concrete.map).toBeDefined();
+  });
+});
+

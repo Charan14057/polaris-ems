@@ -45,6 +45,7 @@ import {
   buildHimadriStation 
 } from '../model/stationMeshBuilders';
 import { createPolarEnvironment, PolarEnvironmentHandles } from '../model/polarEnvironment3D';
+import { createStructuralSteelMaterial } from '../model/pbrMaterialFactory';
 import { ReferenceComparisonModal } from './ReferenceComparisonModal';
 
 interface TwinCanvas3DProps {
@@ -106,11 +107,13 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     mesh: THREE.Mesh 
   }[]>([]);
   const turbinesRef = useRef<{ rotorGroup: THREE.Group; speedMultiplier: number }[]>([]);
+  const statusIndicatorsRef = useRef<{ mesh: THREE.Mesh; type: 'DG' | 'BESS' | 'WIND' | 'SOLAR' | 'BUS'; id: string }[]>([]);
   const environmentRef = useRef<PolarEnvironmentHandles | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
 
-  // Mouse orbit & camera position state
+  // Mouse orbit & camera position state (with smooth glide interpolation)
   const isDraggingRef = useRef<boolean>(false);
+  const isTransitioningRef = useRef<boolean>(false);
   const previousMousePositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const cameraSphericalRef = useRef<{ radius: number; theta: number; phi: number }>({
     radius: 54,
@@ -118,6 +121,12 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     phi: Math.PI / 3.2
   });
   const cameraTargetRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 4.5, 0));
+  const targetSphericalRef = useRef<{ radius: number; theta: number; phi: number }>({
+    radius: 54,
+    theta: Math.PI / 4,
+    phi: Math.PI / 3.2
+  });
+  const targetTargetRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 4.5, 0));
 
   // Initialize Three.js Scene
   useEffect(() => {
@@ -226,7 +235,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     const target = cameraTargetRef.current;
 
     const x = target.x + radius * Math.sin(phi) * Math.sin(theta);
-    const y = target.y + radius * Math.cos(phi);
+    const y = Math.max(1.5, target.y + radius * Math.cos(phi));
     const z = target.z + radius * Math.sin(phi) * Math.cos(theta);
 
     cameraRef.current.position.set(x, y, z);
@@ -268,6 +277,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     meshesRef.current.set('station_architecture', stationResult.architectureGroup);
 
     turbinesRef.current = stationResult.turbines;
+    statusIndicatorsRef.current = stationResult.statusIndicators || [];
 
     // Register interactive equipment meshes
     stationResult.interactiveMeshes.forEach((mesh, devId) => {
@@ -281,70 +291,59 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       if (activeFilter === 'LOADS' && !obj.category.includes('LOAD') && obj.category !== 'SCIENCE' && obj.category !== 'HABITATION') return;
       if (activeFilter === 'THERMAL' && !obj.id.includes('heat') && !obj.id.includes('boiler') && !obj.id.includes('life')) return;
 
+      // If already registered as an interactive mesh in stationResult, bind metadata and skip redundant box creation
+      const existingMesh = 
+        (obj.deviceId && stationResult.interactiveMeshes.get(obj.deviceId)) ||
+        stationResult.interactiveMeshes.get(obj.id);
+
+      if (existingMesh) {
+        existingMesh.userData = { ...existingMesh.userData, spatialObject: obj };
+        meshesRef.current.set(`obj_${obj.id}`, existingMesh);
+        return;
+      }
+
+      // Interior equipment racks, science benches, utility modules
       const group = new THREE.Group();
       group.position.set(obj.position[0], obj.position[1], obj.position[2]);
-
-      // Determine object color & dynamic state
-      let hexColor = obj.color ? parseInt(obj.color.replace('#', '0x')) : 0x0284c7;
-      if (obj.status === 'FAULT') hexColor = 0xe11d48;
-      if (obj.status === 'STANDBY') hexColor = 0x94a3b8;
 
       const isSelected = selectedDeviceId && (obj.deviceId === selectedDeviceId || obj.id === selectedDeviceId);
       const isTraceActive = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
       const isRelatedToSelection = isSelected || (selectedDeviceId && obj.circuitId && obj.circuitId.includes(selectedDeviceId));
       const objectOpacity = (isTraceActive && !isRelatedToSelection && selectedDeviceId) ? 0.25 : 1.0;
 
-      if (obj.meshType === 'cylinder') {
-        const geo = new THREE.CylinderGeometry(obj.dimensions[0] / 2, obj.dimensions[0] / 2, obj.dimensions[1], 16);
-        const mat = new THREE.MeshStandardMaterial({
-          color: hexColor,
-          roughness: 0.4,
-          wireframe: wireframeOnly,
-          transparent: objectOpacity < 1.0,
-          opacity: objectOpacity
-        });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        group.add(mesh);
-      } else if (obj.meshType !== 'turbine') {
-        // Equipment Box / Control Panel / Bus
-        const geo = new THREE.BoxGeometry(obj.dimensions[0], obj.dimensions[1], obj.dimensions[2]);
-        const mat = new THREE.MeshStandardMaterial({
-          color: hexColor,
-          roughness: 0.5,
-          wireframe: wireframeOnly,
-          emissive: isSelected ? new THREE.Color(0x38bdf8) : new THREE.Color(0x000000),
-          emissiveIntensity: isSelected ? 0.45 : 0.0,
-          transparent: objectOpacity < 1.0,
-          opacity: objectOpacity
-        });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        group.add(mesh);
+      // Realistic Industrial Equipment Cubicle / Server Enclosure
+      const cabMat = createStructuralSteelMaterial(0x1e293b, {
+        wireframe: wireframeOnly,
+        transparent: objectOpacity < 1.0,
+        opacity: objectOpacity
+      });
+      const cubicle = new THREE.Mesh(new THREE.BoxGeometry(obj.dimensions[0], obj.dimensions[1], obj.dimensions[2]), cabMat);
+      cubicle.castShadow = true;
+      cubicle.receiveShadow = true;
+      group.add(cubicle);
 
-        // Edges
-        const edgeGeo = new THREE.EdgesGeometry(geo);
-        const edgeMat = new THREE.LineBasicMaterial({
-          color: isSelected ? 0x38bdf8 : 0x475569,
-          linewidth: isSelected ? 2 : 1,
-          transparent: objectOpacity < 1.0,
-          opacity: objectOpacity
-        });
-        const edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
-        group.add(edgeLine);
+      // Status display bezel
+      const displayMat = new THREE.MeshBasicMaterial({
+        color: obj.status === 'FAULT' ? 0xe11d48 : (obj.status === 'STANDBY' ? 0xf59e0b : 0x0284c7)
+      });
+      const disp = new THREE.Mesh(new THREE.PlaneGeometry(obj.dimensions[0] * 0.7, obj.dimensions[1] * 0.25), displayMat);
+      disp.position.set(0, obj.dimensions[1] * 0.2, obj.dimensions[2] / 2 + 0.01);
+      group.add(disp);
 
-        // Status indicator LED pip on top of equipment
-        const ledGeo = new THREE.SphereGeometry(0.2, 8, 8);
-        const ledColor = obj.status === 'ONLINE' ? 0x10b981 : (obj.status === 'FAULT' ? 0xe11d48 : 0xf59e0b);
-        const ledMat = new THREE.MeshBasicMaterial({ color: ledColor });
-        const led = new THREE.Mesh(ledGeo, ledMat);
-        led.position.set(0, obj.dimensions[1] / 2 + 0.25, 0);
-        group.add(led);
+      // Status indicator LED pip on top
+      const ledGeo = new THREE.SphereGeometry(0.12, 8, 8);
+      const ledColor = obj.status === 'ONLINE' ? 0x10b981 : (obj.status === 'FAULT' ? 0xe11d48 : 0xf59e0b);
+      const led = new THREE.Mesh(ledGeo, new THREE.MeshBasicMaterial({ color: ledColor }));
+      led.position.set(0, obj.dimensions[1] / 2 + 0.15, 0);
+      group.add(led);
+
+      // If selected, add high-precision engineering CAD bracket corners
+      if (isSelected) {
+        const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(obj.dimensions[0] + 0.2, obj.dimensions[1] + 0.2, obj.dimensions[2] + 0.2));
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+        group.add(new THREE.LineSegments(edgeGeo, edgeMat));
       }
 
-      // Attach metadata for raycasting
       group.userData = { spatialObject: obj };
       scene.add(group);
       meshesRef.current.set(`obj_${obj.id}`, group);
@@ -394,11 +393,11 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const tubeRadius = Math.max(0.08, Math.min(0.24, 0.08 + (powerKw / 250) * 0.16));
       const tubeGeo = new THREE.TubeGeometry(curve, 32, tubeRadius, 8, false);
       const tubeMat = new THREE.MeshStandardMaterial({
-        color: activeFlow ? lineColor : 0x475569,
+        color: activeFlow ? lineColor : 0x334155,
         emissive: activeFlow ? new THREE.Color(lineColor) : new THREE.Color(0x000000),
-        emissiveIntensity: activeFlow ? 0.6 : 0.0,
-        roughness: 0.3,
-        metalness: 0.5,
+        emissiveIntensity: activeFlow ? 0.75 : 0.0,
+        roughness: 0.35,
+        metalness: 0.65,
         transparent: true,
         opacity: pathOpacity
       });
@@ -444,7 +443,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     viewModel.powerSummary.batteryPowerKw
   ]);
 
-  // Animation Loop (Rotors, Dynamic Energy Particles, Render Loop)
+  // Animation Loop (Rotors, Dynamic Energy Particles, Render Loop & Smooth Camera Glide)
   useEffect(() => {
     const scene = sceneRef.current;
     const renderer = rendererRef.current;
@@ -452,9 +451,28 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     if (!scene || !renderer || !camera) return;
 
     const animate = () => {
+      // 0. Smooth Camera Interpolation towards Target Presets
+      if (isTransitioningRef.current) {
+        const damp = 0.08;
+        cameraSphericalRef.current.radius += (targetSphericalRef.current.radius - cameraSphericalRef.current.radius) * damp;
+        cameraSphericalRef.current.theta += (targetSphericalRef.current.theta - cameraSphericalRef.current.theta) * damp;
+        cameraSphericalRef.current.phi += (targetSphericalRef.current.phi - cameraSphericalRef.current.phi) * damp;
+        cameraTargetRef.current.lerp(targetTargetRef.current, damp);
+
+        const dr = Math.abs(targetSphericalRef.current.radius - cameraSphericalRef.current.radius);
+        const dth = Math.abs(targetSphericalRef.current.theta - cameraSphericalRef.current.theta);
+        const dphi = Math.abs(targetSphericalRef.current.phi - cameraSphericalRef.current.phi);
+        const dTarget = cameraTargetRef.current.distanceTo(targetTargetRef.current);
+
+        if (dr < 0.1 && dth < 0.01 && dphi < 0.01 && dTarget < 0.1) {
+          isTransitioningRef.current = false;
+        }
+        updateCameraPosition();
+      }
+
       // 1. Animate Wind Turbine Rotors (Rotational speed scales with wind generation kW)
       const windActive = viewModel.powerSummary.windGenerationKw > 0.1;
-      const baseRotorSpeed = windActive ? 0.045 : 0.004;
+      const baseRotorSpeed = windActive ? 0.045 : 0.002;
 
       turbinesRef.current.forEach(t => {
         t.rotorGroup.rotation.z += baseRotorSpeed * t.speedMultiplier;
@@ -478,7 +496,39 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         p.mesh.position.copy(pos);
       });
 
-      // 3. Animate Polar Atmosphere, Weather Flurries, Aurora & Thermal Exhaust Plumes
+      // 3. Dynamic Real-Time Industrial Equipment Status LEDs
+      statusIndicatorsRef.current.forEach(ind => {
+        if (!ind.mesh || !ind.mesh.material) return;
+        const mat = ind.mesh.material as THREE.MeshStandardMaterial;
+        if (ind.type === 'DG') {
+          const isDgOn = viewModel.powerSummary.dieselGenerationKw > 0.1;
+          mat.color.setHex(isDgOn ? 0x10b981 : 0x475569);
+          mat.emissive.setHex(isDgOn ? 0x10b981 : 0x000000);
+          mat.emissiveIntensity = isDgOn ? 0.95 : 0.0;
+        } else if (ind.type === 'BESS') {
+          const p = viewModel.powerSummary.batteryPowerKw;
+          if (p < -0.1) {
+            mat.color.setHex(0x10b981);
+            mat.emissive.setHex(0x10b981);
+            mat.emissiveIntensity = 0.5 + Math.sin(Date.now() * 0.005) * 0.4;
+          } else if (p > 0.1) {
+            mat.color.setHex(0x38bdf8);
+            mat.emissive.setHex(0x38bdf8);
+            mat.emissiveIntensity = 0.5 + Math.sin(Date.now() * 0.005) * 0.4;
+          } else {
+            mat.color.setHex(0xf59e0b);
+            mat.emissive.setHex(0xf59e0b);
+            mat.emissiveIntensity = 0.6;
+          }
+        } else if (ind.type === 'BUS') {
+          const hasPower = viewModel.powerSummary.totalGenerationKw > 0.1 || Math.abs(viewModel.powerSummary.batteryPowerKw) > 0.1;
+          mat.color.setHex(hasPower ? 0x38bdf8 : 0xef4444);
+          mat.emissive.setHex(hasPower ? 0x38bdf8 : 0xef4444);
+          mat.emissiveIntensity = hasPower ? 0.85 : 0.4;
+        }
+      });
+
+      // 4. Animate Polar Atmosphere, Weather Flurries, Aurora & Thermal Exhaust Plumes
       if (environmentRef.current) {
         const isBlizzard = viewModel.environment.stormState === 'BLIZZARD' || 
           (viewModel.environment.windSpeedMs > 18);
@@ -500,13 +550,17 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   }, [
     viewModel.powerSummary.windGenerationKw,
     viewModel.powerSummary.dieselGenerationKw,
+    viewModel.powerSummary.batteryPowerKw,
+    viewModel.powerSummary.totalGenerationKw,
     viewModel.environment.windSpeedMs,
-    viewModel.environment.stormState
+    viewModel.environment.stormState,
+    updateCameraPosition
   ]);
 
   // Mouse Orbit & Pan Controls
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     isDraggingRef.current = true;
+    isTransitioningRef.current = false;
     previousMousePositionRef.current = { x: e.clientX, y: e.clientY };
   };
 
@@ -517,6 +571,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     if (!canvas || !camera || !scene) return;
 
     if (isDraggingRef.current) {
+      isTransitioningRef.current = false;
       const deltaX = e.clientX - previousMousePositionRef.current.x;
       const deltaY = e.clientY - previousMousePositionRef.current.y;
 
@@ -533,6 +588,11 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         cameraTargetRef.current.x -= deltaX * panSpeed;
         cameraTargetRef.current.z += deltaY * panSpeed;
       }
+
+      targetSphericalRef.current.theta = cameraSphericalRef.current.theta;
+      targetSphericalRef.current.phi = cameraSphericalRef.current.phi;
+      targetSphericalRef.current.radius = cameraSphericalRef.current.radius;
+      targetTargetRef.current.copy(cameraTargetRef.current);
 
       updateCameraPosition();
       previousMousePositionRef.current = { x: e.clientX, y: e.clientY };
@@ -581,11 +641,13 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
+    isTransitioningRef.current = false;
     const zoomFactor = e.deltaY * 0.035;
     cameraSphericalRef.current.radius = Math.max(
       14,
       Math.min(110, cameraSphericalRef.current.radius + zoomFactor)
     );
+    targetSphericalRef.current.radius = cameraSphericalRef.current.radius;
     updateCameraPosition();
   };
 
@@ -628,43 +690,44 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   // Camera Presets (Cinematic Hero, Renewables Field, Powerhouse BESS/DG, Overhead Drone, Elevation)
   const setCameraPreset = (preset: 'ISOMETRIC' | 'RENEWABLES' | 'POWERHOUSE' | 'TOP' | 'FRONT') => {
     setCameraMode(preset);
+    isTransitioningRef.current = true;
 
     if (preset === 'ISOMETRIC') {
-      cameraTargetRef.current.set(0, 4.5, 0);
-      cameraSphericalRef.current = { radius: 54, theta: Math.PI / 4, phi: Math.PI / 3.2 };
+      targetTargetRef.current.set(0, 4.5, 0);
+      targetSphericalRef.current = { radius: 54, theta: Math.PI / 4, phi: Math.PI / 3.2 };
     } else if (preset === 'RENEWABLES') {
-      // Focus on Solar PV arrays & Wind turbines field
-      cameraTargetRef.current.set(-24, 3.5, 2);
-      cameraSphericalRef.current = { radius: 38, theta: Math.PI / 2.8, phi: Math.PI / 3.5 };
+      targetTargetRef.current.set(-24, 3.5, 2);
+      targetSphericalRef.current = { radius: 38, theta: Math.PI / 2.8, phi: Math.PI / 3.5 };
     } else if (preset === 'POWERHOUSE') {
-      // Focus on BESS energy storage & Diesel Generator powerhouse
-      cameraTargetRef.current.set(24, 3.0, -12);
-      cameraSphericalRef.current = { radius: 34, theta: Math.PI / 5.5, phi: Math.PI / 3.4 };
+      targetTargetRef.current.set(22, 3.0, 0);
+      targetSphericalRef.current = { radius: 34, theta: Math.PI / 5.5, phi: Math.PI / 3.4 };
     } else if (preset === 'TOP') {
-      cameraTargetRef.current.set(0, 0, 0);
-      cameraSphericalRef.current = { radius: 64, theta: 0, phi: 0.08 };
+      targetTargetRef.current.set(0, 0, 0);
+      targetSphericalRef.current = { radius: 64, theta: 0, phi: 0.08 };
     } else if (preset === 'FRONT') {
-      cameraTargetRef.current.set(0, 6.0, 0);
-      cameraSphericalRef.current = { radius: 48, theta: 0, phi: Math.PI / 2 - 0.1 };
+      targetTargetRef.current.set(0, 6.0, 0);
+      targetSphericalRef.current = { radius: 48, theta: 0, phi: Math.PI / 2 - 0.1 };
     }
-    updateCameraPosition();
   };
 
-  // Focus on Selected Asset
+  // Focus on Selected Asset with Smooth Glide
   const focusSelection = () => {
     if (!selectedDeviceId) return;
     const selectedObj = stationProfile3D.objects.find(
       o => o.deviceId === selectedDeviceId || o.id === selectedDeviceId
     );
     if (selectedObj) {
-      cameraTargetRef.current.set(
+      isTransitioningRef.current = true;
+      targetTargetRef.current.set(
         selectedObj.position[0],
-        selectedObj.position[1],
+        Math.max(1.5, selectedObj.position[1]),
         selectedObj.position[2]
       );
-      cameraSphericalRef.current.radius = 24;
-      cameraSphericalRef.current.phi = Math.PI / 3.5;
-      updateCameraPosition();
+      targetSphericalRef.current = {
+        radius: 22,
+        theta: cameraSphericalRef.current.theta,
+        phi: Math.PI / 3.5
+      };
     }
   };
 
