@@ -1,0 +1,98 @@
+{
+  "health_capabilities": {
+    "status": "PASS",
+    "calls": 15,
+    "p50_ms": 15.1,
+    "max_ms": 19.31
+  },
+  "station_telemetry": {
+    "status": "PASS",
+    "calls": 30,
+    "p50_ms": 12.77,
+    "max_ms": 13.9
+  },
+  "spatial_profiles": {
+    "status": "PASS"
+  },
+  "live_simulation_advance": {
+    "status": "PASS",
+    "ticks": 100,
+    "p50_ms": 5.37,
+    "p95_ms": 6.41,
+    "max_residual_kw": 0.0
+  },
+  "scenario_lifecycle": {
+    "status": "PASS",
+    "scenarios_tested": 14,
+    "p50_ms": 19.04,
+    "max_ms": 21.23
+  },
+  "manual_actions": {
+    "status": "PASS",
+    "actions_executed": 15,
+    "p50_ms": 6.29,
+    "max_ms": 7.23
+  },
+  "optimizer": {
+    "status": "PASS",
+    "solves": [
+      {
+        "horizon": 24,
+        "solver_time_sec": 5.683,
+        "api_latency_ms": 5710.66,
+        "objective_value": 305.46
+      },
+      {
+        "horizon": 48,
+        "solver_time_sec": 32.783,
+        "api_latency_ms": 32824.2,
+        "objective_value": 650.97
+      }
+    ],
+    "auto_approval_ms": 5.75
+  },
+  "forward_trajectory": {
+    "status": "PASS",
+    "duration_ms": 37.18,
+    "steps": 48
+  },
+  "topological_trace": {
+    "status": "PASS",
+    "calls": 8,
+    "p50_ms": 4.11,
+    "max_ms": 4.92
+  },
+  "resilience_policy": {
+    "status": "PASS",
+    "stations_evaluated": 3,
+    "p50_ms": 26.81
+  },
+  "pipeline_orchestration": {
+    "status": "PASS",
+    "latency_ms": 943.39,
+    "pipeline_run_id": "pipe-eed9caa2"
+  },
+  "concurrency": {
+    "status": "PASS",
+    "total_requests": 120,
+    "successful_requests": 120,
+    "errors": 0,
+    "error_rate_pct": 0.0,
+    "duration_sec": 0.44,
+    "throughput_req_per_sec": 270.1,
+    "p50_ms": 42.36,
+    "p95_ms": 48.86,
+    "p99_ms": 56.62
+  },
+  "kirchhoff_post_stress": {
+    "status": "PASS",
+    "residuals_kw": {
+      "BHARATI": 0.0,
+      "MAITRI": 0.0,
+      "HIMADRI": 0.0
+    },
+    "acceptance_threshold_kw": 0.05,
+    "max_residual_kw": 0.0
+  },
+  "overall_grade": "PASS"
+}

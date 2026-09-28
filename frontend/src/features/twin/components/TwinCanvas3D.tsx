@@ -26,7 +26,11 @@ import {
   Box,
   Activity,
   Sliders,
-  Focus
+  Focus,
+  Sun,
+  Wind,
+  BatteryCharging,
+  Thermometer
 } from 'lucide-react';
 import { TwinViewModel, TwinDeviceFilter } from '../model/twinTypes';
 import { 
@@ -40,6 +44,7 @@ import {
   buildMaitriStation, 
   buildHimadriStation 
 } from '../model/stationMeshBuilders';
+import { createPolarEnvironment, PolarEnvironmentHandles } from '../model/polarEnvironment3D';
 import { ReferenceComparisonModal } from './ReferenceComparisonModal';
 
 interface TwinCanvas3DProps {
@@ -76,7 +81,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   };
 
   const [hoveredObject, setHoveredObject] = useState<SpatialObject3D | null>(null);
-  const [cameraMode, setCameraMode] = useState<'ISOMETRIC' | 'TOP' | 'FRONT'>('ISOMETRIC');
+  const [cameraMode, setCameraMode] = useState<'ISOMETRIC' | 'RENEWABLES' | 'POWERHOUSE' | 'TOP' | 'FRONT'>('ISOMETRIC');
   const [wireframeOnly, setWireframeOnly] = useState<boolean>(false);
   const [webGlAvailable, setWebGlAvailable] = useState<boolean>(true);
   const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
@@ -101,6 +106,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     mesh: THREE.Mesh 
   }[]>([]);
   const turbinesRef = useRef<{ rotorGroup: THREE.Group; speedMultiplier: number }[]>([]);
+  const environmentRef = useRef<PolarEnvironmentHandles | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
 
   // Mouse orbit & camera position state
@@ -123,19 +129,22 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const width = container.clientWidth || 800;
       const height = container.clientHeight || 580;
 
-      // 1. Scene
+      // 1. Scene with Photorealistic Polar Sky & Atmosphere
       const scene = new THREE.Scene();
-      // Realistic Polar Atmosphere (Slate-900 high-latitude twilight or daylight)
-      scene.background = new THREE.Color(0x0a0f1d); // Deep calm arctic navy/slate
-      scene.fog = new THREE.FogExp2(0x0a0f1d, 0.007);
+      scene.background = new THREE.Color(0x060c18); // Deep polar arctic twilight
+      scene.fog = new THREE.FogExp2(0x0a1628, 0.0045);
       sceneRef.current = scene;
 
+      // Create Real-World Celestial Environment, Mountains, Aurora & Weather Particles
+      const envHandles = createPolarEnvironment(scene);
+      environmentRef.current = envHandles;
+
       // 2. Camera
-      const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 500);
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 600);
       cameraRef.current = camera;
       updateCameraPosition();
 
-      // 3. Renderer with soft PCF shadows and preserved drawing buffer for reference comparison
+      // 3. Renderer with ACES Filmic Tone Mapping and Soft PCF Shadows
       const renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: true,
@@ -147,6 +156,8 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.32;
       rendererRef.current = renderer;
 
       // 4. Lighting: Product-grade Polar Daylight with Natural Fill
@@ -195,6 +206,10 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         window.removeEventListener('resize', handleResize);
         if (animFrameIdRef.current) {
           cancelAnimationFrame(animFrameIdRef.current);
+        }
+        if (environmentRef.current) {
+          environmentRef.current.dispose();
+          environmentRef.current = null;
         }
         renderer.dispose();
       };
@@ -463,6 +478,14 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         p.mesh.position.copy(pos);
       });
 
+      // 3. Animate Polar Atmosphere, Weather Flurries, Aurora & Thermal Exhaust Plumes
+      if (environmentRef.current) {
+        const isBlizzard = viewModel.environment.stormState === 'BLIZZARD' || 
+          (viewModel.environment.windSpeedMs > 18);
+        const dieselActive = viewModel.powerSummary.dieselGenerationKw > 0.1;
+        environmentRef.current.update(0.016, viewModel.environment.windSpeedMs || 10, isBlizzard, dieselActive);
+      }
+
       renderer.render(scene, camera);
       animFrameIdRef.current = requestAnimationFrame(animate);
     };
@@ -474,7 +497,12 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         cancelAnimationFrame(animFrameIdRef.current);
       }
     };
-  }, [viewModel.powerSummary.windGenerationKw]);
+  }, [
+    viewModel.powerSummary.windGenerationKw,
+    viewModel.powerSummary.dieselGenerationKw,
+    viewModel.environment.windSpeedMs,
+    viewModel.environment.stormState
+  ]);
 
   // Mouse Orbit & Pan Controls
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -597,16 +625,26 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     }
   };
 
-  // Camera Presets
-  const setCameraPreset = (preset: 'ISOMETRIC' | 'TOP' | 'FRONT') => {
+  // Camera Presets (Cinematic Hero, Renewables Field, Powerhouse BESS/DG, Overhead Drone, Elevation)
+  const setCameraPreset = (preset: 'ISOMETRIC' | 'RENEWABLES' | 'POWERHOUSE' | 'TOP' | 'FRONT') => {
     setCameraMode(preset);
-    cameraTargetRef.current.set(0, 4.5, 0);
 
     if (preset === 'ISOMETRIC') {
+      cameraTargetRef.current.set(0, 4.5, 0);
       cameraSphericalRef.current = { radius: 54, theta: Math.PI / 4, phi: Math.PI / 3.2 };
+    } else if (preset === 'RENEWABLES') {
+      // Focus on Solar PV arrays & Wind turbines field
+      cameraTargetRef.current.set(-24, 3.5, 2);
+      cameraSphericalRef.current = { radius: 38, theta: Math.PI / 2.8, phi: Math.PI / 3.5 };
+    } else if (preset === 'POWERHOUSE') {
+      // Focus on BESS energy storage & Diesel Generator powerhouse
+      cameraTargetRef.current.set(24, 3.0, -12);
+      cameraSphericalRef.current = { radius: 34, theta: Math.PI / 5.5, phi: Math.PI / 3.4 };
     } else if (preset === 'TOP') {
-      cameraSphericalRef.current = { radius: 58, theta: 0, phi: 0.1 };
+      cameraTargetRef.current.set(0, 0, 0);
+      cameraSphericalRef.current = { radius: 64, theta: 0, phi: 0.08 };
     } else if (preset === 'FRONT') {
+      cameraTargetRef.current.set(0, 6.0, 0);
       cameraSphericalRef.current = { radius: 48, theta: 0, phi: Math.PI / 2 - 0.1 };
     }
     updateCameraPosition();
@@ -691,6 +729,42 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         </div>
       </div>
 
+      {/* Top Center: Real-Time Polar Environmental & Telemetry HUD */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 hidden lg:flex items-center space-x-3 bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-slate-700/80 shadow-lg font-mono text-[11px] pointer-events-none">
+        <div className="flex items-center space-x-1 text-slate-300">
+          <Thermometer className="w-3.5 h-3.5 text-cyan-400" />
+          <span>{viewModel.environment.ambientTempC.toFixed(1)}°C</span>
+        </div>
+        <span className="text-slate-700">|</span>
+        <div className="flex items-center space-x-1 text-slate-300">
+          <Wind className="w-3.5 h-3.5 text-teal-400" />
+          <span>{viewModel.environment.windSpeedMs.toFixed(1)} m/s</span>
+        </div>
+        <span className="text-slate-700">|</span>
+        <div className="flex items-center space-x-1 text-amber-300 font-semibold">
+          <Sun className="w-3.5 h-3.5 text-amber-400" />
+          <span>{viewModel.powerSummary.solarGenerationKw.toFixed(1)} kW</span>
+        </div>
+        <span className="text-slate-700">|</span>
+        <div className="flex items-center space-x-1 text-sky-300 font-semibold">
+          <Wind className="w-3.5 h-3.5 text-sky-400" />
+          <span>{viewModel.powerSummary.windGenerationKw.toFixed(1)} kW</span>
+        </div>
+        <span className="text-slate-700">|</span>
+        <div className="flex items-center space-x-1 text-emerald-300 font-semibold">
+          <BatteryCharging className="w-3.5 h-3.5 text-emerald-400" />
+          <span>{viewModel.powerSummary.batterySocPct.toFixed(0)}%</span>
+        </div>
+        {viewModel.environment.stormState !== 'NORMAL' && (
+          <>
+            <span className="text-slate-700">|</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse">
+              {viewModel.environment.stormState}
+            </span>
+          </>
+        )}
+      </div>
+
       {/* Top Right: Camera Presets, Layer Selector & Comparison Modal Trigger */}
       <div className="absolute top-4 right-4 z-10 flex items-center space-x-1.5 bg-slate-900/90 backdrop-blur-md p-1 rounded-md border border-slate-700/80 shadow-md font-mono text-[10px]">
         {/* Layer Selector */}
@@ -735,9 +809,31 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           className={`px-2 py-1 rounded transition-colors ${
             cameraMode === 'ISOMETRIC' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
           }`}
-          title="Isometric 3D Perspective"
+          title="Cinematic Hero 3D Perspective"
         >
-          3D ISO
+          HERO
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCameraPreset('RENEWABLES')}
+          className={`px-2 py-1 rounded transition-colors ${
+            cameraMode === 'RENEWABLES' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
+          }`}
+          title="Solar PV & Wind Turbines Array"
+        >
+          PV/WIND
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCameraPreset('POWERHOUSE')}
+          className={`px-2 py-1 rounded transition-colors ${
+            cameraMode === 'POWERHOUSE' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
+          }`}
+          title="BESS Storage & Diesel Generator Powerhouse"
+        >
+          BESS/DG
         </button>
 
         <button
@@ -746,9 +842,9 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           className={`px-2 py-1 rounded transition-colors ${
             cameraMode === 'TOP' ? 'bg-sky-600 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
           }`}
-          title="Top-Down Plan View"
+          title="Top-Down Drone Plan View"
         >
-          TOP
+          DRONE
         </button>
 
         <button

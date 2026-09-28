@@ -413,6 +413,105 @@ export function buildPolarTerrain(
   terrainMesh.receiveShadow = true;
   terrainGroup.add(terrainMesh);
 
+  // 1. SCATTERED GRANITE BEDROCK NUNATAK BOULDERS
+  const boulderMat = new THREE.MeshStandardMaterial({
+    color: 0x334155, // Dark Antarctic gneiss / charnockite bedrock
+    roughness: 0.9,
+    metalness: 0.15,
+    flatShading: true
+  });
+  const boulderCoords = [
+    [-38, -25, 2.5], [-44, 18, 3.2], [42, -28, 4.0], [50, 15, 3.5],
+    [-18, 42, 2.8], [25, 45, 3.0], [-52, -8, 4.5], [38, -45, 5.0]
+  ];
+  boulderCoords.forEach(([bx, bz, bscale]) => {
+    const bGeo = new THREE.DodecahedronGeometry(bscale, 1);
+    const bMesh = new THREE.Mesh(bGeo, boulderMat);
+    bMesh.position.set(bx, bscale * 0.45, bz);
+    bMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+    bMesh.castShadow = true;
+    bMesh.receiveShadow = true;
+    terrainGroup.add(bMesh);
+  });
+
+  // 2. REALISTIC POLAR HELIPAD (Landing Pad with perimeter LED beacons)
+  const padGroup = new THREE.Group();
+  padGroup.position.set(36, 0.25, 24);
+
+  // Octagonal concrete / steel reinforced landing platform
+  const padGeo = new THREE.CylinderGeometry(8.5, 9.0, 0.4, 8);
+  const padMat = new THREE.MeshStandardMaterial({
+    color: 0x475569,
+    roughness: 0.8,
+    metalness: 0.2
+  });
+  const padMesh = new THREE.Mesh(padGeo, padMat);
+  padMesh.castShadow = true;
+  padMesh.receiveShadow = true;
+  padGroup.add(padMesh);
+
+  // Painted yellow landing circle & inner 'H' cross
+  const ringGeo = new THREE.RingGeometry(6.0, 6.5, 32);
+  ringGeo.rotateX(-Math.PI / 2);
+  const markMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide });
+  const ringMesh = new THREE.Mesh(ringGeo, markMat);
+  ringMesh.position.y = 0.22;
+  padGroup.add(ringMesh);
+
+  // 'H' marking geometry
+  const hBar1 = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 5.0), markMat);
+  hBar1.rotateX(-Math.PI / 2);
+  hBar1.position.set(-1.8, 0.23, 0);
+  padGroup.add(hBar1);
+
+  const hBar2 = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 5.0), markMat);
+  hBar2.rotateX(-Math.PI / 2);
+  hBar2.position.set(1.8, 0.23, 0);
+  padGroup.add(hBar2);
+
+  const hCross = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.8), markMat);
+  hCross.rotateX(-Math.PI / 2);
+  hCross.position.set(0, 0.23, 0);
+  padGroup.add(hCross);
+
+  // 8 Perimeter LED landing beacons (pulsing green/amber)
+  const beaconMat = new THREE.MeshStandardMaterial({
+    color: 0x10b981, // Emerald landing beacon
+    emissive: 0x10b981,
+    emissiveIntensity: 0.9,
+    roughness: 0.2
+  });
+  const pylonMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+  for (let b = 0; b < 8; b++) {
+    const bAngle = (b / 8) * Math.PI * 2;
+    const bx = Math.sin(bAngle) * 8.2;
+    const bz = Math.cos(bAngle) * 8.2;
+
+    const pylon = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.6, 6), pylonMat);
+    pylon.position.set(bx, 0.5, bz);
+    padGroup.add(pylon);
+
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), beaconMat);
+    led.position.set(bx, 0.85, bz);
+    padGroup.add(led);
+  }
+  terrainGroup.add(padGroup);
+
+  // 3. VEHICLE CRAWLER SNOW TRACKS (PistenBully / Snowcat twin tread depressions)
+  const trackMat = new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.45 });
+  const trackPoints1 = [
+    new THREE.Vector3(20, 0.05, 4),
+    new THREE.Vector3(26, 0.08, 12),
+    new THREE.Vector3(34, 0.12, 18)
+  ];
+  const trackPoints2 = [
+    new THREE.Vector3(21.2, 0.05, 4),
+    new THREE.Vector3(27.2, 0.08, 12),
+    new THREE.Vector3(35.2, 0.12, 18)
+  ];
+  terrainGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(trackPoints1), trackMat));
+  terrainGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(trackPoints2), trackMat));
+
   // If Maitri, add frozen Lake Priyadarshini water plane
   if (terrainType === 'ROCKY_OASIS') {
     const lakeGeo = new THREE.PlaneGeometry(50, 50);
@@ -474,14 +573,15 @@ export function buildBharatiStation(
     wireframe
   });
 
+  // Warm tungsten glowing interior glass (contrasting against dark polar night)
   const glassMat = new THREE.MeshStandardMaterial({
-    color: 0x0f172a,
-    emissive: 0x0284c7,
-    emissiveIntensity: 0.25,
-    roughness: 0.1,
-    metalness: 0.9,
+    color: 0x1e293b,
+    emissive: 0xfef08a, // Warm 2700K tungsten glow from interior labs/habitation
+    emissiveIntensity: isArchMode ? 0.85 : 0.6,
+    roughness: 0.12,
+    metalness: 0.4,
     transparent: true,
-    opacity: isArchMode ? 0.65 : 0.25,
+    opacity: isArchMode ? 0.85 : 0.5,
     wireframe
   });
 
