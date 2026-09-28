@@ -92,31 +92,35 @@ export const PolicyView: React.FC = () => {
 
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* Editorial Header */}
-      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
-            <span>07 Policy Governance</span>
-            <span>•</span>
-            <ProvenanceTag provenance="SIMULATED" size="xs" />
-          </div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-            Autonomous Policy Governance
-          </h1>
-          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
-            Deterministic decision rules, priority ordering (P1 &gt; ... &gt; P8), stateful hysteresis, and four-tier optimizer handoff.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {activeScenario && (
-            <div className="flex items-center space-x-2 bg-amber-50 border border-amber-300 rounded px-2.5 py-1 text-xs font-mono text-amber-900 font-bold">
-              <span>SCENARIO: {activeScenario}</span>
+      {/* 1. Industrial Header with Cobalt Blue / Slate Palette */}
+      <div className="bg-slate-900 border border-blue-500/30 rounded-xl p-5 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-blue-400 font-bold mb-1">
+              <Scale className="w-4 h-4" />
+              <span>07 POLICY GOVERNANCE &amp; DISPATCH CONSTRAINTS • SCADA HIERARCHY</span>
+              <span>•</span>
+              <ProvenanceTag provenance="SIMULATED" size="xs" />
             </div>
-          )}
-          <div className="flex items-center space-x-3 bg-white p-3 rounded border border-slate-200 shadow-sm">
-            <span className="text-xs font-mono text-slate-500 uppercase">Active Directive:</span>
-            <StatusBadge status={policyData.policy_state} size="md" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Operational Policy Governance &amp; Priority Ladder
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">
+              Deterministic priority ladder rules (P1 &gt; ... &gt; P8), stateful hysteresis, and optimizer handoff guarantees protecting human life support and critical scientific assets.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {activeScenario && (
+              <div className="flex items-center space-x-2 bg-amber-500/20 border border-amber-500/40 rounded-lg px-3 py-1.5 text-xs font-mono text-amber-300 font-bold">
+                <span>SCENARIO: {activeScenario}</span>
+              </div>
+            )}
+            <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-700 flex items-center space-x-3">
+              <span className="text-xs font-mono text-slate-400 uppercase font-semibold">Active Directive:</span>
+              <StatusBadge status={policyData.policy_state} size="md" />
+            </div>
           </div>
         </div>
       </div>

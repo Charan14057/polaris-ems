@@ -87,6 +87,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   const [webGlAvailable, setWebGlAvailable] = useState<boolean>(true);
   const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
   const [twinSnapshotUrl, setTwinSnapshotUrl] = useState<string | null>(null);
+  const [pipExpanded, setPipExpanded] = useState<boolean>(true);
 
   // Active 3D profile for the current station
   const stationProfile3D: StationSpatial3DProfile = 
@@ -964,6 +965,61 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
+      </div>
+
+      {/* Bottom Left Picture-in-Picture: Real Base Station Ground Truth Photo */}
+      <div className="absolute bottom-14 left-4 z-20 font-sans">
+        {pipExpanded ? (
+          <div className="w-56 bg-slate-900/95 backdrop-blur-md rounded-lg border border-teal-500/40 p-2 shadow-2xl animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-800 text-[10px] font-mono">
+              <span className="text-teal-300 font-bold flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                REAL BASE STATION
+              </span>
+              <button
+                type="button"
+                onClick={() => setPipExpanded(false)}
+                className="text-slate-400 hover:text-white px-1 font-bold text-xs"
+                title="Minimize Ground Truth PIP"
+              >
+                ✕
+              </button>
+            </div>
+            <div 
+              onClick={handleOpenReferenceModal}
+              className="relative group cursor-pointer overflow-hidden rounded border border-slate-700 aspect-video bg-slate-950"
+            >
+              <img
+                src={`/assets/stations/${(viewModel.stationId || 'BHARATI').toLowerCase()}_real.jpg`}
+                alt="Real Station Ground Truth"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+              <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-mono font-bold backdrop-blur-[1px]">
+                Compare vs 3D
+              </div>
+            </div>
+            <div className="mt-1.5 flex items-center justify-between text-[10px] font-mono">
+              <span className="text-slate-400 truncate max-w-[130px]">{stationProfile3D.name}</span>
+              <button
+                type="button"
+                onClick={handleOpenReferenceModal}
+                className="text-teal-400 hover:text-teal-300 font-bold underline"
+              >
+                Compare
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPipExpanded(true)}
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-slate-900/90 hover:bg-slate-800 text-teal-300 border border-teal-500/40 text-[10px] font-mono font-bold shadow-lg backdrop-blur-md transition-colors"
+            title="Show Real Base Station Reference Photo"
+          >
+            <span className="w-2 h-2 rounded-full bg-teal-400" />
+            <span>Real Photo PIP</span>
+          </button>
+        )}
       </div>
 
       {/* Bottom Left: Navigation & Provenance Hints */}

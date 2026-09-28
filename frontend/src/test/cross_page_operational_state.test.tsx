@@ -95,23 +95,30 @@ vi.mock('../api/endpoints', () => ({
 
 // Test Consumer component reading useOperationalSnapshot
 function StateConsumer() {
-  const snapshot = useOperationalSnapshot();
+  const { 
+    snapshot, 
+    activeScenario, 
+    activateScenario, 
+    clearScenario, 
+    applyManualControl, 
+    approveAutoRecommendation 
+  } = useOperationalSnapshot();
   const { currentStation, setStation } = useStation();
 
   return (
     <div>
       <div data-testid="station-id">{currentStation}</div>
-      <div data-testid="active-scenario">{snapshot.activeScenario || 'NONE'}</div>
+      <div data-testid="active-scenario">{activeScenario || 'NONE'}</div>
       <div data-testid="ambient-temp">{snapshot.ambientTemperatureC != null ? `${snapshot.ambientTemperatureC}°C` : '—'}</div>
       <div data-testid="total-load">{snapshot.totalLoadKw != null ? `${snapshot.totalLoadKw} kW` : '—'}</div>
       <div data-testid="fuel-level">{snapshot.fuelRemainingL != null ? `${snapshot.fuelRemainingL} L` : '—'}</div>
       <div data-testid="unavailable-metric">{(snapshot as any).missingField != null ? `${(snapshot as any).missingField}` : '—'}</div>
       <button onClick={() => setStation('MAITRI')}>Switch to Maitri</button>
       <button onClick={() => setStation('HIMADRI')}>Switch to Himadri</button>
-      <button onClick={() => snapshot.activateScenario('BLIZZARD')}>Activate Blizzard</button>
-      <button onClick={() => snapshot.clearScenario()}>Clear Scenario</button>
-      <button onClick={() => snapshot.applyManualControl('START_DG1')}>Manual Start DG1</button>
-      <button onClick={() => snapshot.approveAutoRecommendation()}>Approve Auto</button>
+      <button onClick={() => activateScenario('BLIZZARD')}>Activate Blizzard</button>
+      <button onClick={() => clearScenario()}>Clear Scenario</button>
+      <button onClick={() => applyManualControl('START_DG1')}>Manual Start DG1</button>
+      <button onClick={() => approveAutoRecommendation()}>Approve Auto</button>
     </div>
   );
 }

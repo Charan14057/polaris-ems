@@ -111,31 +111,35 @@ export const FieldHILValidationView: React.FC = () => {
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans">
-      {/* Editorial Header */}
-      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
-            <span>11 Field &amp; Hardware-in-the-Loop Architecture</span>
-            <span>•</span>
-            <ProvenanceTag provenance="CONFIGURED" size="xs" />
+      {/* 1. Industrial Header with Graphite / Deep Teal Palette */}
+      <div className="bg-slate-900 border border-teal-500/30 rounded-xl p-5 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-teal-400 font-bold mb-1">
+              <Radio className="w-4 h-4" />
+              <span>11 FIELD &amp; HARDWARE-IN-THE-LOOP TESTBED • PHYSICAL AIR-GAP</span>
+              <span>•</span>
+              <ProvenanceTag provenance="CONFIGURED" size="xs" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Field &amp; Hardware-in-the-Loop Testbed
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Device integration testbed, hardware-in-the-loop emulation, and fault-injection verification across station microgrid nodes.
+            </p>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-            Field &amp; Hardware-in-the-Loop Testbed
-          </h1>
-          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
-            Device integration testbed, hardware-in-the-loop emulation, and fault-injection verification across station microgrid nodes.
-          </p>
-        </div>
 
-        <div className="flex items-center space-x-3 text-xs bg-white p-3 rounded-lg border border-slate-200 shadow-xs">
-          <span className="font-mono text-slate-500">Physical Boundary:</span>
-          <span className="font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-            DISCONNECTED
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="font-mono text-slate-500">
-            Station: <strong className="text-slate-900">{currentStation}</strong>
-          </span>
+          <div className="flex items-center space-x-3 text-xs bg-slate-800/90 p-3 rounded-lg border border-slate-700">
+            <span className="font-mono text-slate-400">Boundary:</span>
+            <span className="font-mono font-bold text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800">
+              DISCONNECTED
+            </span>
+            <span className="text-slate-600">|</span>
+            <span className="font-mono text-slate-300">
+              Station: <strong className="text-teal-300">{currentStation}</strong>
+            </span>
+          </div>
         </div>
       </div>
 

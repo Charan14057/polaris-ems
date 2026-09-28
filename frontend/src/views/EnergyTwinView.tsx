@@ -38,6 +38,8 @@ import { TwinInspector } from '../features/twin/components/TwinInspector';
 import { TwinWeatherInfluence } from '../features/twin/components/TwinWeatherInfluence';
 import { TwinOperatingModeControl, OperatingMode } from '../features/twin/components/TwinOperatingModeControl';
 import { TwinLoadGroups } from '../features/twin/components/TwinLoadGroups';
+import { PhysicalStationReferenceCard } from '../features/twin/components/PhysicalStationReferenceCard';
+import { ReferenceComparisonModal } from '../features/twin/components/ReferenceComparisonModal';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { ExplainThis } from '../components/common/ExplainThis';
 import { 
@@ -83,6 +85,7 @@ export const EnergyTwinView: React.FC = () => {
   const [viewMode, setViewMode] = useState<TwinViewMode>('3D_SPATIAL');
   const [operatingMode, setOperatingMode] = useState<OperatingMode>('AUTO');
   const [simulationMode, setSimulationMode] = useState<'SIMULATION' | 'REAL-TIME SIMULATION'>('REAL-TIME SIMULATION');
+  const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
 
   // Interactive Selection Hook
   const {
@@ -675,6 +678,12 @@ export const EnergyTwinView: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-5 items-start">
         {/* Canvas & Timeline Column */}
         <div className="flex-1 w-full space-y-4">
+          {/* Authentic Real-World Base Station Ground Truth Reference */}
+          <PhysicalStationReferenceCard
+            stationId={viewModel.stationId}
+            onOpenComparisonModal={() => setShowReferenceModal(true)}
+          />
+
           {viewMode === '3D_SPATIAL' && (
             <TwinCanvas3D
               viewModel={viewModel}
@@ -799,6 +808,13 @@ export const EnergyTwinView: React.FC = () => {
           Software Model Execution • Verified 6-Tier Provenance
         </span>
       </div>
+
+      {/* Interactive Ground Truth ↔ 3D Digital Twin Comparison Modal */}
+      <ReferenceComparisonModal
+        stationId={viewModel.stationId}
+        isOpen={showReferenceModal}
+        onClose={() => setShowReferenceModal(false)}
+      />
     </div>
   );
 };

@@ -150,43 +150,47 @@ export const EdgeView: React.FC = () => {
 
   return (
     <div className="p-4 lg:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* Editorial Header */}
-      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-slate-500 mb-2">
-            <span>08 Edge Intelligence & Devices</span>
-            <span>•</span>
-            <ProvenanceTag provenance="SIMULATED" size="xs" />
+      {/* 1. Industrial Header with Steel / Cyan Palette */}
+      <div className="bg-slate-900 border border-cyan-500/30 rounded-xl p-5 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-cyan-400 font-bold mb-1">
+              <Cpu className="w-4 h-4" />
+              <span>08 EDGE INTELLIGENCE & FIELD FLEET • HARDWARE RUNTIME</span>
+              <span>•</span>
+              <ProvenanceTag provenance="SIMULATED" size="xs" />
+            </div>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">
+              Edge Intelligence & Field Fleet
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Station <strong className="text-cyan-300">{activeStation}</strong> local node telemetry normalization, data quality validation, device fleet health, and bounded buffer reconciliation.
+            </p>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
-            Edge Intelligence & Field Fleet
-          </h1>
-          <p className="text-sm text-slate-600 font-sans mt-2 max-w-2xl">
-            Station <strong className="text-slate-900">{activeStation}</strong> local node telemetry normalization, data quality validation, device fleet health, and bounded buffer reconciliation.
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {getEdgeModeBadge(stateData?.edge_mode)}
-          <button
-            onClick={fetchData}
-            disabled={isLoading}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 transition shadow-sm"
-            title="Refresh local edge state"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {getEdgeModeBadge(stateData?.edge_mode)}
+            <button
+              onClick={fetchData}
+              disabled={isLoading}
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-bold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition shadow-xs"
+              title="Refresh local edge state"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-cyan-400' : ''}`} />
+              <span>Refresh</span>
+            </button>
 
-          <button
-            onClick={handleSync}
-            disabled={isSyncing || (stateData?.buffer_depth === 0 && !connData?.sync_in_progress)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded bg-sky-600 hover:bg-sky-700 text-white transition shadow-sm disabled:opacity-50"
-            title="Reconcile buffered telemetry with central backend"
-          >
-            <ArrowUpDown className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>Reconcile Buffer</span>
-          </button>
+            <button
+              onClick={handleSync}
+              disabled={isSyncing || (stateData?.buffer_depth === 0 && !connData?.sync_in_progress)}
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition shadow-xs disabled:opacity-50"
+              title="Reconcile buffered telemetry with central backend"
+            >
+              <ArrowUpDown className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>Reconcile Buffer</span>
+            </button>
+          </div>
         </div>
       </div>
 

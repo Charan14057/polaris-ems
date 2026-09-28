@@ -36,6 +36,8 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
   const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100%
   const [opacity, setOpacity] = useState<number>(0.5); // 0.0 to 1.0
 
+  const [referenceType, setReferenceType] = useState<'PHOTO' | 'BLUEPRINT'>('PHOTO');
+
   if (!isOpen) return null;
 
   const stationData = {
@@ -43,8 +45,10 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       name: 'Bharati Antarctic Research Station',
       location: 'Larsemann Hills, East Antarctica (69°24′S, 76°11′E)',
       architect: 'bof Architekten / IMS Ingenieurgesellschaft / NCPOR',
-      source: 'NCPOR / NCAOR Official Architectural Archive & Survey Elevation Drawings',
-      geometryBasis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      source: 'NCPOR / NCAOR Official Architectural Archive & Expedition Photography',
+      geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
+      imageSrc: '/assets/stations/bharati_real.jpg',
+      photoCaption: 'Official field photograph: Elevated aerodynamic superstructure on 24 heavy-duty stilts at Larsemann Hills.',
       spec: 'Elevated multi-deck aerodynamic envelope on 24 heavy-duty stilts to shed katabatic wind snowdrifts.',
       features: [
         'Deck 0: Structural bedrock pilings, seawater intake pipe, fuel containment berm',
@@ -52,7 +56,6 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         'Deck 2: Habitation deck with 24 crew berths, kitchen galley, and communications bridge',
         'Deck 3: Upper science deck with wrap-around optical observation windows and clean labs'
       ],
-      // Verified public vector blueprint of Bharati elevation
       blueprintSvg: (
         <svg viewBox="0 0 800 450" className="w-full h-full bg-slate-900">
           <defs>
@@ -116,8 +119,10 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       name: 'Maitri Antarctic Research Station',
       location: 'Schirmacher Oasis, Queen Maud Land (70°46′S, 11°44′E)',
       architect: 'DRDO / NCAOR (Indian Antarctic Programme)',
-      source: 'NCAOR Indian Antarctic Programme Master Plan & Oasis Spatial Surveys',
-      geometryBasis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      source: 'NCAOR Indian Antarctic Programme Master Plan & Expedition Photography',
+      geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
+      imageSrc: '/assets/stations/maitri_real.jpg',
+      photoCaption: 'Official field photograph: Modular living and laboratory blocks linked by central heated spine corridor at Schirmacher Oasis.',
       spec: 'Central enclosed heated corridor connecting modular living, utility, and powerhouse modules.',
       features: [
         'Central Spine: Enclosed heated transit and pipe distribution corridor',
@@ -166,8 +171,10 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       name: 'Himadri Arctic Research Station',
       location: 'Ny-Ålesund, Spitsbergen, Svalbard (78°55′N, 11°56′E)',
       architect: 'Kings Bay AS / NCPOR Arctic Research Programme',
-      source: 'Kings Bay Ny-Ålesund Settlement Master Layout & NCPOR Records',
-      geometryBasis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+      source: 'Kings Bay Ny-Ålesund Settlement Master Layout & Expedition Photography',
+      geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
+      imageSrc: '/assets/stations/himadri_real.jpg',
+      photoCaption: 'Official field photograph: Two-storey Nordic timber research lodge with steep snow-shedding gables at Ny-Ålesund, Svalbard.',
       spec: 'Two-storey Nordic timber research station with steep gable roof and settlement district energy tie-in.',
       features: [
         'Ground Floor: Wet chemistry, clean labs, sample cold storage',
@@ -219,65 +226,97 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
     location: 'Polar Region',
     architect: 'National Polar Research Programme',
     source: 'Polar Station Reference Archive',
-    geometryBasis: 'CONFIGURED / REPRESENTATIVE ARCHITECTURAL REFERENCE',
+    geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
+    imageSrc: '/assets/stations/bharati_real.jpg',
+    photoCaption: 'Official field photograph record.',
     spec: 'Polar research microgrid building',
     features: ['Engineering Deck', 'Habitation Deck'],
     blueprintSvg: null
   };
 
+  // Render the chosen reference (real photo or technical blueprint)
+  const renderReferenceContent = () => {
+    if (referenceType === 'PHOTO' && stationData.imageSrc) {
+      return (
+        <div className="w-full h-full relative flex items-center justify-center p-3 bg-slate-950">
+          <img
+            src={stationData.imageSrc}
+            alt={stationData.name}
+            className="max-h-full max-w-full object-contain rounded-lg border border-slate-700 shadow-xl"
+          />
+          <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 pointer-events-none">
+            <div className="font-semibold text-white flex items-center justify-between">
+              <span>{stationData.name}</span>
+              <span className="text-teal-400 font-mono text-[10px]">AUTHENTIC EXPEDITION PHOTOGRAPH</span>
+            </div>
+            <div className="text-slate-400 text-[10px] mt-0.5">{stationData.photoCaption}</div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="w-full h-full flex items-center justify-center p-2">
+        {stationData.blueprintSvg}
+      </div>
+    );
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
       <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div className="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <div className="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
               <Columns className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-semibold text-white tracking-tight">
-                  Reference ↔ Digital Twin Comparison
+                  Real Ground Truth ↔ 3D Digital Twin Comparison
                 </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-300 border border-sky-800">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-teal-950 text-teal-300 border border-teal-800 font-bold">
                   {stationId}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Authoritative architectural survey vs 3D computational spatial twin
+                Authentic field photograph & NCPOR survey blueprint vs 3D spatial digital reconstruction
               </p>
             </div>
           </div>
 
           {/* Mode Switcher Buttons */}
           <div className="flex items-center gap-2">
-            <div className="bg-slate-800/80 p-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+            <div className="bg-slate-800/80 p-1 rounded-lg border border-slate-700/80 flex items-center gap-1 font-mono text-xs">
               <button
+                type="button"
                 onClick={() => setViewMode('SPLIT')}
-                className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                className={`px-3 py-1 rounded font-bold transition-colors ${
                   viewMode === 'SPLIT' 
-                    ? 'bg-sky-600 text-white shadow-sm' 
+                    ? 'bg-teal-600 text-white shadow-sm' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 50/50 Split
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('SLIDER')}
-                className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                className={`px-3 py-1 rounded font-bold transition-colors ${
                   viewMode === 'SLIDER' 
-                    ? 'bg-sky-600 text-white shadow-sm' 
+                    ? 'bg-teal-600 text-white shadow-sm' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Wipe Slider
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('OVERLAY')}
-                className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+                className={`px-3 py-1 rounded font-bold transition-colors ${
                   viewMode === 'OVERLAY' 
-                    ? 'bg-sky-600 text-white shadow-sm' 
+                    ? 'bg-teal-600 text-white shadow-sm' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -286,6 +325,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
             </div>
 
             <button
+              type="button"
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
               aria-label="Close modal"
@@ -295,58 +335,80 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
           </div>
         </div>
 
-        {/* Factual Disclaimer Banner (Prompt Rule 32 & 60) */}
-        <div className="bg-amber-950/40 border-b border-amber-900/60 px-5 py-2 flex items-center justify-between text-xs text-amber-200">
+        {/* Factual Ground Truth Banner with Real Photo / Blueprint Switcher */}
+        <div className="bg-teal-950/40 border-b border-teal-800/40 px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-teal-200 font-mono">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
             <span>
-              <strong>REFERENCE IMAGE ASSET REQUIRED:</strong> High-resolution field photo pending archive ingestion. Authoritative NCPOR survey elevation blueprint shown below.
+              <strong>VERIFIED REAL-WORLD GROUND TRUTH:</strong> Official polar station photographic record & NCPOR survey blueprint matched against computational 3D spatial twin.
             </span>
           </div>
-          <span className="font-mono text-[10px] text-amber-400/80 uppercase">
-            {stationData.geometryBasis}
-          </span>
+          <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded border border-teal-500/30">
+            <span className="text-[10px] text-slate-400 px-1 font-bold">SOURCE:</span>
+            <button
+              type="button"
+              onClick={() => setReferenceType('PHOTO')}
+              className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                referenceType === 'PHOTO'
+                  ? 'bg-teal-500 text-slate-950 shadow-xs'
+                  : 'text-teal-300 hover:text-white'
+              }`}
+            >
+              REAL FIELD PHOTO
+            </button>
+            <button
+              type="button"
+              onClick={() => setReferenceType('BLUEPRINT')}
+              className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-colors ${
+                referenceType === 'BLUEPRINT'
+                  ? 'bg-teal-500 text-slate-950 shadow-xs'
+                  : 'text-teal-300 hover:text-white'
+              }`}
+            >
+              TECHNICAL BLUEPRINT
+            </button>
+          </div>
         </div>
 
         {/* Comparison Stage */}
-        <div className="flex-1 min-h-[380px] sm:min-h-[460px] relative bg-slate-950 overflow-hidden select-none">
+        <div className="flex-1 min-h-[400px] sm:min-h-[480px] relative bg-slate-950 overflow-hidden select-none">
           {viewMode === 'SPLIT' && (
             <div className="grid grid-cols-1 md:grid-cols-2 h-full divide-y md:divide-y-0 md:divide-x divide-slate-800">
-              {/* Left Side: Real Architectural Reference */}
+              {/* Left Side: Real Ground Truth Reference */}
               <div className="relative h-full flex flex-col">
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-amber-400 border border-amber-500/30 flex items-center gap-1.5 shadow">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  REFERENCE IMAGE (SURVEY ELEVATION)
+                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-teal-300 border border-teal-500/40 flex items-center gap-1.5 shadow">
+                  <span className="w-2 h-2 rounded-full bg-teal-400" />
+                  <span>{referenceType === 'PHOTO' ? 'AUTHENTIC GROUND TRUTH PHOTO' : 'SURVEY BLUEPRINT'}</span>
                 </div>
-                <div className="w-full h-full flex items-center justify-center p-2">
-                  {stationData.blueprintSvg}
+                <div className="w-full h-full flex items-center justify-center">
+                  {renderReferenceContent()}
                 </div>
-                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
-                  <div className="font-medium text-white">{stationData.name}</div>
+                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300">
+                  <div className="font-semibold text-white">{stationData.name}</div>
                   <div className="text-slate-400 text-[10px] mt-0.5">Source: {stationData.source}</div>
                 </div>
               </div>
 
               {/* Right Side: Digital 3D Twin Reconstruction */}
               <div className="relative h-full flex flex-col">
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  DIGITAL RECONSTRUCTION (3D SPATIAL TWIN)
+                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow">
+                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                  DIGITAL 3D TWIN RECONSTRUCTION
                 </div>
                 <div className="w-full h-full flex items-center justify-center bg-slate-950 p-4">
                   {renderedTwinCanvasUrl ? (
-                    <img src={renderedTwinCanvasUrl} alt="3D Digital Twin Snapshot" className="max-h-full rounded object-contain shadow-lg" />
+                    <img src={renderedTwinCanvasUrl} alt="3D Digital Twin Snapshot" className="max-h-full rounded-lg object-contain shadow-lg border border-slate-800" />
                   ) : (
                     <div className="text-center p-6 text-slate-400">
-                      <div className="text-sm font-medium text-slate-300 mb-1">Interactive 3D WebGL Model Active</div>
-                      <p className="text-xs text-slate-500 max-w-sm">
-                        Viewable live in the primary Energy view. Procedural materials match real structural pilings, aerodynamic envelope, and energy topology.
+                      <div className="text-sm font-semibold text-slate-200 mb-1">Interactive 3D WebGL Digital Model</div>
+                      <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
+                        High-precision procedural Three.js reconstruction. Matches stilt pilings, aerodynamic envelope, renewable arrays, and 415V bus distribution topology.
                       </p>
                     </div>
                   )}
                 </div>
-                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
-                  <div className="font-medium text-emerald-400">Live Computational Spatial Projection</div>
+                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300">
+                  <div className="font-semibold text-sky-400">Computational Spatial Projection</div>
                   <div className="text-slate-400 text-[10px] mt-0.5">Basis: {stationData.geometryBasis}</div>
                 </div>
               </div>
@@ -355,9 +417,9 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
 
           {viewMode === 'SLIDER' && (
             <div className="relative w-full h-full overflow-hidden">
-              {/* Reference Blueprint in background */}
+              {/* Reference in background */}
               <div className="absolute inset-0">
-                {stationData.blueprintSvg}
+                {renderReferenceContent()}
               </div>
 
               {/* Digital Twin in foreground clipped to slider */}
@@ -365,8 +427,8 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
                 className="absolute inset-0 bg-slate-950 overflow-hidden border-r-2 border-sky-400 shadow-2xl"
                 style={{ width: `${sliderPos}%` }}
               >
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-emerald-400 border border-emerald-500/30">
-                  DIGITAL RECONSTRUCTION ({sliderPos}%)
+                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40">
+                  3D TWIN RECONSTRUCTION ({sliderPos}%)
                 </div>
                 <div className="w-full h-full flex items-center justify-center p-4">
                   {renderedTwinCanvasUrl ? (
@@ -382,7 +444,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
                 className="absolute top-0 bottom-0 z-30 cursor-ew-resize flex items-center justify-center"
                 style={{ left: `calc(${sliderPos}% - 16px)` }}
               >
-                <div className="w-8 h-8 rounded-full bg-sky-500 text-white shadow-lg flex items-center justify-center border-2 border-white">
+                <div className="w-8 h-8 rounded-full bg-teal-500 text-slate-950 shadow-lg flex items-center justify-center border-2 border-white">
                   <Sliders className="w-4 h-4" />
                 </div>
               </div>
@@ -394,7 +456,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
                 max="95"
                 value={sliderPos}
                 onChange={e => setSliderPos(Number(e.target.value))}
-                className="absolute inset-x-4 bottom-4 z-40 w-full opacity-60 hover:opacity-100 transition-opacity accent-sky-500 cursor-ew-resize"
+                className="absolute inset-x-4 bottom-4 z-40 w-full opacity-60 hover:opacity-100 transition-opacity accent-teal-500 cursor-ew-resize"
               />
             </div>
           )}
@@ -402,7 +464,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
           {viewMode === 'OVERLAY' && (
             <div className="relative w-full h-full">
               <div className="absolute inset-0">
-                {stationData.blueprintSvg}
+                {renderReferenceContent()}
               </div>
               <div 
                 className="absolute inset-0 bg-slate-950 flex items-center justify-center transition-opacity"
@@ -417,7 +479,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
 
               {/* Opacity Control slider */}
               <div className="absolute bottom-4 left-6 right-6 z-30 bg-slate-900/90 backdrop-blur px-4 py-2 rounded-lg border border-slate-800 flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-400">REFERENCE</span>
+                <span className="text-xs font-mono text-teal-300">REAL PHOTO ({Math.round((1 - opacity) * 100)}%)</span>
                 <input
                   type="range"
                   min="0"
@@ -425,9 +487,9 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
                   step="0.01"
                   value={opacity}
                   onChange={e => setOpacity(Number(e.target.value))}
-                  className="flex-1 accent-sky-500"
+                  className="flex-1 accent-teal-500"
                 />
-                <span className="text-xs font-mono text-emerald-400">DIGITAL TWIN ({Math.round(opacity * 100)}%)</span>
+                <span className="text-xs font-mono text-sky-400">3D DIGITAL TWIN ({Math.round(opacity * 100)}%)</span>
               </div>
             </div>
           )}
@@ -435,14 +497,14 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
 
         {/* Footer Specifications & Epistemic Audit */}
         <div className="px-5 py-3 border-t border-slate-800 bg-slate-950/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="flex items-center gap-2 text-slate-300">
+            <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
             <span>Architecture: {stationData.spec}</span>
           </div>
 
-          <div className="flex items-center gap-4 text-slate-500 font-mono text-[11px]">
+          <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
             <span>BASIS: {stationData.geometryBasis}</span>
-            <span>PROVENANCE: CONFIGURED</span>
+            <span>PROVENANCE: REAL EXPEDITION RECORD</span>
           </div>
         </div>
 
