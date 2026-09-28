@@ -13,7 +13,7 @@
 
 ## 📌 Executive Summary
 
-**Polaris-EMS** is an enterprise-grade Polar Energy Management & Resilience System engineered for extreme polar environments down to **-50°C**. Developed in the 2026 project context for **SIH Problem Statement SIH26061**, Polaris-EMS manages electrical, thermal, battery, and fuel systems for **Indian Polar Research Stations**:
+**Polaris-EMS** is an enterprise-grade Polar Energy Management & Resilience System engineered for extreme polar environments down to **-50°C**. Engineered for mission-critical reliability, Polaris-EMS autonomously monitors, optimizes, and coordinates electrical, thermal, battery, and fuel systems for **Indian Polar Research Stations**:
 - **Bharati Station** (69°S, Larsemann Hills, East Antarctica)
 - **Maitri Station** (70°S, Schirmacher Oasis, East Antarctica)
 - **Himadri Station** (79°N, Ny-Ålesund, Svalbard, Arctic)
@@ -218,5 +218,5 @@ All key reports, logs, and benchmark proofs are maintained under `reports/`:
 
 ---
 <div align="center">
-<b>POLARIS-EMS</b> • Smart India Hackathon (SIH26061) • Hardware & Software Co-Design for High-Reliability Polar Grids
+<b>POLARIS-EMS</b> • Polar Energy Management & Resilience System • Hardware & Software Co-Design for High-Reliability Polar Grids
 </div>

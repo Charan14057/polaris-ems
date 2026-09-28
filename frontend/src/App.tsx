@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StationProvider, useStation } from './context/StationContext';
+import { StationProvider, useStation, useOperationalSnapshot } from './context/StationContext';
 import { EvidenceProvider } from './context/EvidenceContext';
 import { ComprehensionProvider, useComprehension } from './context/ComprehensionContext';
 import { QuickOrientationModal } from './components/common/QuickOrientationModal';
@@ -36,6 +36,7 @@ const AppContent: React.FC = () => {
 
   const { activeThreats } = useStation();
   const { isOrientationOpen, closeOrientation } = useComprehension();
+  const { toast, dismissToast } = useOperationalSnapshot();
 
   const handleToggleCollapse = () => {
     setIsSidebarCollapsed(prev => {
@@ -81,10 +82,10 @@ const AppContent: React.FC = () => {
 
         {/* Primary Operational Stage */}
         <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
-          {activeTab === 'overview' && <OverviewView onNavigate={setActiveTab} />}
+          {activeTab === 'overview' && <OverviewView onNavigate={(tab) => setActiveTab(tab as TabType)} />}
           {activeTab === 'twin' && <EnergyTwinView />}
           {activeTab === 'forecast' && <ForecastView />}
-          {activeTab === 'scenarios' && <ScenariosView />}
+          {activeTab === 'scenarios' && <ScenariosView onNavigate={(tab) => setActiveTab(tab as TabType)} />}
           {activeTab === 'optimization' && <OptimizationView />}
           {activeTab === 'resilience' && <ResilienceView />}
           {activeTab === 'policy' && <PolicyView />}
@@ -113,7 +114,7 @@ const AppContent: React.FC = () => {
               <span className="text-slate-200">|</span>
               <div className="flex items-center space-x-1 text-slate-500">
                 <WifiOff className="w-3.5 h-3.5 text-slate-400" />
-                <span>Simulated Environment • No Physical SCADA</span>
+                <span>Computational Twin • Physical SCADA Disconnected</span>
               </div>
             </div>
           </div>
@@ -126,6 +127,38 @@ const AppContent: React.FC = () => {
       {/* Global Drawers & Modals */}
       <EvidenceDrawer />
       <QuickOrientationModal isOpen={isOrientationOpen} onClose={closeOrientation} />
+
+      {/* Floating Industrial Toast Notification */}
+      {toast && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className={`fixed bottom-6 right-6 z-50 max-w-sm w-full shadow-2xl rounded-xl border overflow-hidden transition-all duration-300 ${
+            toast.type === 'success'
+              ? 'bg-emerald-950 border-emerald-600/50 text-emerald-50'
+              : toast.type === 'warning'
+              ? 'bg-amber-950 border-amber-600/50 text-amber-50'
+              : 'bg-slate-900 border-slate-700 text-slate-100'
+          }`}
+        >
+          <div className="px-4 py-3 flex items-start gap-3">
+            <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${
+              toast.type === 'success' ? 'bg-emerald-400' : toast.type === 'warning' ? 'bg-amber-400' : 'bg-sky-400'
+            }`} />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-mono font-bold uppercase tracking-wide">{toast.title}</p>
+              <p className="text-xs mt-0.5 opacity-80 leading-relaxed">{toast.message}</p>
+            </div>
+            <button
+              onClick={dismissToast}
+              className="shrink-0 text-current opacity-50 hover:opacity-100 text-lg leading-none"
+              aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

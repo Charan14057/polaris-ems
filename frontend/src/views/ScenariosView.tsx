@@ -31,7 +31,7 @@ import {
   Thermometer
 } from 'lucide-react';
 
-export const ScenariosView: React.FC = () => {
+export const ScenariosView: React.FC<{ onNavigate?: (tab: string) => void }> = ({ onNavigate }) => {
   const { currentStation, horizonHours } = useStation();
   const { snapshot, activeScenario, activateScenario, clearScenario } = useOperationalSnapshot();
   const { inspectEvidence } = useEvidence();
@@ -103,6 +103,7 @@ export const ScenariosView: React.FC = () => {
     try {
       await activateScenario(selectedScenarioId);
       await handleEvaluatePreview();
+      if (onNavigate) onNavigate('overview');
     } catch (err: any) {
       setError(err.message || 'Failed to activate scenario in system');
     } finally {
@@ -117,6 +118,7 @@ export const ScenariosView: React.FC = () => {
     try {
       await clearScenario();
       setEvaluateResult(null);
+      if (onNavigate) onNavigate('overview');
     } catch (err: any) {
       setError(err.message || 'Failed to restore baseline');
     } finally {

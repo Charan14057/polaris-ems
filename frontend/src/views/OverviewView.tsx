@@ -186,39 +186,97 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNaviga
         </div>
       </div>
 
-      {/* 2. Active Stress Scenario Alert Banner (if perturbed) */}
+
+      {/* 2. Active Scenario Panel with SCENARIO IMPACT strip */}
       {activeScenario && (
-        <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-200">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 uppercase">
-                  ACTIVE STRESS SCENARIO
-                </span>
-                <span className="text-xs font-mono font-bold text-white">{activeScenario}</span>
+        <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl overflow-hidden">
+          {/* Header row */}
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
               </div>
-              <p className="text-xs text-amber-300/80 mt-0.5">
-                Microgrid physical state is currently perturbed. Downstream generation, loads, and resilience reflect this regime.
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 uppercase tracking-wider">
+                    ACTIVE SCENARIO
+                  </span>
+                  <span className="text-sm font-mono font-bold text-white">{activeScenario.replace(/_/g, ' ')}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                    snapshot.scenarioSeverity === 'CRITICAL' ? 'bg-red-500/20 text-red-300'
+                    : snapshot.scenarioSeverity === 'HIGH' ? 'bg-orange-500/20 text-orange-300'
+                    : 'bg-yellow-500/20 text-yellow-300'
+                  }`}>{snapshot.scenarioSeverity}</span>
+                </div>
+                <p className="text-[11px] text-amber-300/70 mt-0.5">
+                  Operational state perturbed. All downstream pages reflect this regime.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => clearScenario()}
+                className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-mono font-semibold transition-colors"
+              >
+                Restore Baseline
+              </button>
+              <button
+                onClick={() => navigate('scenarios')}
+                className="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 text-slate-200 text-xs font-mono transition-colors border border-slate-700/40"
+              >
+                Scenarios →
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => clearScenario()}
-              className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-mono font-semibold transition-colors"
-            >
-              Restore Baseline
-            </button>
-            <button
-              onClick={() => navigate('scenarios')}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-colors"
-            >
-              View Scenarios →
-            </button>
+          {/* SCENARIO IMPACT strip */}
+          <div className="border-t border-amber-500/20 bg-amber-950/20 px-4 py-2.5">
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-amber-400/70 font-bold">Scenario Impact</span>
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] font-mono">
+              {activeScenario === 'BLIZZARD' || activeScenario === 'EXTREME_COLD' || activeScenario === 'UNFORESEEN_WEATHER' ? (
+                <>
+                  <span className="flex items-center gap-1 text-blue-300"><span className="opacity-60">Environment</span> ↓ degraded</span>
+                  <span className="flex items-center gap-1 text-amber-300"><span className="opacity-60">Solar</span> ↓ suppressed</span>
+                  <span className="flex items-center gap-1 text-orange-300"><span className="opacity-60">Wind stress</span> ↑ elevated</span>
+                  <span className="flex items-center gap-1 text-red-300"><span className="opacity-60">Load</span> ↑ +heating demand</span>
+                  <span className="flex items-center gap-1 text-yellow-300"><span className="opacity-60">Battery demand</span> ↑ increased</span>
+                  <span className="flex items-center gap-1 text-red-300"><span className="opacity-60">Resilience margin</span> ↓ reduced</span>
+                </>
+              ) : activeScenario === 'SOLAR_GENERATION_FAILURE' ? (
+                <>
+                  <span className="flex items-center gap-1 text-amber-300"><span className="opacity-60">Solar</span> ↓ 0.0 kW forced</span>
+                  <span className="flex items-center gap-1 text-emerald-300"><span className="opacity-60">Battery</span> ↑ compensating</span>
+                  <span className="flex items-center gap-1 text-slate-300"><span className="opacity-60">Diesel reserve</span> → on standby</span>
+                  <span className="flex items-center gap-1 text-yellow-300"><span className="opacity-60">Renewable share</span> ↓ wind-only</span>
+                </>
+              ) : activeScenario === 'WIND_GENERATION_FAILURE' ? (
+                <>
+                  <span className="flex items-center gap-1 text-teal-300"><span className="opacity-60">Wind</span> ↓ 0.0 kW forced</span>
+                  <span className="flex items-center gap-1 text-slate-300"><span className="opacity-60">Diesel</span> ↑ ramping up</span>
+                  <span className="flex items-center gap-1 text-red-300"><span className="opacity-60">Renewable share</span> ↓ critical</span>
+                  <span className="flex items-center gap-1 text-orange-300"><span className="opacity-60">Fuel burn rate</span> ↑ active</span>
+                </>
+              ) : activeScenario === 'BATTERY_DEGRADATION' ? (
+                <>
+                  <span className="flex items-center gap-1 text-emerald-300"><span className="opacity-60">BESS capacity</span> ↓ derated</span>
+                  <span className="flex items-center gap-1 text-orange-300"><span className="opacity-60">Battery endurance</span> ↓ reduced</span>
+                  <span className="flex items-center gap-1 text-slate-300"><span className="opacity-60">Diesel reserve</span> ↑ elevated</span>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1 text-amber-300"><span className="opacity-60">Scenario</span> → {activeScenario.replace(/_/g, ' ')}</span>
+                  <span className="flex items-center gap-1 text-orange-300"><span className="opacity-60">State</span> → perturbed</span>
+                  <span className="flex items-center gap-1 text-red-300"><span className="opacity-60">Resilience</span> ↓ under review</span>
+                </>
+              )}
+              <span className="flex items-center gap-1 ml-auto">
+                <span className="text-amber-400/50 font-mono text-[9px]">temp:{fmtTemp(snapshot.ambientTemperatureC)}</span>
+                <span className="text-teal-400/50 font-mono text-[9px] ml-2">wind:{fmtSpeed(snapshot.windSpeedMs)}</span>
+                <span className="text-amber-400/50 font-mono text-[9px] ml-2">diesel:{fmtKw(snapshot.dieselGenerationKw)}</span>
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -532,7 +590,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNaviga
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono uppercase tracking-wider text-sky-600 font-bold">
-                PHASE 6 HIGHS OPTIMIZER
+                HiGHS MILP OPTIMIZER
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                 SOLVER: HiGHS C++
