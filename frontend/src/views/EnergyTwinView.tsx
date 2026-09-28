@@ -19,7 +19,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useStation } from '../context/StationContext';
+import { useStation, useOperationalSnapshot } from '../context/StationContext';
 import { useComprehension } from '../context/ComprehensionContext';
 import { api } from '../api/endpoints';
 import { TwinSpatialProfile, TwinTrajectoryResponseData } from '../api/types';
@@ -58,6 +58,7 @@ import {
 
 export const EnergyTwinView: React.FC = () => {
   const { currentStation, stationDetail } = useStation();
+  const { snapshot } = useOperationalSnapshot();
   const { mode: comprehensionMode } = useComprehension();
 
   const [spatialProfile, setSpatialProfile] = useState<TwinSpatialProfile>(
@@ -212,13 +213,13 @@ export const EnergyTwinView: React.FC = () => {
     };
   }, [currentStation, twinDisplayMode]);
 
-  // Active Twin State: In LIVE mode, derived strictly from live simulation state. In REPLAY mode, driven by timeline scrub.
-  const activeTwinState = useMemo(() => {
+  // Active Twin State: In LIVE mode, derived strictly from live state / operational snapshot. In REPLAY mode, driven by timeline scrub.
+  const activeTwinState: any = useMemo(() => {
     if (twinDisplayMode === 'REPLAY') {
       return playbackCurrentState;
     }
-    return liveState || trajectoryStates[0] || null;
-  }, [twinDisplayMode, playbackCurrentState, liveState, trajectoryStates]);
+    return liveState || snapshot || trajectoryStates[0] || null;
+  }, [twinDisplayMode, playbackCurrentState, liveState, snapshot, trajectoryStates]);
 
   // Handle live recalculation directly from backend live session
   const handleLiveRecalculate = async () => {
@@ -581,9 +582,9 @@ export const EnergyTwinView: React.FC = () => {
         stationId={viewModel.stationId}
         selectedHorizon={selectedHorizon}
         onSelectHorizon={handleHorizonChange}
-        windSpeedMs={activeTwinState?.wind_speed_m_per_s || (viewModel.powerSummary.windGenerationKw > 5 ? 12.8 : 7.2)}
-        solarGhiWm2={activeTwinState?.ghi_w_per_m2 || (viewModel.powerSummary.solarGenerationKw > 5 ? 195 : 15)}
-        ambientTempC={activeTwinState?.ambient_temp_c || (viewModel.stationId === 'HIMADRI' ? -6.5 : -24.0)}
+        windSpeedMs={activeTwinState?.wind_speed_m_per_s ?? (snapshot?.windSpeedMs ?? undefined)}
+        solarGhiWm2={activeTwinState?.ghi_w_per_m2 ?? (snapshot?.irradianceWm2 ?? undefined)}
+        ambientTempC={activeTwinState?.ambient_temp_c ?? (snapshot?.ambientTemperatureC ?? undefined)}
         currentDemandKw={viewModel.powerSummary.totalLoadKw}
       />
 

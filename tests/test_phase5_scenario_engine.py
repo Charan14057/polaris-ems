@@ -115,6 +115,7 @@ def test_scenario_registry_completeness(scenario_reg):
         "BATTERY_DEGRADATION",
         "FUEL_RESUPPLY_DELAY",
         "COMBINED_POLAR_STRESS",
+        "UNFORESEEN_WEATHER",
         "CUSTOM"
     }
     registered_ids = set(scenario_reg.list_ids())

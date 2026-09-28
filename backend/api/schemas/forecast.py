@@ -16,6 +16,7 @@ class ForecastRequestSchema(BaseModel):
     target: str = Field("total_load_kw", description="total_load_kw | solar_generation_kw | wind_generation_kw")
     horizon_hours: int = Field(48, ge=1, le=168, description="Forecast lead time in hours (1 to 168)")
     forecast_origin: Optional[str] = Field(None, description="ISO-8601 timestamp of forecast origin t")
+    scenario_id: Optional[str] = Field(None, description="Optional active scenario ID from ScenarioRegistry")
     historical_records: Optional[List[Dict[str, Any]]] = Field(
         None, description="Optional custom telemetry records at or before origin"
     )

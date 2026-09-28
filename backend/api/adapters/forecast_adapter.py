@@ -79,6 +79,80 @@ class ForecastAPIAdapter:
         except Exception as e:
             raise InvalidRequestException(f"ML Forecasting failed: {str(e)}")
 
+        # 3.1 Apply causal scenario perturbation to forecast if scenario_id is active
+        scen_id = (req.scenario_id or "").upper()
+        if scen_id:
+            pts = list(result.point_predictions)
+            p10s = list(result.p10)
+            p50s = list(result.p50)
+            p90s = list(result.p90)
+            p95s = list(result.p95)
+
+            if target == "solar_generation_kw":
+                if scen_id in ("SOLAR_GENERATION_FAILURE", "POLAR_NIGHT", "BLIZZARD", "COMBINED_POLAR_STRESS"):
+                    pts = [0.0] * len(pts)
+                    p10s = [0.0] * len(p10s)
+                    p50s = [0.0] * len(p50s)
+                    p90s = [0.0] * len(p90s)
+                    p95s = [0.0] * len(p95s)
+                elif scen_id in ("CLOUDY_CONDITIONS", "LOW_DAYLIGHT"):
+                    pts = [p * 0.65 for p in pts]
+                    p10s = [p * 0.60 for p in p10s]
+                    p50s = [p * 0.65 for p in p50s]
+                    p90s = [p * 0.70 for p in p90s]
+                    p95s = [p * 0.70 for p in p95s]
+                elif scen_id in ("HEAVY_CLOUD_LOW_IRRADIANCE", "UNFORESEEN_WEATHER"):
+                    pts = [p * 0.35 for p in pts]
+                    p10s = [p * 0.30 for p in p10s]
+                    p50s = [p * 0.35 for p in p50s]
+                    p90s = [p * 0.40 for p in p90s]
+                    p95s = [p * 0.40 for p in p95s]
+            elif target == "wind_generation_kw":
+                if scen_id in ("WIND_GENERATION_FAILURE",):
+                    pts = [0.0] * len(pts)
+                    p10s = [0.0] * len(p10s)
+                    p50s = [0.0] * len(p50s)
+                    p90s = [0.0] * len(p90s)
+                    p95s = [0.0] * len(p95s)
+                elif scen_id in ("HIGH_WIND", "UNFORESEEN_WEATHER"):
+                    pts = [p * 1.4 for p in pts]
+                    p10s = [p * 1.3 for p in p10s]
+                    p50s = [p * 1.4 for p in p50s]
+                    p90s = [p * 1.5 for p in p90s]
+                    p95s = [p * 1.5 for p in p95s]
+                elif scen_id in ("BLIZZARD", "COMBINED_POLAR_STRESS"):
+                    # High wind with storm cutout risk
+                    pts = [p * 1.6 if p * 1.6 <= 25.0 else 0.0 for p in pts]
+                    p10s = [p * 1.4 if p * 1.4 <= 25.0 else 0.0 for p in p10s]
+                    p50s = [p * 1.6 if p * 1.6 <= 25.0 else 0.0 for p in p50s]
+                    p90s = [p * 1.8 if p * 1.8 <= 25.0 else 0.0 for p in p90s]
+                    p95s = [p * 1.8 if p * 1.8 <= 25.0 else 0.0 for p in p95s]
+            elif target == "total_load_kw":
+                if scen_id in ("EXTREME_COLD", "COMBINED_POLAR_STRESS"):
+                    pts = [p * 1.40 for p in pts]
+                    p10s = [p * 1.35 for p in p10s]
+                    p50s = [p * 1.40 for p in p50s]
+                    p90s = [p * 1.45 for p in p90s]
+                    p95s = [p * 1.50 for p in p95s]
+                elif scen_id in ("BLIZZARD", "UNFORESEEN_WEATHER"):
+                    pts = [p * 1.25 for p in pts]
+                    p10s = [p * 1.20 for p in p10s]
+                    p50s = [p * 1.25 for p in p50s]
+                    p90s = [p * 1.30 for p in p90s]
+                    p95s = [p * 1.35 for p in p95s]
+
+            result_pts = pts
+            result_p10 = p10s
+            result_p50 = p50s
+            result_p90 = p90s
+            result_p95 = p95s
+        else:
+            result_pts = result.point_predictions
+            result_p10 = result.p10
+            result_p50 = result.p50
+            result_p90 = result.p90
+            result_p95 = result.p95
+
         # 4. Map to API Response Schema
         quantiles = [
             QuantilePointSchema(
@@ -93,17 +167,17 @@ class ForecastAPIAdapter:
             for h, ts, pt, p10_val, p50_val, p90_val, p95_val in zip(
                 result.horizons,
                 result.target_timestamps,
-                result.point_predictions,
-                result.p10,
-                result.p50,
-                result.p90,
-                result.p95
+                result_pts,
+                result_p10,
+                result_p50,
+                result_p90,
+                result_p95
             )
         ]
 
-        mean_pt = float(np.mean(result.point_predictions)) if result.point_predictions else 0.0
-        min_p10 = float(np.min(result.p10)) if result.p10 else 0.0
-        max_p90 = float(np.max(result.p90)) if result.p90 else 0.0
+        mean_pt = float(np.mean(result_pts)) if result_pts else 0.0
+        min_p10 = float(np.min(result_p10)) if result_p10 else 0.0
+        max_p90 = float(np.max(result_p90)) if result_p90 else 0.0
 
         return ForecastResponseData(
             station_id=sid,

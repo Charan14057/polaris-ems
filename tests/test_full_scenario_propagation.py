@@ -27,10 +27,10 @@ def session_mgr():
 
 
 def test_authoritative_scenario_registry_enumeration():
-    """Verifies that all 14 registered scenarios in ScenarioRegistry are present."""
+    """Verifies that all 15 registered scenarios in ScenarioRegistry are present."""
     reg = ScenarioRegistry()
     scenarios = reg.list_scenarios()
-    assert len(scenarios) == 14, f"Expected exactly 14 scenarios, found {len(scenarios)}"
+    assert len(scenarios) == 15, f"Expected exactly 15 scenarios, found {len(scenarios)}"
     scenario_ids = set(reg.list_ids())
     
     expected_ids = {
@@ -47,6 +47,7 @@ def test_authoritative_scenario_registry_enumeration():
         "BATTERY_DEGRADATION",
         "FUEL_RESUPPLY_DELAY",
         "COMBINED_POLAR_STRESS",
+        "UNFORESEEN_WEATHER",
         "CUSTOM"
     }
     assert scenario_ids == expected_ids, f"Mismatch in scenario registry: {scenario_ids ^ expected_ids}"
@@ -64,7 +65,8 @@ def test_authoritative_scenario_registry_enumeration():
     "WIND_GENERATION_FAILURE",
     "BATTERY_DEGRADATION",
     "FUEL_RESUPPLY_DELAY",
-    "COMBINED_POLAR_STRESS"
+    "COMBINED_POLAR_STRESS",
+    "UNFORESEEN_WEATHER"
 ])
 def test_individual_scenario_causal_propagation(session_mgr, scenario_id):
     """

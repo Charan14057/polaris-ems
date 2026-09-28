@@ -16,55 +16,24 @@ interface ResilienceEnvelopeProps {
   stationId?: string;
   overallState?: string;
   overallHorizonHours?: number;
+  dimensions?: ResilienceDimension[];
+  bindingConstraint?: string;
+  bindingDescription?: string;
   className?: string;
 }
 
 export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
   stationId = 'BHARATI',
-  overallState = 'WATCH',
-  overallHorizonHours = 84.0,
+  overallState = 'SAFE',
+  overallHorizonHours = 0,
+  dimensions = [],
+  bindingConstraint = 'DIESEL FUEL RUNWAY',
+  bindingDescription,
   className = '',
 }) => {
   const { inspectEvidence } = useEvidence();
 
-  const dimensions: ResilienceDimension[] = [
-    {
-      id: 'critical_load',
-      name: 'Life-Support Critical Load',
-      horizonHours: 120.0,
-      score: 0.92,
-      isBinding: false,
-      status: 'SAFE',
-      description: 'Habitation heating, atmospheric scrubbers, and satellite coms load (29.5 kW) priority dispatch sustained.',
-    },
-    {
-      id: 'fuel',
-      name: 'Diesel Fuel Reserve',
-      horizonHours: 84.0,
-      score: 0.72,
-      isBinding: true,
-      status: 'WATCH',
-      description: 'Tank capacity remaining: 3,420 liters. At current dual-generator run profile, fuel will bind in 84 hours.',
-    },
-    {
-      id: 'thermal',
-      name: 'Thermal Building Envelope',
-      horizonHours: 96.0,
-      score: 0.81,
-      isBinding: false,
-      status: 'SAFE',
-      description: 'Habitation core interior sustained at +19.5°C; safe minimum threshold is +15.0°C.',
-    },
-    {
-      id: 'battery',
-      name: 'BESS Electrochemical Reserve',
-      horizonHours: 9.5,
-      score: 0.65,
-      isBinding: false,
-      status: 'WATCH',
-      description: 'Battery bank SOC at 68.4%. Provides 9.5 hours of emergency black-sky bridging without generator support.',
-    },
-  ];
+  const activeDimensions = dimensions;
 
   return (
     <div className={`editorial-sheet rounded p-5 sm:p-6 ${className}`}>
@@ -100,10 +69,10 @@ export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
           <AlertTriangle className="w-4 h-4 text-copper shrink-0 mt-0.5" />
           <div>
             <span className="text-xs font-mono uppercase tracking-wider text-copper font-bold block">
-              PRIMARY BINDING CONSTRAINT: DIESEL FUEL RUNWAY
+              PRIMARY BINDING CONSTRAINT: {bindingConstraint.toUpperCase()}
             </span>
             <p className="text-xs text-ink-secondary mt-0.5 leading-relaxed">
-              Resilience is currently limited to 84.0 hours by remaining fuel tank capacity. Battery and thermal buffers have adequate safety margins.
+              {bindingDescription || `Resilience is currently limited to ${overallHorizonHours.toFixed(1)} hours by ${bindingConstraint.toLowerCase()}.`}
             </p>
           </div>
         </div>
@@ -111,13 +80,13 @@ export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
           onClick={() =>
             inspectEvidence({
               title: 'Resilience Binding Constraint',
-              value: '84.0 hours (Fuel Bound)',
+              value: `${overallHorizonHours.toFixed(1)} hours (${bindingConstraint})`,
               source: 'Polaris Resilience State Machine',
               provenance: 'SIMULATED',
               station: stationId,
               modelOrSubsystem: 'Multi-Horizon Survival Calculus',
               mathematicalBasis: '$T_{\\text{surv}} = \\min(T_{\\text{fuel}}, T_{\\text{battery}}, T_{\\text{thermal}}, T_{\\text{critical}})$',
-              validationState: 'Verified via Digital Twin 168h Replay',
+              validationState: 'Verified via Digital Twin Replay',
             })
           }
           className="text-xs font-mono text-copper hover:text-copper-dark shrink-0 p-1"
@@ -129,7 +98,7 @@ export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
 
       {/* Dimensional Breakdown Bars */}
       <div className="space-y-4">
-        {dimensions.map((dim) => (
+        {activeDimensions.map((dim) => (
           <div key={dim.id} className="p-3 rounded bg-canvas-subtle border border-border-subtle">
             <div className="flex items-center justify-between text-xs mb-1.5">
               <div className="flex items-center space-x-2">

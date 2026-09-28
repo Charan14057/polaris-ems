@@ -36,27 +36,27 @@ export const TwinWeatherInfluence: React.FC<TwinWeatherInfluenceProps> = ({
   stationId,
   selectedHorizon,
   onSelectHorizon,
-  windSpeedMs = 11.2,
-  solarGhiWm2 = 180,
-  ambientTempC = -22.5,
-  currentDemandKw = 48.0
+  windSpeedMs,
+  solarGhiWm2,
+  ambientTempC,
+  currentDemandKw
 }) => {
   // Realistic arctic seasonal weather context
   const isArctic = stationId === 'HIMADRI';
 
   // Trends over next 12 hours based on station location
-  const windTrend = windSpeedMs > 14 ? 'up' : 'stable';
-  const solarTrend = solarGhiWm2 > 50 ? 'down' : 'stable';
-  const tempTrend = ambientTempC < -30 ? 'down' : 'stable';
-  const demandTrend = ambientTempC < -25 ? 'up' : 'stable';
+  const windTrend = (windSpeedMs ?? 0) > 14 ? 'up' : 'stable';
+  const solarTrend = (solarGhiWm2 ?? 0) > 50 ? 'down' : 'stable';
+  const tempTrend = (ambientTempC ?? 0) < -30 ? 'down' : 'stable';
+  const demandTrend = (ambientTempC ?? 0) < -25 ? 'up' : 'stable';
 
   // Contextual impact statement
   let expectedImpact = 'Moderate renewable generation potential. Battery and wind supply base load with zero diesel startup needed.';
-  if (windSpeedMs > 18) {
+  if ((windSpeedMs ?? 0) > 18) {
     expectedImpact = 'High wind storm approaching. High wind generation potential; monitoring 25 m/s turbine aerodynamic cut-out threshold.';
-  } else if (ambientTempC < -35) {
+  } else if ((ambientTempC ?? 0) < -35) {
     expectedImpact = 'Severe cold plunge expected. Life-support thermal heating demand projected to rise +15 kW over next 12 hours.';
-  } else if (solarGhiWm2 < 20 && windSpeedMs < 6) {
+  } else if ((solarGhiWm2 ?? 0) < 20 && (windSpeedMs ?? 0) < 6) {
     expectedImpact = 'Low wind lull and minimal solar. Expect increased battery buffer discharge and potential diesel dispatch at dusk.';
   }
 
@@ -91,10 +91,10 @@ export const TwinWeatherInfluence: React.FC<TwinWeatherInfluenceProps> = ({
             )}
           </div>
           <div className="text-base font-bold text-slate-900 mt-1">
-            {windSpeedMs.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">m/s</span>
+            {windSpeedMs !== undefined ? `${windSpeedMs.toFixed(1)} m/s` : '—'}
           </div>
           <span className="text-[9px] text-slate-400 block truncate">
-            {windSpeedMs > 15 ? 'Turbine High Yield' : 'Moderate Flow'}
+            {windSpeedMs !== undefined && windSpeedMs > 15 ? 'Turbine High Yield' : 'Moderate Flow'}
           </span>
         </div>
 
@@ -112,7 +112,7 @@ export const TwinWeatherInfluence: React.FC<TwinWeatherInfluenceProps> = ({
             )}
           </div>
           <div className="text-base font-bold text-slate-900 mt-1">
-            {solarGhiWm2.toFixed(0)} <span className="text-[10px] text-slate-400 font-normal">W/m²</span>
+            {solarGhiWm2 !== undefined ? `${solarGhiWm2.toFixed(0)} W/m²` : '—'}
           </div>
           <span className="text-[9px] text-slate-400 block truncate">
             {isArctic ? '24h Polar Day' : 'Diurnal Window'}
@@ -133,7 +133,7 @@ export const TwinWeatherInfluence: React.FC<TwinWeatherInfluenceProps> = ({
             )}
           </div>
           <div className="text-base font-bold text-slate-900 mt-1">
-            {ambientTempC.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">°C</span>
+            {ambientTempC !== undefined ? `${ambientTempC.toFixed(1)} °C` : '—'}
           </div>
           <span className="text-[9px] text-slate-400 block truncate">
             Sub-Zero Cold Stress
@@ -154,7 +154,7 @@ export const TwinWeatherInfluence: React.FC<TwinWeatherInfluenceProps> = ({
             )}
           </div>
           <div className="text-base font-bold text-slate-900 mt-1">
-            {currentDemandKw.toFixed(1)} <span className="text-[10px] text-slate-400 font-normal">kW</span>
+            {currentDemandKw !== undefined ? `${currentDemandKw.toFixed(1)} kW` : '—'}
           </div>
           <span className="text-[9px] text-slate-400 block truncate">
             Thermal Heating Load

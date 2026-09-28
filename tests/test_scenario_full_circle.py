@@ -33,10 +33,10 @@ def session_mgr():
 
 
 def test_authoritative_scenario_registry_enumeration():
-    """Verifies that all 14 registered scenarios in ScenarioRegistry and SCENARIO_CONTRACTS are present."""
+    """Verifies that all 15 registered scenarios in ScenarioRegistry and SCENARIO_CONTRACTS are present."""
     reg = ScenarioRegistry()
     scenarios = reg.list_scenarios()
-    assert len(scenarios) == 14, f"Expected exactly 14 scenarios, found {len(scenarios)}"
+    assert len(scenarios) == 15, f"Expected exactly 15 scenarios, found {len(scenarios)}"
     scenario_ids = set(reg.list_ids())
     contract_ids = set(SCENARIO_CONTRACTS.keys())
     assert scenario_ids == contract_ids, f"Contract mismatch: {scenario_ids ^ contract_ids}"
@@ -56,6 +56,7 @@ def test_authoritative_scenario_registry_enumeration():
     "BATTERY_DEGRADATION",
     "FUEL_RESUPPLY_DELAY",
     "COMBINED_POLAR_STRESS",
+    "UNFORESEEN_WEATHER",
     "CUSTOM"
 ])
 def test_individual_scenario_full_circle_lifecycle(session_mgr, scenario_id):

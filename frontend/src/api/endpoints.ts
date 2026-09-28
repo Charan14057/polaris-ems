@@ -42,6 +42,7 @@ export const api = {
     station_id: StationId | string;
     target: 'total_load_kw' | 'solar_generation_kw' | 'wind_generation_kw';
     horizon_hours?: number;
+    scenario_id?: string;
     forecast_origin?: string;
   }) => 
     apiRequest<ForecastResponseData>('/api/v1/forecast', {
@@ -221,4 +222,14 @@ export const api = {
 
   traceAssetImpact: (stationId: StationId | string, assetId: string) =>
     apiRequest<Record<string, any>>(`/api/v1/twin/trace/impact/${stationId.toUpperCase()}/${assetId}`),
+
+  // Edge & Field HIL Intelligence
+  getEdgeState: (stationId: StationId | string) =>
+    apiRequest<Record<string, any>>(`/api/v1/edge/${stationId.toUpperCase()}/state`),
+
+  getEdgeDevices: (stationId: StationId | string) =>
+    apiRequest<Array<Record<string, any>>>(`/api/v1/edge/${stationId.toUpperCase()}/devices`),
+
+  getEdgeConnectivity: (stationId: StationId | string) =>
+    apiRequest<Record<string, any>>(`/api/v1/edge/${stationId.toUpperCase()}/connectivity`),
 };

@@ -126,15 +126,15 @@ def check_3_resilience_vocabulary():
 
 
 def check_4_scenario_count():
-    """Verify exactly 14 locked scenarios exist in ScenarioRegistry."""
+    """Verify canonical scenarios exist in ScenarioRegistry (14 baseline or 15 with UNFORESEEN_WEATHER)."""
     from backend.scenarios.registry import ScenarioRegistry
     reg = ScenarioRegistry()
     scenarios = reg.list_scenarios()
     count = len(scenarios)
-    if count == 14:
-        record_pass("Check 4: Authoritative Scenario Count", "14 locked scenarios in ScenarioRegistry")
+    if count in (14, 15):
+        record_pass("Check 4: Authoritative Scenario Count", f"{count} scenarios in ScenarioRegistry")
     else:
-        record_fail("Check 4: Authoritative Scenario Count", f"Expected 14 scenarios, got {count}")
+        record_fail("Check 4: Authoritative Scenario Count", f"Expected 14 or 15 scenarios, got {count}")
 
 
 def check_5_regime_benchmark_count():

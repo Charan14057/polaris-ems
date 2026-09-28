@@ -1,12 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useStation } from '../context/StationContext';
+import React from 'react';
+import { useStation, useOperationalSnapshot } from '../context/StationContext';
 import { useComprehension } from '../context/ComprehensionContext';
-import { api } from '../api/endpoints';
-import { 
-  ResilienceEvaluateResponseData, 
-  PolicyEvaluateResponseData,
-  StationId 
-} from '../api/types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { 
@@ -14,6 +8,7 @@ import {
   BatteryCharging, 
   Wind, 
   Sun,
+  Flame,
   ShieldAlert, 
   ArrowRight,
   ShieldCheck, 
@@ -22,7 +17,17 @@ import {
   Info,
   Maximize2,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Compass,
+  Thermometer,
+  CloudSun,
+  Activity,
+  Layers,
+  Cpu,
+  Radio,
+  Sliders,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 interface OverviewViewProps {
@@ -32,435 +37,523 @@ interface OverviewViewProps {
 
 export const OverviewView: React.FC<OverviewViewProps> = ({ onNavigate, onNavigateTab }) => {
   const navigate = onNavigate || onNavigateTab || (() => {});
-  const { currentStation, horizonHours, stationDetail, activeThreats, refreshStationData } = useStation();
+  const { stationDetail, refreshStationData, loading } = useStation();
+  const { snapshot, activeScenario, clearScenario } = useOperationalSnapshot();
   const { openOrientation } = useComprehension();
 
-  const [resilience, setResilience] = useState<ResilienceEvaluateResponseData | null>(null);
-  const [policy, setPolicy] = useState<PolicyEvaluateResponseData | null>(null);
-  const [twinState, setTwinState] = useState<any | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [apiError, setApiError] = useState<string | null>(null);
+  // Helper formatters: Render "—" when data is genuinely null or undefined
+  const fmtKw = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${val.toFixed(1)} kW`;
+  };
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setApiError(null);
-    try {
-      const [resRes, polRes, twinRes] = await Promise.all([
-        api.evaluateResilience({
-          station_id: currentStation,
-          horizon_hours: horizonHours,
-        }).catch(() => null),
-        api.evaluatePolicy({
-          station_id: currentStation,
-          horizon_hours: horizonHours,
-          include_suppressed: true,
-        }).catch(() => null),
-        api.getTwinCurrentState(currentStation).catch(() => null),
-      ]);
+  const fmtPct = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${Math.round(val)}%`;
+  };
 
-      if (resRes?.data) setResilience(resRes.data);
-      if (polRes?.data) setPolicy(polRes.data);
-      if (twinRes?.data) setTwinState(twinRes.data);
-    } catch (err: any) {
-      setApiError(err.message || 'API connection failed');
-    } finally {
-      setLoading(false);
-    }
-  }, [currentStation, horizonHours]);
+  const fmtHours = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    if (val > 500) return '>500 h';
+    return `${val.toFixed(0)} h`;
+  };
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const fmtLiters = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${Math.round(val).toLocaleString()} L`;
+  };
 
-  // Derive real values from authoritative sources without fake fallback constants
-  const resState = resilience?.resilience_state || 'SAFE';
-  
-  // Nominal load derived from station device definitions if twin telemetry unavailable
-  const calculatedConnectedLoad = stationDetail?.devices?.reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
-  const calculatedCriticalLoad = stationDetail?.devices
-    ?.filter(d => d.priority_rank <= 2)
-    .reduce((acc, d) => acc + (d.nominal_power_kw || 0), 0) ?? null;
+  const fmtTemp = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1)}°C`;
+  };
 
-  const currentLoadKw = twinState?.loads?.total_load_kw ?? calculatedConnectedLoad;
-  const criticalLoadKw = twinState?.loads?.critical_load_kw ?? calculatedCriticalLoad;
-  
-  const solarKw = twinState?.sources?.solar?.power_kw ?? 0.0;
-  const windKw = twinState?.sources?.wind?.power_kw ?? (currentStation === 'HIMADRI' ? 0.0 : 8.1);
-  const dieselKw = twinState?.sources?.diesel?.total_power_kw ?? 0.0;
-  const batterySoc = twinState?.storage?.bess?.soc_pct ?? 65.0;
-  const batteryPowerKw = twinState?.storage?.bess?.power_kw ?? 0.0; // Positive = discharging, negative = charging
+  const fmtSpeed = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${val.toFixed(1)} m/s`;
+  };
 
-  const totalGenKw = solarKw + windKw + dieselKw + Math.max(0, batteryPowerKw);
-  const renewablePct = totalGenKw > 0.1 
-    ? Math.min(100, Math.round(((solarKw + windKw) / totalGenKw) * 100))
-    : 0;
+  const fmtWm2 = (val: number | null | undefined): string => {
+    if (val === null || val === undefined || isNaN(val)) return '—';
+    return `${val.toFixed(0)} W/m²`;
+  };
 
-  const survivalHours = resilience?.survival_horizons?.critical_load_survival_horizon_h ?? 84.0;
-  const activeDirective = policy?.primary_directive ?? 'RENEWABLE_PRIORITY';
+  const isBessDischarging = snapshot.bessStatus === 'DISCHARGING';
+  const isBessCharging = snapshot.bessStatus === 'CHARGING';
+  const isSolarGenerating = snapshot.solarGenerationKw !== null && snapshot.solarGenerationKw > 0.1;
+  const isWindGenerating = snapshot.windGenerationKw !== null && snapshot.windGenerationKw > 0.1;
+  const isDieselOnline = snapshot.dieselGenerationKw !== null && snapshot.dieselGenerationKw > 0.1;
+
+  // Source mix percentages from authoritative topology
+  const sourceMix = snapshot.powerFlowTopology?.sourceMix || {
+    solar_pct: snapshot.totalGenerationKw && snapshot.solarGenerationKw ? Math.round((snapshot.solarGenerationKw / snapshot.totalGenerationKw) * 100) : 0,
+    wind_pct: snapshot.totalGenerationKw && snapshot.windGenerationKw ? Math.round((snapshot.windGenerationKw / snapshot.totalGenerationKw) * 100) : 0,
+    diesel_pct: snapshot.totalGenerationKw && snapshot.dieselGenerationKw ? Math.round((snapshot.dieselGenerationKw / snapshot.totalGenerationKw) * 100) : 0,
+    battery_pct: snapshot.totalGenerationKw && isBessDischarging && snapshot.bessPowerKw ? Math.round((snapshot.bessPowerKw / snapshot.totalGenerationKw) * 100) : 0,
+  };
 
   return (
-    <div className="space-y-6 max-w-[1520px] mx-auto pb-10 font-sans">
-      {/* 1. Station Identity & Status Banner */}
-      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-            <span className="font-semibold text-slate-800">{stationDetail?.region || 'INDIAN ANTARCTIC PROGRAM'}</span>
-            <span className="text-slate-300">•</span>
-            <span>{stationDetail?.location || '69°S • Larsemann Hills'}</span>
+    <div className="space-y-6 max-w-[1520px] mx-auto pb-12 font-sans selection:bg-sky-500/20">
+      
+      {/* 1. Industrial Header & Station Condition Strip */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-2.5 text-[11px] font-mono uppercase tracking-wider text-sky-400 mb-1.5">
+              <span className="font-semibold text-slate-300">{snapshot.stationRegion}</span>
+              <span className="text-slate-600">•</span>
+              <span>{snapshot.stationLocation}</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-400">STATION ID: {snapshot.currentStation}</span>
+            </div>
+            
+            <div className="flex items-baseline gap-3.5">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                {snapshot.stationName}
+              </h1>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-sky-300 border border-slate-700">
+                400V 3-Phase Microgrid
+              </span>
+            </div>
+            
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Authoritative operational command center monitoring real-time generation balance, thermal habitability, and multi-horizon survivability.
+            </p>
           </div>
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              {stationDetail?.name || currentStation} Station
-            </h1>
-            <span className="text-xs font-mono text-slate-500 hidden sm:inline">
-              400V 3-Phase Polar Microgrid
-            </span>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-slate-800/80 border border-slate-700 rounded-lg px-3.5 py-2 flex flex-col items-start lg:items-end">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Resilience State</span>
+              <div className="mt-0.5">
+                <StatusBadge status={snapshot.resilienceState} size="md" />
+              </div>
+            </div>
+
+            <div className="bg-slate-800/80 border border-slate-700 rounded-lg px-3.5 py-2 flex flex-col items-start lg:items-end">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Operating Mode</span>
+              <span className="text-xs font-mono font-bold text-sky-300 mt-0.5 flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${snapshot.operatingMode === 'AUTO' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                {snapshot.operatingMode} GOVERNANCE
+              </span>
+            </div>
+
+            <button
+              onClick={() => refreshStationData()}
+              disabled={loading}
+              className="p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+              title="Refresh Authoritative Telemetry"
+            >
+              <RotateCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
+            </button>
           </div>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-normal">
-            Automated microgrid dispatch and resilience advisory preserving continuous life-support heating and critical research power.
-          </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="flex flex-col items-start md:items-end">
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">System State</span>
-            <StatusBadge status={resState} size="md" />
+        {/* Environmental Telemetry Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-800/80 text-xs font-mono">
+          <div className="flex items-center gap-2.5 text-slate-300">
+            <Thermometer className="w-4 h-4 text-sky-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase">Ambient Temp</span>
+              <span className="font-bold text-white">{fmtTemp(snapshot.ambientTemperatureC)}</span>
+            </div>
           </div>
 
-          <button
-            onClick={openOrientation}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-            title="Open Orientation Tour"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-sky-600" />
-            <span>Guide</span>
-          </button>
+          <div className="flex items-center gap-2.5 text-slate-300">
+            <Wind className="w-4 h-4 text-teal-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase">Wind Velocity</span>
+              <span className="font-bold text-white">{fmtSpeed(snapshot.windSpeedMs)}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 text-slate-300">
+            <Sun className="w-4 h-4 text-amber-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase">Solar Irradiance</span>
+              <span className="font-bold text-white">{fmtWm2(snapshot.irradianceWm2)}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 text-slate-300">
+            <CloudSun className="w-4 h-4 text-indigo-400 shrink-0" />
+            <div>
+              <span className="text-[10px] text-slate-400 block uppercase">Cloud Cover</span>
+              <span className="font-bold text-white">{snapshot.cloudFraction !== null ? `${Math.round(snapshot.cloudFraction * 100)}%` : '—'}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Offline / API Notification if error occurred */}
-      {apiError && (
-        <div className="p-3 rounded-md bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>
-              Unable to reach live backend. Displaying validated baseline station configuration.
-            </span>
+      {/* 2. Active Stress Scenario Alert Banner (if perturbed) */}
+      {activeScenario && (
+        <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-200">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 uppercase">
+                  ACTIVE STRESS SCENARIO
+                </span>
+                <span className="text-xs font-mono font-bold text-white">{activeScenario}</span>
+              </div>
+              <p className="text-xs text-amber-300/80 mt-0.5">
+                Microgrid physical state is currently perturbed. Downstream generation, loads, and resilience reflect this regime.
+              </p>
+            </div>
           </div>
-          <button
-            onClick={loadData}
-            className="flex items-center gap-1 font-semibold text-amber-900 hover:underline shrink-0"
-          >
-            <RotateCw className="w-3 h-3" />
-            <span>Retry</span>
-          </button>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => clearScenario()}
+              className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-mono font-semibold transition-colors"
+            >
+              Restore Baseline
+            </button>
+            <button
+              onClick={() => navigate('scenarios')}
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-colors"
+            >
+              View Scenarios →
+            </button>
+          </div>
         </div>
       )}
 
-      {/* 2. Primary Metrics Row (3-4 KPIs Only) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Station Load */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Station Demand</span>
-            <ProvenanceTag provenance="SIMULATED" size="xs" />
-          </div>
+      {/* 3. Primary Real-Time Operational Metrics Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3.5">
+        {/* Metric 1: Total Demand */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Total Demand</span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
-              {currentLoadKw !== null ? currentLoadKw.toFixed(1) : '—'}
-            </span>
-            <span className="text-xs font-mono text-slate-500">kW</span>
+            <span className="text-xl sm:text-2xl font-bold font-mono text-slate-900">{fmtKw(snapshot.totalLoadKw)}</span>
           </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-            <span>Critical Life Support:</span>
-            <span className="font-semibold text-emerald-700">
-              {criticalLoadKw !== null ? `${criticalLoadKw.toFixed(1)} kW` : 'Protected'}
-            </span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1 flex items-center justify-between">
+            <span>Critical: {fmtKw(snapshot.criticalLoadKw)}</span>
+            <span className="text-slate-400">Flex: {fmtKw(snapshot.flexibleLoadKw)}</span>
           </div>
         </div>
 
-        {/* Metric 2: Renewable Share */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Renewable Mix</span>
-            <span className="text-[10px] font-mono text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
-              {renewablePct}% Clean
-            </span>
+        {/* Metric 2: Solar PV Generation */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Solar PV Output</span>
+            <span className={`w-2 h-2 rounded-full ${isSolarGenerating ? 'bg-amber-500' : 'bg-slate-300'}`} />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
-              {(solarKw + windKw).toFixed(1)}
-            </span>
-            <span className="text-xs font-mono text-slate-500">kW Generated</span>
-          </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-            <span>Wind: {windKw.toFixed(1)} kW</span>
-            <span>Solar: {solarKw.toFixed(1)} kW</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-amber-600">{fmtKw(snapshot.solarGenerationKw)}</span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Status: <span className="font-semibold text-slate-700">{snapshot.solarStatus || '—'}</span>
           </div>
         </div>
 
-        {/* Metric 3: Battery & Autonomous Reserve */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Energy Storage</span>
-            <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
-              BESS
-            </span>
+        {/* Metric 3: Wind Turbine Generation */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Wind Turbine Output</span>
+            <span className={`w-2 h-2 rounded-full ${isWindGenerating ? 'bg-teal-500' : 'bg-slate-300'}`} />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-bold font-mono-numbers text-slate-900">
-              {batterySoc.toFixed(1)}%
-            </span>
-            <span className="text-xs font-mono text-slate-500">State of Charge</span>
-          </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-            <span>Survival Runway:</span>
-            <span className="font-semibold text-slate-700">{survivalHours.toFixed(0)}h reserve</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-teal-600">{fmtKw(snapshot.windGenerationKw)}</span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Status: <span className="font-semibold text-slate-700">{snapshot.windStatus || '—'}</span>
           </div>
         </div>
 
-        {/* Metric 4: Active Dispatch Directive */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-            <span className="font-mono text-[11px] uppercase tracking-wider">Active Policy</span>
-            <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
-              MILP
-            </span>
+        {/* Metric 4: Diesel Generation */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Diesel Genset</span>
+            <span className={`w-2 h-2 rounded-full ${isDieselOnline ? 'bg-amber-600 animate-pulse' : 'bg-slate-300'}`} />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-lg sm:text-xl font-bold text-slate-900 truncate">
-              {activeDirective.replace(/_/g, ' ')}
-            </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-slate-800">{fmtKw(snapshot.dieselGenerationKw)}</span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Burn: <span className="font-semibold text-slate-700">{snapshot.fuelConsumptionLph !== null ? `${snapshot.fuelConsumptionLph.toFixed(1)} L/h` : '—'}</span>
           </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Diesel Status:</span>
-            <span className={`font-mono font-semibold ${dieselKw > 0 ? 'text-amber-700' : 'text-slate-600'}`}>
-              {dieselKw > 0 ? `${dieselKw.toFixed(1)} kW Online` : 'Standby / Warm'}
-            </span>
+        </div>
+
+        {/* Metric 5: BESS State of Charge */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">BESS SOC</span>
+            <BatteryCharging className="w-3.5 h-3.5 text-emerald-600" />
+          </div>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-600">{fmtPct(snapshot.bessSocPct)}</span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Flow: <span className="font-semibold text-slate-700">{fmtKw(snapshot.bessPowerKw)}</span>
+          </div>
+        </div>
+
+        {/* Metric 6: Fuel & Survival Horizon */}
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Survival Horizon</span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-indigo-600">
+            {fmtHours(snapshot.survivalHorizons?.criticalLoadSurvivalH)}
+          </span>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Fuel: <span className="font-semibold text-slate-700">{fmtLiters(snapshot.fuelRemainingL)}</span>
           </div>
         </div>
       </div>
 
-      {/* 3. Primary Visual: Large Energy & System Flow Architecture */}
-      <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+      {/* 4. VISUAL ENERGY BALANCE (Interactive Physical Bus Topology) */}
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-slate-100 gap-2">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-slate-900">System Flow Architecture</h2>
-              <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                Kirchhoff Conserved
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Live power flow from primary sources across 400V bus to critical loads and battery storage.
-            </p>
-          </div>
-
-          <button
-            onClick={() => navigate('twin')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium shadow-xs transition-colors shrink-0"
-          >
-            <span>Launch Spatial Digital Twin</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Clean Topological Schematic */}
-        <div className="p-4 sm:p-6 bg-slate-50 rounded-lg border border-slate-200 overflow-x-auto">
-          <div className="min-w-[640px] flex items-center justify-between gap-4">
-            {/* Column 1: Sources */}
-            <div className="w-48 space-y-2.5 shrink-0">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                Generation Sources
-              </div>
-
-              {/* Wind */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Wind className="w-4 h-4 text-sky-600" />
-                  <span className="text-xs font-medium text-slate-800">Wind Turbine</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-sky-700">{windKw.toFixed(1)} kW</span>
-              </div>
-
-              {/* Solar */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sun className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-medium text-slate-800">Solar PV</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-slate-700">{solarKw.toFixed(1)} kW</span>
-              </div>
-
-              {/* Diesel */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-medium text-slate-800">Diesel Genset</span>
-                </div>
-                <span className={`text-xs font-mono font-bold ${dieselKw > 0 ? 'text-amber-700' : 'text-slate-400'}`}>
-                  {dieselKw > 0 ? `${dieselKw.toFixed(1)} kW` : 'Standby'}
-                </span>
-              </div>
-            </div>
-
-            {/* Influx Conduits */}
-            <div className="flex-1 flex flex-col items-center justify-center px-2">
-              <div className="w-full h-0.5 bg-slate-300 relative my-3">
-                <div className="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-400 rotate-45" />
-              </div>
-              <span className="text-[10px] font-mono text-slate-400 uppercase">
-                Synchronized Infeed
-              </span>
-            </div>
-
-            {/* Column 2: Central Main 400V Switchboard & Storage */}
-            <div className="w-56 space-y-2.5 shrink-0">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                Central Bus & Storage
-              </div>
-
-              {/* 400V Main Bus */}
-              <div className="p-3 rounded-md bg-slate-900 text-white shadow-sm space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold font-mono">MAIN 400V BUS</span>
-                  <span className="text-[10px] font-mono text-emerald-400">ENERGIZED</span>
-                </div>
-                <div className="text-[11px] text-slate-300 font-mono">
-                  Throughput: {((currentLoadKw ?? 40.0) + Math.abs(batteryPowerKw)).toFixed(1)} kW
-                </div>
-              </div>
-
-              {/* Battery Storage */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <BatteryCharging className="w-4 h-4 text-emerald-600" />
-                  <div>
-                    <span className="text-xs font-medium text-slate-800 block">BESS Unit</span>
-                    <span className="text-[10px] text-slate-400 font-mono">SOC: {batterySoc.toFixed(0)}%</span>
-                  </div>
-                </div>
-                <span className="text-xs font-mono font-bold text-slate-700">
-                  {batteryPowerKw > 0 ? `+${batteryPowerKw.toFixed(1)} kW` : batteryPowerKw < 0 ? `${batteryPowerKw.toFixed(1)} kW` : 'Float'}
-                </span>
-              </div>
-            </div>
-
-            {/* Outflow Conduits */}
-            <div className="flex-1 flex flex-col items-center justify-center px-2">
-              <div className="w-full h-0.5 bg-slate-300 relative my-3">
-                <div className="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-400 rotate-45" />
-              </div>
-              <span className="text-[10px] font-mono text-slate-400 uppercase">
-                Feeder Distribution
-              </span>
-            </div>
-
-            {/* Column 3: Load Categories */}
-            <div className="w-48 space-y-2.5 shrink-0">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1">
-                Load Feeders
-              </div>
-
-              {/* P1 Life Support */}
-              <div className="p-2.5 rounded-md bg-white border border-emerald-200 bg-emerald-50/20 shadow-xs flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold text-slate-900 block">Life Support & Heat</span>
-                  <span className="text-[10px] text-emerald-700 font-mono">Priority 1 • Protected</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-emerald-700">
-                  {criticalLoadKw !== null ? `${criticalLoadKw.toFixed(1)} kW` : '18.5 kW'}
-                </span>
-              </div>
-
-              {/* P2 Science & Uplink */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-slate-800 block">Science & Comms</span>
-                  <span className="text-[10px] text-slate-400 font-mono">Priority 2 • Essential</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-slate-700">12.0 kW</span>
-              </div>
-
-              {/* P3 Base Habitability */}
-              <div className="p-2.5 rounded-md bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium text-slate-800 block">Operations & Living</span>
-                  <span className="text-[10px] text-slate-400 font-mono">Priority 3 • Deferrable</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-slate-700">9.5 kW</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Bottom Row: Active Conditions & Next Operational Focus */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Left: Active Conditions */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4 text-sky-600" />
-              Active System Conditions
+            <span className="text-[10px] font-mono uppercase tracking-widest text-sky-600 font-bold block">
+              INSTANTANEOUS POWER BALANCE & SCADA TOPOLOGY
             </span>
-            <span className="text-[11px] font-mono text-slate-400">
-              {activeThreats.length > 0 ? `${activeThreats.length} flagged` : 'Zero critical alerts'}
+            <h2 className="text-lg font-bold text-slate-900 mt-0.5">
+              Live Microgrid Generation, Distribution Bus & Substation Feeders
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono text-slate-500">
+              Renewable Penetration: <strong className="text-emerald-600 font-bold">{fmtPct(snapshot.renewableSharePct)}</strong>
             </span>
-          </div>
-
-          {activeThreats.length > 0 ? (
-            <div className="space-y-2">
-              {activeThreats.slice(0, 2).map((threat, idx) => (
-                <div key={idx} className="p-2.5 rounded bg-slate-50 border border-slate-200 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-900">{threat.threat_type.replace(/_/g, ' ')}</span>
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${threat.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
-                      {threat.severity}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 text-[11px]">{threat.trigger_condition}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-4 rounded bg-slate-50 border border-slate-200 text-xs text-slate-500 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>All environmental envelopes and thermal thresholds are within nominal bounds.</span>
-            </div>
-          )}
-        </div>
-
-        {/* Right: Next Operational Focus */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-                <ArrowRight className="w-4 h-4 text-emerald-600" />
-                Operational Focus
-              </span>
-              <span className="text-[11px] font-mono text-slate-400">Horizon {horizonHours}h</span>
-            </div>
-
-            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-              Dispatch schedule prioritizes full renewable capture while maintaining BESS above 60% SOC for polar night resilience.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
             <button
-              onClick={() => navigate('optimization')}
-              className="text-xs text-sky-600 hover:text-sky-800 font-semibold inline-flex items-center gap-1"
+              onClick={() => navigate('twin')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs font-mono font-medium transition-colors"
             >
-              <span>Inspect Dispatch Plan</span>
+              <span>Explore 3D Twin</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Visual Flow Representation */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+          
+          {/* Column A: Generation Sources (4 cols) */}
+          <div className="lg:col-span-4 space-y-2.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold block px-1">
+              Generation Assets & Storage
+            </span>
+
+            {/* Solar Box */}
+            <div className={`p-3 rounded-lg border flex items-center justify-between transition-colors ${
+              isSolarGenerating ? 'bg-amber-50/50 border-amber-200 text-slate-900' : 'bg-slate-50 border-slate-200 text-slate-400'
+            }`}>
+              <div className="flex items-center gap-3">
+                <Sun className={`w-4 h-4 ${isSolarGenerating ? 'text-amber-500' : 'text-slate-400'}`} />
+                <div>
+                  <span className="text-xs font-bold font-mono block">Solar PV Array</span>
+                  <span className="text-[10px] font-mono text-slate-500">Peak: {fmtKw(snapshot.solarCapacityKw)}</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold">{fmtKw(snapshot.solarGenerationKw)}</span>
+            </div>
+
+            {/* Wind Box */}
+            <div className={`p-3 rounded-lg border flex items-center justify-between transition-colors ${
+              isWindGenerating ? 'bg-teal-50/50 border-teal-200 text-slate-900' : 'bg-slate-50 border-slate-200 text-slate-400'
+            }`}>
+              <div className="flex items-center gap-3">
+                <Wind className={`w-4 h-4 ${isWindGenerating ? 'text-teal-500' : 'text-slate-400'}`} />
+                <div>
+                  <span className="text-xs font-bold font-mono block">Wind Turbine</span>
+                  <span className="text-[10px] font-mono text-slate-500">Rated: {fmtKw(snapshot.windCapacityKw)}</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold">{fmtKw(snapshot.windGenerationKw)}</span>
+            </div>
+
+            {/* Diesel Box */}
+            <div className={`p-3 rounded-lg border flex items-center justify-between transition-colors ${
+              isDieselOnline ? 'bg-slate-100 border-slate-300 text-slate-900' : 'bg-slate-50 border-slate-200 text-slate-400'
+            }`}>
+              <div className="flex items-center gap-3">
+                <Flame className={`w-4 h-4 ${isDieselOnline ? 'text-amber-600' : 'text-slate-400'}`} />
+                <div>
+                  <span className="text-xs font-bold font-mono block">Diesel Generator (DG-1)</span>
+                  <span className="text-[10px] font-mono text-slate-500">Capacity: {fmtKw(snapshot.dieselMaxKw)}</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold">{fmtKw(snapshot.dieselGenerationKw)}</span>
+            </div>
+
+            {/* BESS Box */}
+            <div className={`p-3 rounded-lg border flex items-center justify-between transition-colors ${
+              isBessDischarging ? 'bg-emerald-50/60 border-emerald-200 text-slate-900' : 
+              (isBessCharging ? 'bg-sky-50/60 border-sky-200 text-slate-900' : 'bg-slate-50 border-slate-200 text-slate-500')
+            }`}>
+              <div className="flex items-center gap-3">
+                <BatteryCharging className={`w-4 h-4 ${isBessDischarging ? 'text-emerald-600' : (isBessCharging ? 'text-sky-600' : 'text-slate-400')}`} />
+                <div>
+                  <span className="text-xs font-bold font-mono block">Station BESS (120 kWh)</span>
+                  <span className="text-[10px] font-mono text-slate-500">
+                    SOC: {fmtPct(snapshot.bessSocPct)} • {snapshot.bessStatus || 'STANDBY'}
+                  </span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold">{fmtKw(snapshot.bessPowerKw)}</span>
+            </div>
+          </div>
+
+          {/* Column B: Main Distribution Bus (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col items-center justify-center p-5 rounded-xl bg-slate-900 text-white border border-slate-800 shadow-md">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-sky-400 mb-2">
+              MAIN 415V AC SYNCHRONOUS BUS
+            </span>
+            
+            <div className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-800/90 border border-slate-700 text-xs font-mono mb-3">
+              <span className="text-slate-400">Total Generation Inflow</span>
+              <span className="font-bold text-emerald-400">{fmtKw(snapshot.totalGenerationKw)}</span>
+            </div>
+
+            <div className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-slate-800/90 border border-slate-700 text-xs font-mono mb-3">
+              <span className="text-slate-400">Total Demand Throughput</span>
+              <span className="font-bold text-sky-300">{fmtKw(snapshot.totalLoadKw)}</span>
+            </div>
+
+            <div className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono text-slate-400 border-t border-slate-800 pt-2">
+              <span>Bus Frequency: 50.00 Hz</span>
+              <span>Voltage: 415 V</span>
+            </div>
+          </div>
+
+          {/* Column C: Substation Loads (4 cols) */}
+          <div className="lg:col-span-4 space-y-2.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold block px-1">
+              Station Load Demands
+            </span>
+
+            {/* Critical Load */}
+            <div className="p-3 rounded-lg border border-red-200 bg-red-50/50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-4 h-4 text-red-600" />
+                <div>
+                  <span className="text-xs font-bold font-mono block text-red-950">Priority 1 Life Support</span>
+                  <span className="text-[10px] font-mono text-red-700">Habitation, heating & medical</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-red-900">{fmtKw(snapshot.criticalLoadKw)}</span>
+            </div>
+
+            {/* Scientific & Operational */}
+            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Radio className="w-4 h-4 text-sky-600" />
+                <div>
+                  <span className="text-xs font-bold font-mono block text-slate-900">Priority 2 Research & Comms</span>
+                  <span className="text-[10px] font-mono text-slate-500">Satcom, core physics & radars</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-800">
+                {snapshot.totalLoadKw && snapshot.criticalLoadKw && snapshot.flexibleLoadKw
+                  ? fmtKw(Math.max(0, snapshot.totalLoadKw - snapshot.criticalLoadKw - snapshot.flexibleLoadKw))
+                  : '—'}
+              </span>
+            </div>
+
+            {/* Flexible Loads */}
+            <div className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sliders className="w-4 h-4 text-slate-500" />
+                <div>
+                  <span className="text-xs font-bold font-mono block text-slate-800">Priority 3 Flexible / Deferrable</span>
+                  <span className="text-[10px] font-mono text-slate-500">Workshop & secondary HVAC</span>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-700">{fmtKw(snapshot.flexibleLoadKw)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Source Mix Progress Bar */}
+        <div className="mt-6 pt-5 border-t border-slate-100">
+          <div className="flex items-center justify-between text-xs font-mono mb-2">
+            <span className="font-semibold text-slate-700">Generation Source Mix</span>
+            <span className="text-slate-500">
+              Solar: {sourceMix.solar_pct}% • Wind: {sourceMix.wind_pct}% • Diesel: {sourceMix.diesel_pct}% • BESS: {sourceMix.battery_pct}%
+            </span>
+          </div>
+
+          <div className="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+            <div 
+              style={{ width: `${sourceMix.solar_pct}%` }} 
+              className="bg-amber-500 h-full transition-all duration-500" 
+              title={`Solar: ${sourceMix.solar_pct}%`}
+            />
+            <div 
+              style={{ width: `${sourceMix.wind_pct}%` }} 
+              className="bg-teal-500 h-full transition-all duration-500" 
+              title={`Wind: ${sourceMix.wind_pct}%`}
+            />
+            <div 
+              style={{ width: `${sourceMix.diesel_pct}%` }} 
+              className="bg-slate-700 h-full transition-all duration-500" 
+              title={`Diesel: ${sourceMix.diesel_pct}%`}
+            />
+            <div 
+              style={{ width: `${sourceMix.battery_pct}%` }} 
+              className="bg-emerald-500 h-full transition-all duration-500" 
+              title={`Battery: ${sourceMix.battery_pct}%`}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Policy Directive & HiGHS Optimizer Recommendations */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Policy Box */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                OPERATIONAL POLICY GOVERNANCE
+              </span>
+              <StatusBadge status={snapshot.resilienceState} size="sm" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900 font-sans">
+              Directive: {snapshot.activeDirective || 'RENEWABLE_PRIORITY'}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Enforcing priority order across the station load ladder. Life-support circuits are unconditionally protected against curtailment.
+            </p>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+            <span className="text-slate-500">Policy State: {snapshot.policyState || 'MONITOR'}</span>
+            <button
+              onClick={() => navigate('policy')}
+              className="text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1"
+            >
+              <span>Audit Rules</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
-            <span className="text-slate-300">•</span>
+          </div>
+        </div>
+
+        {/* Optimizer Box */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-sky-600 font-bold">
+                PHASE 6 HIGHS OPTIMIZER
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                SOLVER: HiGHS C++
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-slate-900 font-sans">
+              {snapshot.optimizerRecommendation}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              {snapshot.optimizerRationale}
+            </p>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+            <span className="text-slate-500">Lookahead: 48h Rolling MILP</span>
             <button
-              onClick={() => navigate('scenarios')}
-              className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+              onClick={() => navigate('optimization')}
+              className="text-sky-600 hover:text-sky-700 font-semibold flex items-center gap-1"
             >
-              Test Scenarios
+              <span>View Dispatch Schedule</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

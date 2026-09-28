@@ -375,7 +375,49 @@ class ScenarioRegistry:
             rationale="Worst-case polar emergency evaluating multi-tier station survivability."
         ))
 
-        # 14. CUSTOM
+        # 14. UNFORESEEN_WEATHER
+        self.register(ScenarioDefinition(
+            scenario_id="UNFORESEEN_WEATHER",
+            name="Unforeseen Weather Regime Shift",
+            description="Abrupt meteorological regime shift uncaptured by baseline forecast: rapid temperature plunge, wind squalls, and cloud cover surge.",
+            category=ScenarioCategory.COMPOUND,
+            duration_hours=48,
+            transforms=[
+                ParameterTransform(
+                    parameter="ambient_temperature_c",
+                    operator=TransformOperator.ADD,
+                    value=-12.0,
+                    unit="deg_C",
+                    rationale="Abrupt polar katabatic cold front depression."
+                ),
+                ParameterTransform(
+                    parameter="wind_speed_ms",
+                    operator=TransformOperator.MULTIPLY,
+                    value=1.8,
+                    unit="m/s",
+                    rationale="Gale-force squalls pushing toward turbine ramp limits."
+                ),
+                ParameterTransform(
+                    parameter="cloud_fraction",
+                    operator=TransformOperator.SET,
+                    value=0.85,
+                    unit="fraction",
+                    rationale="Dense squall cloud deck."
+                ),
+                ParameterTransform(
+                    parameter="irradiance_wm2",
+                    operator=TransformOperator.MULTIPLY,
+                    value=0.40,
+                    unit="W/m2",
+                    rationale="60% solar irradiance attenuation through storm deck."
+                )
+            ],
+            active_effects=["regime_shift", "temperature_plunge", "wind_squall", "irradiance_drop"],
+            provenance="CONFIGURED",
+            rationale="Deterministic bounded perturbation representing unpredicted weather regime shift."
+        ))
+
+        # 15. CUSTOM
         self.register(ScenarioDefinition(
             scenario_id="CUSTOM",
             name="Custom Scenario Exploration",

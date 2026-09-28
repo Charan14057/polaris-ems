@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 export const PolicyView: React.FC = () => {
-  const { currentStation, horizonHours } = useStation();
+  const { currentStation, horizonHours, activeScenario } = useStation();
   const { inspectEvidence } = useEvidence();
 
   const [policyData, setPolicyData] = useState<PolicyEvaluateResponseData | null>(null);
@@ -41,6 +41,7 @@ export const PolicyView: React.FC = () => {
       const res = await api.evaluatePolicy({
         station_id: currentStation,
         horizon_hours: horizonHours,
+        scenario_id: activeScenario || undefined,
         include_suppressed: true,
         include_evaluation_trace: true,
       });
@@ -52,7 +53,7 @@ export const PolicyView: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentStation, horizonHours]);
+  }, [currentStation, horizonHours, activeScenario]);
 
   useEffect(() => {
     fetchPolicy();
@@ -107,9 +108,16 @@ export const PolicyView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 bg-white p-3 rounded border border-slate-200 shadow-sm">
-          <span className="text-xs font-mono text-slate-500 uppercase">Active Directive:</span>
-          <StatusBadge status={policyData.policy_state} size="md" />
+        <div className="flex flex-wrap items-center gap-2">
+          {activeScenario && (
+            <div className="flex items-center space-x-2 bg-amber-50 border border-amber-300 rounded px-2.5 py-1 text-xs font-mono text-amber-900 font-bold">
+              <span>SCENARIO: {activeScenario}</span>
+            </div>
+          )}
+          <div className="flex items-center space-x-3 bg-white p-3 rounded border border-slate-200 shadow-sm">
+            <span className="text-xs font-mono text-slate-500 uppercase">Active Directive:</span>
+            <StatusBadge status={policyData.policy_state} size="md" />
+          </div>
         </div>
       </div>
 

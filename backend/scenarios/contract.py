@@ -227,6 +227,21 @@ SCENARIO_CONTRACTS: Dict[str, ScenarioImpactContract] = {
         expected_policy_changes={"p1_p8_shed_flexible_mandatory": True},
         expected_visual_changes={"extreme_storm_whiteout": True, "station_emergency_flashing": True}
     ),
+    "UNFORESEEN_WEATHER": ScenarioImpactContract(
+        scenario_id="UNFORESEEN_WEATHER",
+        name="Unforeseen Weather Regime Shift",
+        category="COMPOUND",
+        direct_inputs={"ambient_temperature_c": -12.0, "wind_speed_ms": 1.8, "cloud_fraction": 0.85, "irradiance_wm2": 0.4},
+        expected_state_changes=["environment.ambient_temperature_c", "environment.wind_speed_ms", "environment.cloud_fraction", "solar.solar_generation_kw", "wind.wind_generation_kw"],
+        expected_asset_changes={"solar": "ATTENUATED", "wind": "SQUALL_ELEVATED"},
+        expected_load_changes={"thermal_surge": True},
+        expected_energy_changes={"power_balance_residual_max": 0.05},
+        expected_storage_changes={"battery_active": True},
+        expected_fuel_changes={"diesel_active": True},
+        expected_resilience_changes={"threat_state": ["WATCH", "THREATENED", "CRITICAL", "SAFE"]},
+        expected_policy_changes={"heating_protection_governed": True},
+        expected_visual_changes={"weather_squall_particles": True}
+    ),
     "CUSTOM": ScenarioImpactContract(
         scenario_id="CUSTOM",
         name="Custom Scenario Exploration",

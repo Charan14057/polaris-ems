@@ -14,7 +14,7 @@ import {
 } from '../api/types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
-import { FALLBACK_TRACES, computeDecisionDelta } from '../features/decision/fallbackTraces';
+import { computeDecisionDelta } from '../features/decision/fallbackTraces';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { ErrorCard } from '../components/common/ErrorCard';
 import { WhyThisMatters } from '../components/common/WhyThisMatters';
@@ -43,15 +43,13 @@ export const DecisionTraceView: React.FC = () => {
   const { currentStation, horizonHours } = useStation();
   const { inspectEvidence } = useEvidence();
 
-  const initialFallback = FALLBACK_TRACES[currentStation] || FALLBACK_TRACES.BHARATI;
-
   // Active trace and pipeline state
   const [pipelineData, setPipelineData] = useState<PipelineAnalyzeResponseData | null>(null);
-  const [traceHistory, setTraceHistory] = useState<TraceSummary[]>([initialFallback.summary]);
-  const [selectedTraceId, setSelectedTraceId] = useState<string>(initialFallback.summary.decision_trace_id);
-  const [traceDetail, setTraceDetail] = useState<TraceDetail>(initialFallback.detail);
-  const [explanation, setExplanation] = useState<DecisionExplanation>(initialFallback.explanation);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(initialFallback.detail.events[0]?.event_id || null);
+  const [traceHistory, setTraceHistory] = useState<TraceSummary[]>([]);
+  const [selectedTraceId, setSelectedTraceId] = useState<string>('');
+  const [traceDetail, setTraceDetail] = useState<TraceDetail | null>(null);
+  const [explanation, setExplanation] = useState<DecisionExplanation | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   // Comparison state
   const [compareTraceId, setCompareTraceId] = useState<string | null>(null);
@@ -64,35 +62,9 @@ export const DecisionTraceView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState<boolean>(false);
 
-  // Load trace history for the station from backend
-  const loadTraceHistory = useCallback(async () => {
-    try {
-      const res = await api.listTraces({ station_id: currentStation, limit: 20 });
-      if (res?.data && res.data.length > 0) {
-        const data = res.data;
-        setTraceHistory(data);
-        setSelectedTraceId(prev => {
-          const match = data.some(t => t.decision_trace_id === prev);
-          return match ? prev : data[0].decision_trace_id;
-        });
-      }
-    } catch {
-      // Non-blocking history fetch
-    }
-  }, [currentStation]);
-
   // Load detail and explanation for selected trace
   const loadTraceDetail = useCallback(async (traceId: string) => {
-    const stationFallback = FALLBACK_TRACES[currentStation] || FALLBACK_TRACES.BHARATI;
-    if (traceId === stationFallback.summary.decision_trace_id) {
-      setTraceDetail(stationFallback.detail);
-      setExplanation(stationFallback.explanation);
-      if (stationFallback.detail.events.length > 0) {
-        setSelectedEventId(stationFallback.detail.events[0].event_id);
-      }
-      return;
-    }
-
+    if (!traceId) return;
     try {
       const [detailRes, expRes] = await Promise.all([
         api.getTrace(traceId).catch(() => null),
@@ -100,7 +72,7 @@ export const DecisionTraceView: React.FC = () => {
       ]);
       if (detailRes?.data) {
         setTraceDetail(detailRes.data);
-        if (detailRes.data.events.length > 0) {
+        if (detailRes.data.events && detailRes.data.events.length > 0) {
           setSelectedEventId(detailRes.data.events[0].event_id);
         }
       }
@@ -110,7 +82,34 @@ export const DecisionTraceView: React.FC = () => {
     } catch (err: any) {
       console.warn("Could not load trace detail:", err);
     }
-  }, [currentStation]);
+  }, []);
+
+  // Load trace history for the station from backend
+  const loadTraceHistory = useCallback(async () => {
+    try {
+      const res = await api.listTraces({ station_id: currentStation, limit: 20 });
+      if (res?.data && res.data.length > 0) {
+        const data = res.data;
+        setTraceHistory(data);
+        setSelectedTraceId(prev => {
+          const match = data.some(t => t.decision_trace_id === prev);
+          const active = match ? prev : data[0].decision_trace_id;
+          loadTraceDetail(active);
+          return active;
+        });
+      } else {
+        setTraceHistory([]);
+        setSelectedTraceId('');
+        setTraceDetail(null);
+        setExplanation(null);
+      }
+    } catch {
+      setTraceHistory([]);
+      setSelectedTraceId('');
+      setTraceDetail(null);
+      setExplanation(null);
+    }
+  }, [currentStation, loadTraceDetail]);
 
   // Run pipeline analysis and immediately select new decision trace
   const runPipeline = useCallback(async () => {
@@ -133,42 +132,16 @@ export const DecisionTraceView: React.FC = () => {
         await loadTraceHistory();
       }
     } catch (err: any) {
-      // Graceful offline simulated pipeline run
-      const fb = FALLBACK_TRACES[currentStation] || FALLBACK_TRACES.BHARATI;
-      const simTraceId = `DT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${currentStation}-SIM${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-      const simSummary: TraceSummary = {
-        ...fb.summary,
-        decision_trace_id: simTraceId,
-        creation_timestamp: new Date().toISOString()
-      };
-      const simDetail: TraceDetail = {
-        ...fb.detail,
-        decision_trace_id: simTraceId,
-        creation_timestamp: new Date().toISOString()
-      };
-      setTraceHistory(prev => [simSummary, ...prev.filter(t => t.decision_trace_id !== simTraceId)]);
-      setSelectedTraceId(simTraceId);
-      setTraceDetail(simDetail);
-      setExplanation(fb.explanation);
-      if (simDetail.events.length > 0) {
-        setSelectedEventId(simDetail.events[0].event_id);
-      }
+      setError(err.message || 'Pipeline analysis execution failed');
     } finally {
       setLoading(false);
     }
   }, [currentStation, horizonHours, loadTraceDetail, loadTraceHistory]);
 
-  // Initial load on station change: set immediate fallback then check backend
+  // Initial load on station change
   useEffect(() => {
-    const fb = FALLBACK_TRACES[currentStation] || FALLBACK_TRACES.BHARATI;
-    setTraceDetail(fb.detail);
-    setExplanation(fb.explanation);
-    setSelectedEventId(fb.detail.events[0]?.event_id || null);
-    setSelectedTraceId(fb.summary.decision_trace_id);
-    setTraceHistory([fb.summary]);
-
     loadTraceHistory();
-  }, [currentStation, loadTraceHistory]);
+  }, [loadTraceHistory]);
 
   // When selectedTraceId changes manually, fetch details
   useEffect(() => {
@@ -319,6 +292,24 @@ export const DecisionTraceView: React.FC = () => {
         <LoadingSkeleton height="h-64" rows={3} />
       ) : error ? (
         <ErrorCard title="Pipeline Audit Execution Error" message={error} onRetry={runPipeline} />
+      ) : traceHistory.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-xs space-y-4">
+          <Database className="w-12 h-12 text-slate-300 mx-auto" />
+          <h3 className="text-lg font-bold text-slate-900 font-sans">No Decision Traces Recorded for {currentStation}</h3>
+          <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto font-sans leading-relaxed">
+            Every dispatch action, optimizer solve, scenario perturbation, or manual override automatically appends an authoritative provenance trace. No synthetic records are fabricated.
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={runPipeline}
+              disabled={loading}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-mono font-bold rounded-lg transition shadow-xs"
+            >
+              <Play className="w-3.5 h-3.5" />
+              <span>{loading ? 'Auditing Pipeline...' : 'Generate Authoritative Trace Now'}</span>
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="space-y-6">
           {/* 2. Trace Selector Bar & Metadata Overview */}

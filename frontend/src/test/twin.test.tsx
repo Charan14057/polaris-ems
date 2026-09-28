@@ -502,7 +502,7 @@ describe('Phase 18 Spatial Digital Twin Engine - Components Rendering', () => {
       />
     );
 
-    expect(screen.getByText('OPERATOR SIMULATION DISPATCH')).toBeInTheDocument();
+    expect(screen.getByText('OPERATOR MANUAL DISPATCH')).toBeInTheDocument();
     expect(screen.getByText('Start Backup Diesel Generator (DG1)')).toBeInTheDocument();
   });
 
