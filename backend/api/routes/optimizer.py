@@ -25,7 +25,7 @@ router = APIRouter(prefix="/optimize", tags=["Optimizer"])
 
 
 @router.post("", response_model=APIResponse[OptimizeResponseData])
-async def optimize_microgrid(
+def optimize_microgrid(
     req: OptimizeRequestSchema,
     request: Request,
     profile_reg: StationProfileRegistry = Depends(get_profile_registry),

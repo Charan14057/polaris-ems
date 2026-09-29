@@ -58,7 +58,7 @@ async def get_scenario(
 
 
 @router.post("/evaluate", response_model=APIResponse[ScenarioEvaluateResponseData])
-async def evaluate_scenario(
+def evaluate_scenario(
     req: ScenarioEvaluateRequestSchema,
     request: Request,
     profile_reg: StationProfileRegistry = Depends(get_profile_registry),

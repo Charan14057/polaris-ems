@@ -27,7 +27,7 @@ router = APIRouter(tags=["Policy"])
 
 
 @router.post("/policy/evaluate", response_model=APIResponse[PolicyEvaluateResponseData])
-async def evaluate_policy(
+def evaluate_policy(
     req: PolicyEvaluateRequestSchema,
     request: Request,
     profile_reg: StationProfileRegistry = Depends(get_profile_registry),

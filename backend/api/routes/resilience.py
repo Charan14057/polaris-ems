@@ -25,7 +25,7 @@ router = APIRouter(prefix="/resilience", tags=["Resilience"])
 
 
 @router.post("/evaluate", response_model=APIResponse[ResilienceEvaluateResponseData])
-async def evaluate_resilience(
+def evaluate_resilience(
     req: ResilienceEvaluateRequestSchema,
     request: Request,
     profile_reg: StationProfileRegistry = Depends(get_profile_registry),

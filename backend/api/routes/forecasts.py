@@ -20,7 +20,7 @@ router = APIRouter(prefix="/forecast", tags=["Forecasting"])
 
 
 @router.post("", response_model=APIResponse[ForecastResponseData])
-async def execute_forecast(
+def execute_forecast(
     req: ForecastRequestSchema,
     request: Request,
     profile_reg: StationProfileRegistry = Depends(get_profile_registry),
