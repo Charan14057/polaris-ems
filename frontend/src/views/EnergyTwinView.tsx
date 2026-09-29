@@ -380,237 +380,229 @@ export const EnergyTwinView: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-[1520px] mx-auto pb-10 font-sans">
-      {/* 1. Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 mb-1">
-            <span className="font-semibold text-slate-800">{stationDetail?.name || currentStation}</span>
-            <span className="text-slate-300">•</span>
-            <span>Operational Digital Twin</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-            Spatial Energy &amp; Microgrid Operations
-          </h1>
-          <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-            Reference-aligned 3D spatial twin, thermal zone distribution, and real-time directional electrical flow.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 shrink-0 relative">
-          {/* LIVE vs HISTORICAL vs REPLAY Toggle Pill */}
-          <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
-            <button
-              type="button"
-              onClick={handleSelectLiveNow}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
-                twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Real-time wall-clock anchored computational twin"
-            >
-              <span className={`w-2 h-2 rounded-full ${twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE' ? 'bg-white' : 'bg-emerald-500'} animate-pulse`} />
-              <span>LIVE NOW</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsHistoricalPickerOpen(!isHistoricalPickerOpen)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
-                sessionDataMode === 'HISTORICAL'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Anchor simulation to a specific calendar date and seasonal profile"
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>HISTORICAL</span>
-              <ChevronDown className="w-3 h-3 ml-0.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setTwinDisplayMode('REPLAY');
-                setSessionDataMode('REPLAY');
-                setIsHistoricalPickerOpen(false);
-              }}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
-                twinDisplayMode === 'REPLAY'
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Timeline scrub replay of stored multi-horizon trajectory"
-            >
-              <RotateCw className="w-3.5 h-3.5" />
-              <span>REPLAY</span>
-            </button>
-          </div>
-
-          {/* Historical Date Picker Dropdown */}
-          {isHistoricalPickerOpen && (
-            <div className="absolute right-0 top-12 z-50 w-72 bg-white rounded-lg border border-slate-200 shadow-xl p-3 space-y-3 font-mono text-xs">
-              <div className="font-bold text-slate-800 text-[11px] uppercase tracking-wider border-b border-slate-100 pb-1.5">
-                Select Simulation Date / Season
-              </div>
-              <div className="space-y-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleSelectHistoricalDate('2024-07-15T12:00:00Z')}
-                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
-                >
-                  <div>
-                    <span className="font-bold text-slate-900 block">Austral Winter (Mid-July)</span>
-                    <span className="text-slate-500 text-[10px]">Polar Night (0 W/m² GHI, -32°C)</span>
-                  </div>
-                  {historicalDateInput.startsWith('2024-07') && <Check className="w-3.5 h-3.5 text-amber-600" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSelectHistoricalDate('2025-01-15T12:00:00Z')}
-                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
-                >
-                  <div>
-                    <span className="font-bold text-slate-900 block">Austral Summer (Mid-January)</span>
-                    <span className="text-slate-500 text-[10px]">24h Polar Day (High Solar PV, -8°C)</span>
-                  </div>
-                  {historicalDateInput.startsWith('2025-01') && <Check className="w-3.5 h-3.5 text-amber-600" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSelectHistoricalDate('2026-09-28T12:00:00Z')}
-                  className="w-full text-left p-2 rounded hover:bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]"
-                >
-                  <div>
-                    <span className="font-bold text-slate-900 block">Spring Equinox (Late September)</span>
-                    <span className="text-slate-500 text-[10px]">Sun returning, 12h daylight</span>
-                  </div>
-                  {historicalDateInput.startsWith('2026-09') && <Check className="w-3.5 h-3.5 text-amber-600" />}
-                </button>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100">
-                <label className="text-[10px] text-slate-500 block mb-1">Custom ISO Date/Time:</label>
-                <div className="flex gap-1.5">
-                  <input
-                    type="text"
-                    value={historicalDateInput}
-                    onChange={(e) => setHistoricalDateInput(e.target.value)}
-                    className="flex-1 px-2 py-1 text-[11px] rounded border border-slate-200 bg-slate-50 focus:outline-none focus:border-sky-500"
-                    placeholder="YYYY-MM-DDTHH:MM:SSZ"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleSelectHistoricalDate(historicalDateInput)}
-                    className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-bold text-[10px]"
-                  >
-                    Set
-                  </button>
-                </div>
-              </div>
+      {/* 1. Industrial Header with Ambient Cyan/Sky Polish */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-sky-400 mb-1.5">
+              <span className="font-semibold text-slate-300">{stationDetail?.name || currentStation}</span>
+              <span className="text-slate-600">•</span>
+              <span>{stationDetail?.region || (currentStation === 'HIMADRI' ? 'SVALBARD, ARCTIC' : 'EAST ANTARCTICA')}</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-400 font-bold">STATION ID: {currentStation}</span>
             </div>
-          )}
 
-          {/* Temporal Status Badge */}
-          {sessionDataMode === 'HISTORICAL' ? (
-            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-50 border border-amber-200 text-amber-800 font-bold">
-              HISTORICAL: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 16) + ' UTC' : historicalDateInput.slice(0, 10)}
-            </span>
-          ) : (
-            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
-              CURRENT STATE: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 19) + ' UTC' : 'SYNCHRONIZED'}
-            </span>
-          )}
+            <div className="flex flex-wrap items-baseline gap-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Spatial Energy &amp; Digital Twin Engine
+              </h1>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-sky-300 border border-slate-700">
+                400V 3-Phase Bus Topology
+              </span>
+            </div>
 
-          <ProvenanceTag provenance={viewModel.provenance} size="sm" />
-          <span className="text-xs font-mono px-2 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600 font-semibold">
-            {viewModel.layoutStatus} MODEL
-          </span>
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Reference-aligned 3D spatial twin, thermal zone distribution, and real-time directional electrical flow.
+            </p>
+          </div>
 
-          {/* Executive Presentation Demo Mode Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              const nextMode = !demoMode;
-              setDemoMode(nextMode);
-              if (nextMode) setViewMode('3D_SPATIAL');
-            }}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition-colors ${
-              demoMode
-                ? 'bg-purple-600 text-white shadow-xs'
-                : 'bg-white text-purple-700 hover:bg-purple-50 border border-purple-200'
-            }`}
-            title="Toggle Executive Presentation Demo Mode"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{demoMode ? 'EXIT DEMO' : 'DEMO MODE'}</span>
-          </button>
+          <div className="flex flex-col items-start lg:items-end gap-2.5">
+            {/* Top Status Cluster: Temporal Status + Provenance + Model State */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+              {sessionDataMode === 'HISTORICAL' ? (
+                <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3 text-amber-400" />
+                  <span>HISTORICAL: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 16) + ' UTC' : historicalDateInput.slice(0, 10)}</span>
+                </span>
+              ) : (
+                <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>CURRENT STATE: {simulationTimestamp ? simulationTimestamp.replace('T', ' ').slice(0, 19) + ' UTC' : 'SYNCHRONIZED'}</span>
+                </span>
+              )}
+
+              <ProvenanceTag provenance={viewModel.provenance} size="sm" />
+              <span className="text-xs font-mono px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 font-semibold">
+                {viewModel.layoutStatus} MODEL
+              </span>
+            </div>
+
+            {/* Bottom Controls: Mode Selector + Replay / Historical / Live + Demo Mode + Refresh */}
+            <div className="flex flex-wrap items-center gap-2.5 relative">
+              {/* LIVE vs HISTORICAL vs REPLAY Toggle Pill */}
+              <div className="flex items-center rounded-lg border border-slate-700 bg-slate-800/90 p-0.5 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={handleSelectLiveNow}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-bold transition-colors ${
+                    twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Real-time wall-clock anchored computational twin"
+                >
+                  <span className={`w-2 h-2 rounded-full ${twinDisplayMode === 'LIVE' && sessionDataMode === 'LIVE' ? 'bg-white' : 'bg-emerald-400'} animate-pulse`} />
+                  <span>LIVE NOW</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsHistoricalPickerOpen(!isHistoricalPickerOpen)}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-bold transition-colors ${
+                    sessionDataMode === 'HISTORICAL'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Anchor simulation to a specific calendar date and seasonal profile"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>HISTORICAL</span>
+                  <ChevronDown className="w-3 h-3 ml-0.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTwinDisplayMode('REPLAY');
+                    setSessionDataMode('REPLAY');
+                    setIsHistoricalPickerOpen(false);
+                  }}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-bold transition-colors ${
+                    twinDisplayMode === 'REPLAY'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Timeline scrub replay of stored multi-horizon trajectory"
+                >
+                  <RotateCw className="w-3.5 h-3.5" />
+                  <span>REPLAY</span>
+                </button>
+              </div>
+
+              {/* Historical Date Picker Dropdown */}
+              {isHistoricalPickerOpen && (
+                <div className="absolute right-0 top-11 z-50 w-72 bg-slate-900 rounded-lg border border-slate-700 shadow-2xl p-3 space-y-3 font-mono text-xs text-white">
+                  <div className="font-bold text-slate-300 text-[11px] uppercase tracking-wider border-b border-slate-800 pb-1.5">
+                    Select Simulation Date / Season
+                  </div>
+                  <div className="space-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectHistoricalDate('2024-07-15T12:00:00Z')}
+                      className="w-full text-left p-2 rounded hover:bg-slate-800 border border-slate-800 flex items-center justify-between text-[11px]"
+                    >
+                      <div>
+                        <span className="font-bold text-white block">Austral Winter (Mid-July)</span>
+                        <span className="text-slate-400 text-[10px]">Polar Night (0 W/m² GHI, -32°C)</span>
+                      </div>
+                      {historicalDateInput.startsWith('2024-07') && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectHistoricalDate('2025-01-15T12:00:00Z')}
+                      className="w-full text-left p-2 rounded hover:bg-slate-800 border border-slate-800 flex items-center justify-between text-[11px]"
+                    >
+                      <div>
+                        <span className="font-bold text-white block">Austral Summer (Mid-January)</span>
+                        <span className="text-slate-400 text-[10px]">24h Polar Day (High Solar PV, -8°C)</span>
+                      </div>
+                      {historicalDateInput.startsWith('2025-01') && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectHistoricalDate('2026-09-28T12:00:00Z')}
+                      className="w-full text-left p-2 rounded hover:bg-slate-800 border border-slate-800 flex items-center justify-between text-[11px]"
+                    >
+                      <div>
+                        <span className="font-bold text-white block">Spring Equinox (Late September)</span>
+                        <span className="text-slate-400 text-[10px]">Sun returning, 12h daylight</span>
+                      </div>
+                      {historicalDateInput.startsWith('2026-09') && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                    </button>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800">
+                    <label className="text-[10px] text-slate-400 block mb-1">Custom ISO Date/Time:</label>
+                    <div className="flex gap-1.5">
+                      <input
+                        type="text"
+                        value={historicalDateInput}
+                        onChange={(e) => setHistoricalDateInput(e.target.value)}
+                        className="flex-1 px-2 py-1 text-[11px] rounded border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-sky-500"
+                        placeholder="YYYY-MM-DDTHH:MM:SSZ"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleSelectHistoricalDate(historicalDateInput)}
+                        className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded font-bold text-[10px]"
+                      >
+                        Set
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Executive Presentation Demo Mode Toggle */}
+              <button
+                type="button"
+                onClick={() => {
+                  const nextMode = !demoMode;
+                  setDemoMode(nextMode);
+                  if (nextMode) setViewMode('3D_SPATIAL');
+                }}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all shadow-xs ${
+                  demoMode
+                    ? 'bg-purple-600 text-white shadow-purple-900/50'
+                    : 'bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30'
+                }`}
+                title="Toggle Executive Presentation Demo Mode"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{demoMode ? 'EXIT DEMO' : 'DEMO MODE'}</span>
+              </button>
+
+              {/* Force Recalculate Button */}
+              <button
+                type="button"
+                onClick={handleLiveRecalculate}
+                disabled={recalculating}
+                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors shadow-xs"
+                title="Force recalculate live digital twin operational balance"
+              >
+                <RotateCw className={`w-3.5 h-3.5 ${recalculating ? 'animate-spin text-sky-400' : ''}`} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 2. Executive Summary Strip */}
       <TwinSummaryStrip viewModel={viewModel} />
 
-      {/* 3. Source Mix Bar */}
-      <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-xs">
-        <TwinSourceMix
-          solarKw={viewModel.powerSummary.solarGenerationKw}
-          windKw={viewModel.powerSummary.windGenerationKw}
-          dieselKw={viewModel.powerSummary.dieselGenerationKw}
-          batteryKw={viewModel.powerSummary.batteryPowerKw}
-          totalLoadKw={viewModel.powerSummary.totalLoadKw}
-        />
-      </div>
-
-      {/* 4. Operational Mode Control Strip (MANUAL vs AUTO) */}
-      <TwinOperatingModeControl
-        mode={operatingMode}
-        onModeChange={setOperatingMode}
-        onSimulateAction={handleSimulateManualAction}
-        onApproveRecommendation={handleApproveAutoRecommendation}
-        currentDieselKw={viewModel.powerSummary.dieselGenerationKw}
-        currentBatterySoc={viewModel.powerSummary.batterySocPct}
-      />
-
-      {/* 5. Aggregated Functional Load Groups */}
-      <TwinLoadGroups
-        viewModel={viewModel}
-        onSelectDevice={selectDevice}
-      />
-
-      {/* 6. Forward Weather Drivers & Expected Impact */}
-      <TwinWeatherInfluence
-        stationId={viewModel.stationId}
-        selectedHorizon={selectedHorizon}
-        onSelectHorizon={handleHorizonChange}
-        windSpeedMs={activeTwinState?.wind_speed_m_per_s ?? (snapshot?.windSpeedMs ?? undefined)}
-        solarGhiWm2={activeTwinState?.ghi_w_per_m2 ?? (snapshot?.irradianceWm2 ?? undefined)}
-        ambientTempC={activeTwinState?.ambient_temp_c ?? (snapshot?.ambientTemperatureC ?? undefined)}
-        currentDemandKw={viewModel.powerSummary.totalLoadKw}
-      />
-
       {/* Demo Mode Presentation Banner */}
       {demoMode && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-xs font-mono flex items-center justify-between text-purple-900 shadow-2xs">
+        <div className="bg-purple-950/80 border border-purple-500/40 rounded-xl p-3 text-xs font-mono flex items-center justify-between text-purple-200 shadow-lg backdrop-blur-sm">
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
-            <span className="font-bold">EXECUTIVE PRESENTATION DEMO MODE</span>
-            <span className="text-purple-300">•</span>
-            <span className="text-purple-700 text-[11px]">Displaying reference-aligned 3D spatial twin, live directional power flow, source mix, and automated advisory recommendation.</span>
+            <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
+            <span className="font-bold text-white">EXECUTIVE PRESENTATION DEMO MODE</span>
+            <span className="text-purple-400">•</span>
+            <span className="text-purple-300 text-[11px]">Displaying reference-aligned 3D spatial twin, live directional power flow, source mix, and automated advisory recommendation.</span>
           </div>
           <button 
             type="button" 
             onClick={() => setDemoMode(false)}
-            className="text-[11px] font-bold text-purple-700 hover:text-purple-950 underline shrink-0 ml-3"
+            className="text-[11px] font-bold text-purple-300 hover:text-white underline shrink-0 ml-3"
           >
             Exit Demo Mode
           </button>
         </div>
       )}
 
-      {/* 7. Master View Mode Selector Toolbar */}
+      {/* 3. Master View Mode Selector Toolbar */}
       {!demoMode && (
         <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
           <div className="flex items-center space-x-2">
@@ -673,6 +665,7 @@ export const EnergyTwinView: React.FC = () => {
           </div>
         </div>
       )}
+
 
       {/* 8. Main Twin Canvas & Side Inspector Layout */}
       <div className="flex flex-col lg:flex-row gap-5 items-start">
@@ -788,6 +781,44 @@ export const EnergyTwinView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 5. Generation Source Mix Bar */}
+      <div className="bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-xs">
+        <TwinSourceMix
+          solarKw={viewModel.powerSummary.solarGenerationKw}
+          windKw={viewModel.powerSummary.windGenerationKw}
+          dieselKw={viewModel.powerSummary.dieselGenerationKw}
+          batteryKw={viewModel.powerSummary.batteryPowerKw}
+          totalLoadKw={viewModel.powerSummary.totalLoadKw}
+        />
+      </div>
+
+      {/* 6. Operational Mode Control Strip (MANUAL vs AUTO) */}
+      <TwinOperatingModeControl
+        mode={operatingMode}
+        onModeChange={setOperatingMode}
+        onSimulateAction={handleSimulateManualAction}
+        onApproveRecommendation={handleApproveAutoRecommendation}
+        currentDieselKw={viewModel.powerSummary.dieselGenerationKw}
+        currentBatterySoc={viewModel.powerSummary.batterySocPct}
+      />
+
+      {/* 7. Aggregated Functional Load Groups */}
+      <TwinLoadGroups
+        viewModel={viewModel}
+        onSelectDevice={selectDevice}
+      />
+
+      {/* 8. Forward Weather Drivers & Expected Impact */}
+      <TwinWeatherInfluence
+        stationId={viewModel.stationId}
+        selectedHorizon={selectedHorizon}
+        onSelectHorizon={handleHorizonChange}
+        windSpeedMs={activeTwinState?.wind_speed_m_per_s ?? (snapshot?.windSpeedMs ?? undefined)}
+        solarGhiWm2={activeTwinState?.ghi_w_per_m2 ?? (snapshot?.irradianceWm2 ?? undefined)}
+        ambientTempC={activeTwinState?.ambient_temp_c ?? (snapshot?.ambientTemperatureC ?? undefined)}
+        currentDemandKw={viewModel.powerSummary.totalLoadKw}
+      />
 
       {/* 9. Progressive Disclosure: Explain This Component */}
       <ExplainThis

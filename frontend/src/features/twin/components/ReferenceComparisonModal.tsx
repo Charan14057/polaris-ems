@@ -18,7 +18,7 @@
 
 import React, { useState } from 'react';
 import { X, Sliders, Columns, Eye, ShieldCheck, AlertCircle, ExternalLink } from 'lucide-react';
-import { getStationPhoto, getPublicStationPhoto } from '../model/stationPhotos';
+import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
 
 interface ReferenceComparisonModalProps {
   stationId: string;
@@ -222,7 +222,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         </svg>
       )
     }
-  }[stationId.toUpperCase()] || {
+  }[normalizeStationKey(stationId)] || {
     name: 'Polar Research Station',
     location: 'Polar Region',
     architect: 'National Polar Research Programme',
@@ -235,19 +235,22 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
     blueprintSvg: null
   };
 
+  const stationKey = normalizeStationKey(stationId);
+
   // Render the chosen reference (real photo or technical blueprint)
   const renderReferenceContent = () => {
     if (referenceType === 'PHOTO' && stationData.imageSrc) {
       return (
         <div className="w-full h-full relative flex items-center justify-center p-3 bg-slate-950">
           <img
-            src={getStationPhoto(stationId)}
+            key={stationKey}
+            src={getStationPhoto(stationKey)}
             alt={stationData.name}
             onError={(e) => {
               const target = e.currentTarget;
               if (!target.dataset.fallback) {
                 target.dataset.fallback = 'true';
-                target.src = getPublicStationPhoto(stationId);
+                target.src = getPublicStationPhoto(stationKey);
               }
             }}
             className="max-h-full max-w-full object-contain rounded-lg border border-slate-700 shadow-xl"

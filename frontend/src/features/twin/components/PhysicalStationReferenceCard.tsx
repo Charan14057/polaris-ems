@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Info
 } from 'lucide-react';
-import { getStationPhoto, getPublicStationPhoto } from '../model/stationPhotos';
+import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
 
 interface PhysicalStationReferenceCardProps {
   stationId: string;
@@ -99,8 +99,9 @@ export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCard
   onOpenComparisonModal
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
-  const data = STATION_GROUND_TRUTH[stationId.toUpperCase()] || STATION_GROUND_TRUTH.BHARATI;
-  const currentPhoto = getStationPhoto(stationId);
+  const stationKey = normalizeStationKey(stationId);
+  const data = STATION_GROUND_TRUTH[stationKey] || STATION_GROUND_TRUTH.BHARATI;
+  const currentPhoto = getStationPhoto(stationKey);
 
   return (
     <div className="bg-white rounded-xl border border-teal-500/20 shadow-sm overflow-hidden font-sans transition-all">
@@ -152,13 +153,14 @@ export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCard
             {/* Medium-Sized Authentic Photo */}
             <div className="md:col-span-6 relative group overflow-hidden rounded-lg border border-slate-200 shadow-xs bg-slate-900">
               <img
+                key={stationKey}
                 src={currentPhoto}
                 alt={data.name}
                 onError={(e) => {
                   const target = e.currentTarget;
                   if (!target.dataset.fallback) {
                     target.dataset.fallback = 'true';
-                    target.src = getPublicStationPhoto(stationId);
+                    target.src = getPublicStationPhoto(stationKey);
                   }
                 }}
                 className="w-full h-56 sm:h-64 object-cover object-center group-hover:scale-102 transition-transform duration-300"

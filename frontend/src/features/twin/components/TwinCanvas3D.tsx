@@ -47,7 +47,7 @@ import {
 import { createPolarEnvironment, PolarEnvironmentHandles } from '../model/polarEnvironment3D';
 import { createStructuralSteelMaterial } from '../model/pbrMaterialFactory';
 import { ReferenceComparisonModal } from './ReferenceComparisonModal';
-import { getStationPhoto, getPublicStationPhoto } from '../model/stationPhotos';
+import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
 
 interface TwinCanvas3DProps {
   viewModel: TwinViewModel;
@@ -991,6 +991,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
               className="relative group cursor-pointer overflow-hidden rounded border border-slate-700 aspect-video bg-slate-950"
             >
               <img
+                key={normalizeStationKey(viewModel.stationId)}
                 src={getStationPhoto(viewModel.stationId)}
                 alt="Real Station Ground Truth"
                 onError={(e) => {
