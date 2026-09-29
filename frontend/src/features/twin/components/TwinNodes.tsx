@@ -167,28 +167,51 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
               <g transform={`translate(${x - 42}, ${y - 12})`}>
                 <circle cx={12} cy={12} r={14} fill={`${sourceColor}25`} />
 
-                {/* Animated spinning wind turbine rotor blades */}
+                {/* Animated spinning wind turbine rotor blades with SVG native animateTransform */}
                 {node.id.includes('wind') && isSourceActive ? (
-                  <g
-                    transform="translate(12, 12)"
-                    style={{
-                      animation: 'spinRotor 1.4s linear infinite',
-                      transformOrigin: '0px 0px'
-                    }}
-                  >
-                    <line x1="0" y1="0" x2="0" y2="-9" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
-                    <line x1="0" y1="0" x2="7.8" y2="4.5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
-                    <line x1="0" y1="0" x2="-7.8" y2="4.5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
-                    <circle cx="0" cy="0" r="2.5" fill="#ffffff" />
+                  <g transform="translate(12, 12)">
+                    <g>
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0 0 0"
+                        to="360 0 0"
+                        dur={`${Math.max(0.6, 2.2 - (genKw / 25) * 1.4)}s`}
+                        repeatCount="indefinite"
+                      />
+                      <line x1="0" y1="0" x2="0" y2="-10" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                      <line x1="0" y1="0" x2="8.6" y2="5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                      <line x1="0" y1="0" x2="-8.6" y2="5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                      <circle cx="0" cy="0" r="3" fill="#ffffff" stroke={sourceColor} strokeWidth="1" />
+                    </g>
                   </g>
                 ) : node.id.includes('solar') && isSourceActive ? (
-                  /* Animated Solar Glint Rays */
-                  <g transform="translate(4, 4)" color={sourceColor} style={{ animation: 'solarPulse 2s ease-in-out infinite' }}>
+                  /* Animated Solar Glint with Shimmering Photons */
+                  <g transform="translate(4, 4)" color={sourceColor}>
+                    <circle cx="8" cy="8" r="10" fill="none" stroke={sourceColor} strokeWidth="1" opacity="0.6">
+                      <animate attributeName="r" values="8;13;8" dur="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.7;0.1;0.7" dur="2s" repeatCount="indefinite" />
+                    </circle>
                     {renderIcon(node.iconKey, 'w-4 h-4')}
                   </g>
                 ) : node.id.includes('diesel') && isSourceActive ? (
-                  /* Animated Diesel Running Glow */
-                  <g transform="translate(4, 4)" color={sourceColor} style={{ animation: 'pulseEngine 0.8s ease-in-out infinite' }}>
+                  /* Animated Diesel Running with Acoustic Shockwave Rings */
+                  <g transform="translate(4, 4)" color={sourceColor}>
+                    <circle cx="8" cy="8" r="8" fill="none" stroke="#f97316" strokeWidth="1.2">
+                      <animate attributeName="r" from="8" to="16" dur="0.9s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" from="0.9" to="0" dur="0.9s" repeatCount="indefinite" />
+                    </circle>
+                    {renderIcon(node.iconKey, 'w-4 h-4')}
+                  </g>
+                ) : node.id.includes('battery') ? (
+                  /* Animated Battery with Inward Charging Rings */
+                  <g transform="translate(4, 4)" color={sourceColor}>
+                    {powerSummary.batteryPowerKw < -0.1 && (
+                      <circle cx="8" cy="8" r="8" fill="none" stroke="#10b981" strokeWidth="1.2">
+                        <animate attributeName="r" from="15" to="7" dur="1.2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" from="0.1" to="0.9" dur="1.2s" repeatCount="indefinite" />
+                      </circle>
+                    )}
                     {renderIcon(node.iconKey, 'w-4 h-4')}
                   </g>
                 ) : (
@@ -232,6 +255,22 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
               onClick={() => onSelectNode(node.id)}
               className="cursor-pointer group"
             >
+              {/* Electric Corona Field Glow */}
+              <rect
+                x={x - 76}
+                y={y - 36}
+                width={152}
+                height={72}
+                rx={10}
+                fill="none"
+                stroke="#38bdf8"
+                strokeWidth={1}
+                opacity={0.4}
+                filter="url(#flow-glow)"
+              >
+                <animate attributeName="opacity" values="0.25;0.65;0.25" dur="2.4s" repeatCount="indefinite" />
+              </rect>
+
               {/* Central Switchboard Enclosure */}
               <rect
                 x={x - 72}
@@ -264,6 +303,11 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
                 400V 50Hz MAIN BUSBAR
               </text>
 
+              {/* 3-Phase Status LEDs (Red, Yellow, Blue) */}
+              <circle cx={x - 52} cy={y + 19} r={2.5} fill="#ef4444" />
+              <circle cx={x - 44} cy={y + 19} r={2.5} fill="#eab308" />
+              <circle cx={x - 36} cy={y + 19} r={2.5} fill="#3b82f6" />
+
               {/* Total Active Load & Status */}
               <text
                 x={x}
@@ -275,8 +319,8 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
                 {totalLoad.toFixed(1)} kW
               </text>
               <text
-                x={x}
-                y={y + 21}
+                x={x + 10}
+                y={y + 22}
                 textAnchor="middle"
                 className="font-mono text-[8px] font-semibold uppercase tracking-wider"
                 fill="#10b981"

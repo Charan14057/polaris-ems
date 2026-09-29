@@ -110,8 +110,8 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
 
     // 1. Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x060c18); // Deep polar dusk
-    scene.fog = new THREE.FogExp2(0x0a1628, 0.005);
+    scene.background = new THREE.Color(0x7dd3fc); // Match radiant polar daylight sky of expedition photo
+    scene.fog = new THREE.FogExp2(0xbae6fd, 0.0035);
     sceneRef.current = scene;
 
     // 2. Camera
@@ -139,20 +139,20 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
     renderer.toneMappingExposure = 1.35;
     rendererRef.current = renderer;
 
-    // 4. Lighting: Polar daylight + low-angle sun + soft glacial fill
-    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.7);
+    // 4. Lighting: Radiant Polar daylight + low-angle sun + soft glacial fill (matches photo)
+    const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.85);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
-    sunLight.position.set(40, 50, 30);
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.7);
+    sunLight.position.set(45, 38, 28);
     sunLight.castShadow = true;
     scene.add(sunLight);
 
-    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.5);
+    const fillLight = new THREE.DirectionalLight(0x7dd3fc, 0.6);
     fillLight.position.set(-35, 25, -35);
     scene.add(fillLight);
 
-    const groundBounce = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.5);
+    const groundBounce = new THREE.HemisphereLight(0xe0f2fe, 0x64748b, 0.65);
     scene.add(groundBounce);
 
     // 5. Build Station Architecture & Terrain

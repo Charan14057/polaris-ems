@@ -99,6 +99,12 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const ambientLightRef = useRef<THREE.AmbientLight | null>(null);
+  const sunLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const fillLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const groundBounceRef = useRef<THREE.HemisphereLight | null>(null);
+  const [lightingMode, setLightingMode] = useState<'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD'>('DAYLIGHT');
+
   const meshesRef = useRef<Map<string, THREE.Object3D>>(new Map());
   const flowLinesRef = useRef<THREE.Object3D[]>([]);
   const flowParticlesRef = useRef<{ 
@@ -140,14 +146,14 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const width = container.clientWidth || 800;
       const height = container.clientHeight || 580;
 
-      // 1. Scene with Photorealistic Polar Sky & Atmosphere
+      // 1. Scene with Photorealistic Polar Sky & Atmosphere (Defaults to Radiant Polar Daylight)
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x060c18); // Deep polar arctic twilight
-      scene.fog = new THREE.FogExp2(0x0a1628, 0.0045);
+      scene.background = new THREE.Color(0x7dd3fc); // Radiant Polar Sky matching ground truth photo
+      scene.fog = new THREE.FogExp2(0xbae6fd, 0.0035);
       sceneRef.current = scene;
 
-      // Create Real-World Celestial Environment, Mountains, Aurora & Weather Particles
-      const envHandles = createPolarEnvironment(scene);
+      // Create Real-World Celestial Environment, Mountains & Atmosphere (DAYLIGHT default)
+      const envHandles = createPolarEnvironment(scene, 'DAYLIGHT');
       environmentRef.current = envHandles;
 
       // 2. Camera
@@ -168,17 +174,18 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.32;
+      renderer.toneMappingExposure = 1.35;
       rendererRef.current = renderer;
 
-      // 4. Lighting: Product-grade Polar Daylight with Natural Fill
+      // 4. Lighting: Product-grade Polar Daylight with Natural Fill (Photo Match)
       // Soft ambient light simulating polar diffuse sky reflection
-      const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.65);
+      const ambientLight = new THREE.AmbientLight(0xe0f2fe, 0.85);
       scene.add(ambientLight);
+      ambientLightRef.current = ambientLight;
 
       // Warm low-angle Antarctic sunlight (18-30° grazing polar sun casting realistic shadows)
-      const sunLight = new THREE.DirectionalLight(0xffedd5, 1.45);
-      sunLight.position.set(45, 32, 28);
+      const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.7);
+      sunLight.position.set(45, 36, 28);
       sunLight.castShadow = true;
       sunLight.shadow.mapSize.width = 2048;
       sunLight.shadow.mapSize.height = 2048;
@@ -190,15 +197,18 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       sunLight.shadow.camera.bottom = -60;
       sunLight.shadow.bias = -0.0003;
       scene.add(sunLight);
+      sunLightRef.current = sunLight;
 
       // Cool glacial blue fill light
-      const fillLight = new THREE.DirectionalLight(0x7dd3fc, 0.55);
+      const fillLight = new THREE.DirectionalLight(0x7dd3fc, 0.6);
       fillLight.position.set(-40, 20, -35);
       scene.add(fillLight);
+      fillLightRef.current = fillLight;
 
       // Subtle upward ground bounce light from sastrugi snow crust
-      const groundBounce = new THREE.HemisphereLight(0xbae6fd, 0x1e293b, 0.55);
+      const groundBounce = new THREE.HemisphereLight(0xe0f2fe, 0x64748b, 0.65);
       scene.add(groundBounce);
+      groundBounceRef.current = groundBounce;
 
       // Handle Resize
       const handleResize = () => {
@@ -733,6 +743,50 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     }
   };
 
+  const applyLightingMode = useCallback((mode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD') => {
+    setLightingMode(mode);
+    if (environmentRef.current) {
+      environmentRef.current.setLightingMode(mode);
+    }
+    if (ambientLightRef.current && sunLightRef.current && fillLightRef.current && groundBounceRef.current) {
+      if (mode === 'DAYLIGHT') {
+        ambientLightRef.current.color.setHex(0xe0f2fe);
+        ambientLightRef.current.intensity = 0.85;
+        sunLightRef.current.color.setHex(0xfffbeb);
+        sunLightRef.current.intensity = 1.7;
+        fillLightRef.current.color.setHex(0x7dd3fc);
+        fillLightRef.current.intensity = 0.6;
+        groundBounceRef.current.color.setHex(0xe0f2fe);
+        groundBounceRef.current.groundColor.setHex(0x64748b);
+        groundBounceRef.current.intensity = 0.65;
+        if (rendererRef.current) rendererRef.current.toneMappingExposure = 1.35;
+      } else if (mode === 'BLIZZARD') {
+        ambientLightRef.current.color.setHex(0xcfd8dc);
+        ambientLightRef.current.intensity = 0.95;
+        sunLightRef.current.color.setHex(0xffffff);
+        sunLightRef.current.intensity = 0.6;
+        fillLightRef.current.color.setHex(0x94a3b8);
+        fillLightRef.current.intensity = 0.4;
+        groundBounceRef.current.color.setHex(0x94a3b8);
+        groundBounceRef.current.groundColor.setHex(0x334155);
+        groundBounceRef.current.intensity = 0.5;
+        if (rendererRef.current) rendererRef.current.toneMappingExposure = 1.15;
+      } else {
+        // TWILIGHT / AURORA
+        ambientLightRef.current.color.setHex(0x1e293b);
+        ambientLightRef.current.intensity = 0.4;
+        sunLightRef.current.color.setHex(0xf97316);
+        sunLightRef.current.intensity = 0.8;
+        fillLightRef.current.color.setHex(0x38bdf8);
+        fillLightRef.current.intensity = 0.4;
+        groundBounceRef.current.color.setHex(0x10b981);
+        groundBounceRef.current.groundColor.setHex(0x020617);
+        groundBounceRef.current.intensity = 0.35;
+        if (rendererRef.current) rendererRef.current.toneMappingExposure = 1.25;
+      }
+    }
+  }, []);
+
   const resetView = () => {
     setCameraPreset('ISOMETRIC');
   };
@@ -864,6 +918,45 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
             title="Focus Circuit Downstream Impact & Trips"
           >
             IMPACT
+          </button>
+        </div>
+
+        <div className="w-[1px] h-4 bg-slate-700 mx-0.5" />
+
+        {/* Polar Sky & Sunlight Lighting Mode (Photo Match) */}
+        <div className="flex items-center rounded bg-slate-800/90 p-0.5 mr-1">
+          <button
+            type="button"
+            onClick={() => applyLightingMode('DAYLIGHT')}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${
+              lightingMode === 'DAYLIGHT' ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Antarctic Polar Daylight (Authentic Expedition Photo Match)"
+          >
+            <Sun className="w-3 h-3" />
+            <span>DAY</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => applyLightingMode('TWILIGHT')}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${
+              lightingMode === 'TWILIGHT' ? 'bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Polar Twilight with Aurora Australis"
+          >
+            <Activity className="w-3 h-3" />
+            <span>AURORA</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => applyLightingMode('BLIZZARD')}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${
+              lightingMode === 'BLIZZARD' ? 'bg-rose-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'
+            }`}
+            title="Katabatic Blizzard Whiteout"
+          >
+            <Wind className="w-3 h-3" />
+            <span>GALE</span>
           </button>
         </div>
 

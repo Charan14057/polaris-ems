@@ -14,35 +14,57 @@ export interface PolarEnvironmentHandles {
   snowParticles: THREE.Points;
   exhaustParticles: THREE.Points;
   beaconLights: THREE.Mesh[];
+  setLightingMode: (mode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD') => void;
   update: (deltaSeconds: number, windSpeedMs: number, isBlizzard: boolean, dieselActive: boolean) => void;
   dispose: () => void;
 }
 
-export function createPolarEnvironment(scene: THREE.Scene): PolarEnvironmentHandles {
-  const envGroup = new THREE.Group();
-  scene.add(envGroup);
-
-  // 1. CELESTIAL SKY DOME (High-Latitude Twilight / Horizon Scattering)
-  const skyRadius = 240;
-  const skyGeo = new THREE.SphereGeometry(skyRadius, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2);
-  skyGeo.scale(-1, 1, 1); // Render inside
-
-  // Procedural gradient canvas texture for high-altitude polar sky
+function createSkyCanvas(mode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD'): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
   if (ctx) {
     const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0.0, '#040714'); // Deep cosmic arctic navy zenith
-    grad.addColorStop(0.4, '#09152e'); // Cold twilight blue
-    grad.addColorStop(0.75, '#122b4a'); // Cyan/navy atmospheric transition
-    grad.addColorStop(0.92, '#1e3a5f'); // Horizon glow
-    grad.addColorStop(1.0, '#2d4a6e'); // Distant icy horizon line
+    if (mode === 'DAYLIGHT') {
+      grad.addColorStop(0.0, '#0284c7'); // Radiant Arctic blue zenith (matches authentic ground truth photo)
+      grad.addColorStop(0.35, '#38bdf8'); // Clear azure sky
+      grad.addColorStop(0.70, '#7dd3fc'); // Polar sky blue
+      grad.addColorStop(0.90, '#bae6fd'); // Icy horizon haze
+      grad.addColorStop(1.0, '#e0f2fe'); // Snow reflection line
+    } else if (mode === 'BLIZZARD') {
+      grad.addColorStop(0.0, '#475569');
+      grad.addColorStop(0.5, '#64748b');
+      grad.addColorStop(1.0, '#cbd5e1');
+    } else {
+      // TWILIGHT / AURORA
+      grad.addColorStop(0.0, '#040714');
+      grad.addColorStop(0.4, '#09152e');
+      grad.addColorStop(0.75, '#122b4a');
+      grad.addColorStop(0.92, '#1e3a5f');
+      grad.addColorStop(1.0, '#2d4a6e');
+    }
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 512, 512);
   }
-  const skyTexture = new THREE.CanvasTexture(canvas);
+  return canvas;
+}
+
+export function createPolarEnvironment(
+  scene: THREE.Scene,
+  initialMode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD' = 'DAYLIGHT'
+): PolarEnvironmentHandles {
+  const envGroup = new THREE.Group();
+  scene.add(envGroup);
+
+  let currentMode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD' = initialMode;
+
+  // 1. CELESTIAL SKY DOME (High-Latitude Radiant Polar Sky / Scattering)
+  const skyRadius = 240;
+  const skyGeo = new THREE.SphereGeometry(skyRadius, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2);
+  skyGeo.scale(-1, 1, 1); // Render inside
+
+  const skyTexture = new THREE.CanvasTexture(createSkyCanvas(currentMode));
 
   const skyMat = new THREE.MeshBasicMaterial({
     map: skyTexture,
@@ -321,6 +343,23 @@ export function createPolarEnvironment(scene: THREE.Scene): PolarEnvironmentHand
     exhaustMat.dispose();
   };
 
+  const setLightingMode = (mode: 'DAYLIGHT' | 'TWILIGHT' | 'BLIZZARD') => {
+    currentMode = mode;
+    const newCanvas = createSkyCanvas(mode);
+    skyTexture.image = newCanvas;
+    skyTexture.needsUpdate = true;
+    starField.visible = (mode === 'TWILIGHT');
+    auroraMesh.visible = (mode === 'TWILIGHT');
+    scene.background = new THREE.Color(mode === 'DAYLIGHT' ? 0x7dd3fc : mode === 'BLIZZARD' ? 0x94a3b8 : 0x060c18);
+    scene.fog = new THREE.FogExp2(
+      mode === 'DAYLIGHT' ? 0xbae6fd : mode === 'BLIZZARD' ? 0xcfd8dc : 0x0a1628, 
+      mode === 'BLIZZARD' ? 0.015 : 0.0035
+    );
+  };
+
+  // Set initial lighting and atmospheric fog
+  setLightingMode(initialMode);
+
   return {
     skyDome,
     mountainRange: mountainGroup,
@@ -329,6 +368,7 @@ export function createPolarEnvironment(scene: THREE.Scene): PolarEnvironmentHand
     snowParticles,
     exhaustParticles,
     beaconLights,
+    setLightingMode,
     update,
     dispose
   };

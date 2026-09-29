@@ -180,40 +180,61 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
             )}
 
             {/* Moving Electron Energy Packets along Active Conduits */}
-            {isActive && powerKw > 0.2 && (
+            {isActive && powerKw > 0.1 && (
               <g pointerEvents="none">
+                {/* Packet 1 */}
                 <circle
-                  r={Math.min(3.5, Math.max(2.2, edge.lineWidthPx * 0.7))}
+                  r={Math.min(3.8, Math.max(2.4, edge.lineWidthPx * 0.75))}
                   fill={isScada ? '#ffffff' : color}
                   stroke={color}
-                  strokeWidth={1}
+                  strokeWidth={1.2}
                   filter="url(#flow-glow)"
                 >
                   <animateMotion
                     path={pathData}
-                    dur={`${baseDuration * 1.6}s`}
+                    dur={`${baseDuration * 1.5}s`}
                     repeatCount="indefinite"
+                    calcMode="linear"
                     keyPoints={isReverse ? "1;0" : "0;1"}
                     keyTimes="0;1"
                   />
                 </circle>
 
-                {powerKw > 15 && (
-                  <circle
-                    r={Math.min(2.8, Math.max(1.8, edge.lineWidthPx * 0.55))}
-                    fill={color}
-                    opacity={0.85}
-                  >
-                    <animateMotion
-                      path={pathData}
-                      dur={`${baseDuration * 1.6}s`}
-                      begin={`${(baseDuration * 1.6) / 2}s`}
-                      repeatCount="indefinite"
-                      keyPoints={isReverse ? "1;0" : "0;1"}
-                      keyTimes="0;1"
-                    />
-                  </circle>
-                )}
+                {/* Packet 2 (staggered 1/3 cycle) */}
+                <circle
+                  r={Math.min(3.2, Math.max(2.0, edge.lineWidthPx * 0.65))}
+                  fill={color}
+                  opacity={0.9}
+                  filter="url(#flow-glow)"
+                >
+                  <animateMotion
+                    path={pathData}
+                    dur={`${baseDuration * 1.5}s`}
+                    begin={`${(baseDuration * 1.5) / 3}s`}
+                    repeatCount="indefinite"
+                    calcMode="linear"
+                    keyPoints={isReverse ? "1;0" : "0;1"}
+                    keyTimes="0;1"
+                  />
+                </circle>
+
+                {/* Packet 3 (staggered 2/3 cycle) */}
+                <circle
+                  r={Math.min(3.0, Math.max(1.8, edge.lineWidthPx * 0.6))}
+                  fill={isScada ? '#e0f2fe' : color}
+                  opacity={0.85}
+                  filter="url(#flow-glow)"
+                >
+                  <animateMotion
+                    path={pathData}
+                    dur={`${baseDuration * 1.5}s`}
+                    begin={`${((baseDuration * 1.5) * 2) / 3}s`}
+                    repeatCount="indefinite"
+                    calcMode="linear"
+                    keyPoints={isReverse ? "1;0" : "0;1"}
+                    keyTimes="0;1"
+                  />
+                </circle>
               </g>
             )}
 

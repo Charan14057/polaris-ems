@@ -1204,6 +1204,27 @@ export function buildBharatiStation(
   bridgeFloor.castShadow = true;
   hullGroup.add(bridgeFloor);
 
+  // Pedestrian Bridge Handrails along both sides
+  const railMat = createStructuralSteelMaterial(0x94a3b8);
+  [-1.0, 1.0].forEach(sideOffset => {
+    const topRail = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 16.2, 8), railMat);
+    topRail.position.set(18 - Math.sin(0.55) * sideOffset, 5.7, 14 + Math.cos(0.55) * sideOffset);
+    topRail.rotation.y = 0.55;
+    topRail.rotation.z = -0.32;
+    topRail.castShadow = true;
+    hullGroup.add(topRail);
+
+    // Stanchions every 3m
+    for (let s = -6; s <= 6; s += 3) {
+      const stanchion = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 6), railMat);
+      const sx = 18 + Math.cos(0.55) * s - Math.sin(0.55) * sideOffset;
+      const sy = 4.8 + Math.sin(0.32) * s + 0.45;
+      const sz = 14 + Math.sin(0.55) * s + Math.cos(0.55) * sideOffset;
+      stanchion.position.set(sx, sy, sz);
+      hullGroup.add(stanchion);
+    }
+  });
+
   // Bridge Support Stilts
   [12, 18, 24].forEach((bx, idx) => {
     const bHeight = Math.max(1.0, 7.2 - idx * 2.2);
@@ -1211,6 +1232,24 @@ export function buildBharatiStation(
     bStilt.position.set(bx, bHeight / 2, 10 + idx * 2.8);
     hullGroup.add(bStilt);
   });
+
+  // Rooftop Safety Perimeter Handrails around Deck 3
+  const roofRailMat = createStructuralSteelMaterial(0x64748b);
+  const rL = d3Length;
+  const rW = d3Width;
+  const rY = 11.0 + d3Height + 0.5;
+  const railN = new THREE.Mesh(new THREE.BoxGeometry(rL, 0.06, 0.06), roofRailMat);
+  railN.position.set(1, rY, rW / 2);
+  hullGroup.add(railN);
+  const railS = new THREE.Mesh(new THREE.BoxGeometry(rL, 0.06, 0.06), roofRailMat);
+  railS.position.set(1, rY, -rW / 2);
+  hullGroup.add(railS);
+  const railW = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, rW), roofRailMat);
+  railW.position.set(1 - rL / 2, rY, 0);
+  hullGroup.add(railW);
+  const railE = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, rW), roofRailMat);
+  railE.position.set(1 + rL / 2, rY, 0);
+  hullGroup.add(railE);
 
   // Blue Insulated Seawater Intake Pipeline
   const pipeMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4, metalness: 0.6 });

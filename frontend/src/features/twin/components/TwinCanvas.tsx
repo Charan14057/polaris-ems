@@ -17,10 +17,16 @@ import {
   Layers,
   Compass,
   Monitor,
-  FileCode
+  FileCode,
+  Thermometer,
+  Wind,
+  Sun,
+  Zap,
+  BatteryCharging
 } from 'lucide-react';
 import { TwinViewModel, TwinDeviceFilter, TwinViewMode } from '../model/twinTypes';
 import { useTwinViewport } from '../hooks/useTwinViewport';
+import { TwinFloorPlanLayer } from './TwinFloorPlanLayer';
 import { TwinZones } from './TwinZones';
 import { TwinFlowLayer } from './TwinFlowLayer';
 import { TwinJunctions } from './TwinJunctions';
@@ -262,6 +268,36 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           <span>SCALE 1:250 • {canvasTheme}</span>
         </div>
 
+        {/* Floating SCADA Telemetry & Environmental HUD Bar (Top Center) */}
+        <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-20 hidden md:flex items-center space-x-3 px-3.5 py-1.5 rounded-full border shadow-lg backdrop-blur-md font-mono text-[11px] pointer-events-none ${
+          isScada ? 'bg-slate-900/90 border-slate-700/80 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-700'
+        }`}>
+          <div className="flex items-center space-x-1 text-cyan-400">
+            <Thermometer className="w-3.5 h-3.5" />
+            <span className="font-bold">{viewModel.environment.ambientTempC.toFixed(1)}°C</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center space-x-1 text-teal-400">
+            <Wind className="w-3.5 h-3.5" />
+            <span>{viewModel.environment.windSpeedMs.toFixed(1)} m/s SE</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center space-x-1 text-amber-400 font-semibold">
+            <Sun className="w-3.5 h-3.5" />
+            <span>PV: {viewModel.powerSummary.solarGenerationKw.toFixed(1)} kW</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center space-x-1 text-sky-400 font-semibold">
+            <Zap className="w-3.5 h-3.5" />
+            <span>400.2V • 50.01Hz</span>
+          </div>
+          <span className="text-slate-600">|</span>
+          <div className="flex items-center space-x-1 text-emerald-400 font-bold">
+            <BatteryCharging className="w-3.5 h-3.5" />
+            <span>BESS {viewModel.powerSummary.batterySocPct.toFixed(0)}%</span>
+          </div>
+        </div>
+
         {/* Map Legend */}
         <TwinLegend />
 
@@ -302,6 +338,14 @@ export const TwinCanvas: React.FC<TwinCanvasProps> = ({
           />
 
           <g transform={`translate(${viewport.panX}, ${viewport.panY}) scale(${viewport.zoom})`}>
+            {/* 0. Authentic Architectural Station Floor Plan & Hull Envelope */}
+            {viewMode === 'ARCHITECTURAL' && (
+              <TwinFloorPlanLayer
+                stationId={viewModel.stationId}
+                theme={canvasTheme}
+              />
+            )}
+
             {/* 1. Architectural Zones & Room Partitions */}
             {viewMode === 'ARCHITECTURAL' && (
               <TwinZones
