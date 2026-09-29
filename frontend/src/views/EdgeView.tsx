@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStation } from '../context/StationContext';
+import { useStation, useOperationalSnapshot } from '../context/StationContext';
 import { useEvidence } from '../context/EvidenceContext';
 import { edgeApi } from '../api/client';
 import { 
@@ -32,7 +32,11 @@ import {
 
 export const EdgeView: React.FC = () => {
   const { stationId, currentStation } = useStation();
+  const { snapshot, activeScenario } = useOperationalSnapshot();
   const { inspectEvidence } = useEvidence();
+
+  const isScenarioActive = Boolean(activeScenario && activeScenario !== 'NORMAL_BASELINE');
+  const scenarioName = activeScenario ? activeScenario.replace(/_/g, ' ') : '';
 
   const [stateData, setStateData] = useState<EdgeStateResponseData | null>(null);
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
@@ -344,6 +348,35 @@ export const EdgeView: React.FC = () => {
 
       {/* Device Fleet Health & Telemetry Grid */}
       <div className="space-y-4">
+        {isScenarioActive && (
+          <div className="bg-slate-900 border-2 border-rose-500/80 rounded-xl p-4 shadow-xl text-white relative overflow-hidden animate-pulse">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center space-x-3">
+                <span className="p-2 bg-rose-500/20 rounded-lg border border-rose-500/40 text-rose-400">
+                  <AlertTriangle className="w-5 h-5 animate-bounce" />
+                </span>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold">
+                      ACTIVE CONTINGENCY REGIME DETECTED ON EDGE BUS
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-rose-950 text-rose-300 border border-rose-800">
+                      {scenarioName}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Physical asset operating telemetry is subjected to active stress perturbations. Downstream protective interlocks and spinning reserve dispatch are active.
+                  </p>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="text-[10px] font-mono text-slate-400 block">Total Load Active</span>
+                <span className="text-sm font-bold font-mono text-cyan-400 font-mono-numbers">{(snapshot.totalLoadKw ?? 0).toFixed(1)} kW</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <Cpu className="w-4 h-4 text-sky-700" />
@@ -374,25 +407,60 @@ export const EdgeView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDevices.map((dev) => {
             const health = healthItems.find(h => h.device_id === dev.device_id);
+            const isWindDev = dev.device_type === 'WIND' || dev.name.toLowerCase().includes('wind');
+            const isWindFaulted = Boolean(isScenarioActive && isWindDev && ((snapshot.windGenerationKw ?? 0) <= 0.05 || scenarioName.includes('WIND')));
+            const isSolarDev = dev.device_type === 'SOLAR' || dev.name.toLowerCase().includes('solar');
+            const isSolarFaulted = Boolean(isScenarioActive && isSolarDev && (snapshot.solarGenerationKw ?? 0) <= 0.05 && scenarioName.includes('SOLAR'));
+            const isDieselDev = dev.device_type === 'DIESEL_GENERATOR' || dev.name.toLowerCase().includes('diesel') || dev.name.toLowerCase().includes('generator');
+            const isDieselDispatched = Boolean(isScenarioActive && isDieselDev && (snapshot.dieselGenerationKw ?? 0) > 1.0);
+
             return (
               <div 
                 key={dev.device_id}
-                className="bg-white border border-slate-200 rounded p-4 hover:border-sky-600/50 transition-colors shadow-sm flex flex-col justify-between"
+                className={`rounded p-4 transition-all shadow-sm flex flex-col justify-between ${
+                  isWindFaulted
+                    ? 'bg-rose-950/20 border-2 border-rose-500 ring-2 ring-rose-500/50 shadow-lg shadow-rose-950/30 animate-pulse'
+                    : isSolarFaulted
+                    ? 'bg-amber-950/20 border-2 border-amber-500 ring-2 ring-amber-500/50'
+                    : isDieselDispatched
+                    ? 'bg-amber-500/10 border-2 border-amber-500/60 shadow-md'
+                    : 'bg-white border border-slate-200 hover:border-sky-600/50'
+                }`}
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-mono text-sky-700 uppercase tracking-wider block font-semibold">
-                        {dev.device_type}
-                      </span>
-                      <h3 className="text-sm font-semibold text-slate-900 mt-0.5">
+                      <div className="flex items-center space-x-1.5">
+                        <span className={`text-[10px] font-mono uppercase tracking-wider block font-semibold ${
+                          isWindFaulted ? 'text-rose-400 font-bold' : 'text-sky-700'
+                        }`}>
+                          {dev.device_type}
+                        </span>
+                        {isWindFaulted && (
+                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping inline-block" />
+                        )}
+                      </div>
+                      <h3 className={`text-sm font-semibold mt-0.5 ${
+                        isWindFaulted ? 'text-rose-300 font-bold' : 'text-slate-900'
+                      }`}>
                         {dev.name}
                       </h3>
                       <span className="text-[11px] font-mono text-slate-500">
                         ID: {dev.device_id}
                       </span>
                     </div>
-                    {getHealthBadge(health?.health_state || dev.health_state)}
+                    {isWindFaulted ? (
+                      <span className="px-2.5 py-1 text-[10px] font-bold font-mono rounded bg-rose-900 text-rose-200 border border-rose-500 animate-pulse flex items-center space-x-1">
+                        <span>⚠️</span>
+                        <span>FAULT (TRIPPED)</span>
+                      </span>
+                    ) : isDieselDispatched ? (
+                      <span className="px-2 py-0.5 text-[10px] font-bold font-mono rounded bg-amber-50 text-amber-800 border border-amber-300">
+                        SPINNING RESERVE
+                      </span>
+                    ) : (
+                      getHealthBadge(health?.health_state || dev.health_state)
+                    )}
                   </div>
 
                   {/* Rated Capacity & Protocol */}
@@ -420,25 +488,40 @@ export const EdgeView: React.FC = () => {
                       {dev.telemetry_channels.map(ch => {
                         const readingKey = `${dev.device_id}::${ch.channel}`;
                         const reading = stateData?.latest_readings?.[readingKey];
+                        
+                        // Overwrite with scenario impact if faulted
+                        const isPowerChannel = ch.channel.toLowerCase().includes('power') || ch.channel.toLowerCase().includes('active');
+                        const displayVal = isWindFaulted && isPowerChannel 
+                          ? '0.00 kW (TRIPPED)'
+                          : isDieselDispatched && isPowerChannel
+                          ? `${(snapshot.dieselGenerationKw ?? 0).toFixed(1)} kW`
+                          : reading?.value != null ? `${reading.value} ${ch.unit}` : `${ch.min_val}–${ch.max_val} ${ch.unit}`;
+
                         return (
                           <button 
                             key={ch.channel} 
                             onClick={() => inspectEvidence({
-                              value: reading?.value != null ? `${reading.value} ${ch.unit}` : `${ch.min_val}–${ch.max_val} ${ch.unit}`,
+                              value: displayVal,
                               source: `${dev.name} [${ch.channel}]`,
                               provenance: 'SIMULATED',
                               timestamp: reading?.timestamp || new Date().toISOString(),
                               station: activeStation,
                               model: `${dev.device_type} Transducer Driver`,
-                              validationState: 'VALIDATED',
+                              validationState: isWindFaulted ? 'DEGRADED' : 'VALIDATED',
                               uncertaintyInterval: `Operational bounds [${ch.min_val}, ${ch.max_val}] ${ch.unit}`,
                               governingInvariant: 'Hardware telemetry bounds check verified: readings outside operational range trigger DEGRADED device state.'
                             })}
-                            className="bg-slate-50 px-2 py-1 rounded text-[10px] border border-slate-200 flex items-center space-x-1.5 hover:border-sky-600 transition-colors"
+                            className={`px-2 py-1 rounded text-[10px] border flex items-center space-x-1.5 transition-colors ${
+                              isWindFaulted && isPowerChannel
+                                ? 'bg-rose-900/60 border-rose-500 text-rose-200 font-bold animate-pulse'
+                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-sky-600'
+                            }`}
                           >
                             <span className="text-slate-500">{ch.channel}:</span>
-                            <span className="font-mono font-semibold text-sky-700 font-mono-numbers">
-                              {reading?.value != null ? `${reading.value} ${ch.unit}` : `${ch.min_val}–${ch.max_val} ${ch.unit}`}
+                            <span className={`font-mono font-semibold font-mono-numbers ${
+                              isWindFaulted && isPowerChannel ? 'text-rose-300' : 'text-sky-700'
+                            }`}>
+                              {displayVal}
                             </span>
                           </button>
                         );
@@ -448,12 +531,17 @@ export const EdgeView: React.FC = () => {
                 </div>
 
                 {/* Health Signals */}
-                {health?.contributing_signals && health.contributing_signals.length > 0 && (
+                {isWindFaulted ? (
+                  <div className="mt-3 pt-2 border-t border-rose-800 text-[10px] text-rose-400 font-mono flex items-center space-x-1.5">
+                    <AlertTriangle className="w-3 h-3 text-rose-400 animate-pulse" />
+                    <span className="truncate">Contingency Trip: Breaker Open • Rotor Feathered</span>
+                  </div>
+                ) : health?.contributing_signals && health.contributing_signals.length > 0 ? (
                   <div className="mt-3 pt-2 border-t border-slate-200 text-[10px] text-slate-500 flex items-center space-x-1">
                     <Activity className="w-3 h-3 text-sky-700" />
                     <span className="truncate">Signals: {health.contributing_signals.join(', ')}</span>
                   </div>
-                )}
+                ) : null}
               </div>
             );
           })}

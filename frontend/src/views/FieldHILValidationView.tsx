@@ -16,7 +16,7 @@ import {
   Info,
   RefreshCw
 } from 'lucide-react';
-import { useStation } from '../context/StationContext';
+import { useStation, useOperationalSnapshot } from '../context/StationContext';
 import { api } from '../api/endpoints';
 import { ProvenanceTag } from '../components/common/ProvenanceTag';
 import { WhyThisMatters } from '../components/common/WhyThisMatters';
@@ -39,6 +39,10 @@ interface DeviceItem {
 
 export const FieldHILValidationView: React.FC = () => {
   const { currentStation, stationDetail } = useStation();
+  const { snapshot, activeScenario } = useOperationalSnapshot();
+
+  const isScenarioActive = Boolean(activeScenario && activeScenario !== 'NORMAL_BASELINE');
+  const scenarioName = activeScenario ? activeScenario.replace(/_/g, ' ') : '';
 
   const [edgeState, setEdgeState] = useState<Record<string, any> | null>(null);
   const [devices, setDevices] = useState<DeviceItem[]>([]);
@@ -165,6 +169,45 @@ export const FieldHILValidationView: React.FC = () => {
         <ErrorCard title="Edge Telemetry Offline" message={error} onRetry={fetchEdgeData} />
       ) : (
         <>
+          {/* HIL Fault Injection Banner */}
+          {isScenarioActive && (
+            <div className="bg-slate-900 border-2 border-amber-500/70 rounded-xl p-5 text-white shadow-xl relative overflow-hidden animate-pulse">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex items-center space-x-3.5">
+                  <span className="p-2.5 bg-amber-500/20 rounded-lg border border-amber-500/40 text-amber-400 shrink-0">
+                    <Activity className="w-6 h-6 animate-pulse" />
+                  </span>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
+                        HIL FAULT INJECTION &amp; HARNESS STRESS TEST ACTIVE
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-700">
+                        EMULATION RUNNING
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-white mt-0.5 font-mono">
+                      Simulated Microgrid Perturbation: <span className="text-cyan-300">{scenarioName}</span>
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1">
+                      Hardware-in-the-loop testbed emulating transient power surge, phase droop, and breaker trip without actuating physical equipment.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800/90 p-3 rounded-lg border border-slate-700 font-mono text-[11px] space-y-1 shrink-0">
+                  <div className="text-slate-400 flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                    <span>CAN Frame TX: <strong className="text-rose-400">0x4B2 [FAULT_INJECT]</strong></span>
+                  </div>
+                  <div className="text-slate-400">
+                    CAN Frame RX: <strong className="text-emerald-400">0x1A0 [ISOLATED_SAFE]</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Status Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
@@ -228,24 +271,58 @@ export const FieldHILValidationView: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {devices.map((d) => (
-                    <tr key={d.device_id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-2.5 px-3 font-bold text-slate-900">{d.device_id}</td>
-                      <td className="py-2.5 px-3 text-slate-700">{d.name}</td>
-                      <td className="py-2.5 px-3 text-slate-500">{d.category}</td>
-                      <td className="py-2.5 px-3 font-mono-numbers text-slate-900 font-semibold">{d.nominal_power_kw.toFixed(1)}</td>
-                      <td className="py-2.5 px-3">
-                        <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${envStyles[d.environment] || envStyles.SIMULATION}`}>
-                          {d.environment}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                          AIR-GAPPED
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {devices.map((d) => {
+                    const isWindDev = d.name.toLowerCase().includes('wind') || d.category.toLowerCase().includes('wind');
+                    const isFaulted = Boolean(isScenarioActive && isWindDev && ((snapshot.windGenerationKw ?? 0) <= 0.05 || scenarioName.includes('WIND')));
+
+                    return (
+                      <tr 
+                        key={d.device_id} 
+                        className={`transition-colors ${
+                          isFaulted ? 'bg-rose-950/20 border-l-4 border-rose-500 font-bold' : 'hover:bg-slate-50'
+                        }`}
+                      >
+                        <td className="py-2.5 px-3 font-bold text-slate-900">
+                          {d.device_id}
+                          {isFaulted && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] bg-rose-900 text-rose-200 border border-rose-600 animate-pulse">
+                              FAULT INJECTED
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-700">{d.name}</td>
+                        <td className="py-2.5 px-3 text-slate-500">{d.category}</td>
+                        <td className="py-2.5 px-3 font-mono-numbers text-slate-900 font-semibold">
+                          {isFaulted ? (
+                            <div className="flex items-center space-x-1.5">
+                              <span className="line-through text-slate-400 font-normal">{d.nominal_power_kw.toFixed(1)}</span>
+                              <span className="text-rose-400 font-bold animate-pulse">0.0 kW</span>
+                            </div>
+                          ) : (
+                            d.nominal_power_kw.toFixed(1)
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                            isFaulted 
+                              ? 'bg-rose-900/60 text-rose-200 border-rose-500 animate-pulse'
+                              : envStyles[d.environment] || envStyles.SIMULATION
+                          }`}>
+                            {isFaulted ? 'HIL_FAULT_TRIP' : d.environment}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                            isFaulted 
+                              ? 'bg-rose-950 text-rose-300 border-rose-800'
+                              : 'bg-slate-100 text-slate-600 border-slate-200'
+                          }`}>
+                            {isFaulted ? 'BREAKER_TRIPPED' : 'AIR-GAPPED'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

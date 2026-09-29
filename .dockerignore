@@ -1,4 +1,8 @@
-# Virtual Environment
+# Version Control
+.git/
+.gitignore
+
+# Virtual Environments
 .venv/
 venv/
 env/
@@ -11,7 +15,7 @@ __pycache__/
 *.so
 .Python
 
-# Testing & Linting
+# Testing & Coverage
 .pytest_cache/
 .coverage
 htmlcov/
@@ -24,28 +28,24 @@ htmlcov/
 *.swp
 *.swo
 
-# OS specific
+# OS Specific
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
 
-# Temporary / Scratch
+# Temporary & Scratch Files
 scratch/
 tmp/
 *.log
 
-# Environment files (may contain secrets)
-.env
-.env.local
-.env.production
-
-# Node
+# Node & Build Outputs
+frontend/node_modules/
 **/node_modules/
-node_modules/
 frontend/dist/
 dist/
 
-# Test generated runtime traces
-reports/traces/
-
+# Local Environment Variables
+.env
+.env.local
+.env.production

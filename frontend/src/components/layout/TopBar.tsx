@@ -34,6 +34,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobileMenu, onNavigateToPo
   const { openOrientation } = useComprehension();
 
   const [utcTime, setUtcTime] = useState<string>('');
+  const [localTime, setLocalTime] = useState<string>('');
   const [showEnvInfo, setShowEnvInfo] = useState<boolean>(false);
   const [showAlertsMenu, setShowAlertsMenu] = useState<boolean>(false);
   const envInfoRef = useRef<HTMLDivElement>(null);
@@ -44,7 +45,13 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobileMenu, onNavigateToPo
       const now = new Date();
       const hours = String(now.getUTCHours()).padStart(2, '0');
       const mins = String(now.getUTCMinutes()).padStart(2, '0');
-      setUtcTime(`${hours}:${mins} UTC`);
+      const secs = String(now.getUTCSeconds()).padStart(2, '0');
+      setUtcTime(`${hours}:${mins}:${secs} UTC`);
+
+      const locHours = String(now.getHours()).padStart(2, '0');
+      const locMins = String(now.getMinutes()).padStart(2, '0');
+      const locSecs = String(now.getSeconds()).padStart(2, '0');
+      setLocalTime(`${locHours}:${locMins}:${locSecs}`);
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -223,10 +230,16 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMobileMenu, onNavigateToPo
           )}
         </div>
 
-        {/* UTC Clock */}
-        <div className="hidden xl:flex items-center gap-1.5 text-xs font-mono text-slate-500 px-2 py-1 bg-slate-50 rounded border border-slate-200">
-          <Clock className="w-3.5 h-3.5 text-slate-400" />
-          <span>{utcTime}</span>
+        {/* Dual Local & UTC Clock */}
+        <div 
+          className="flex items-center gap-2 text-xs font-mono px-2.5 py-1 bg-slate-50 rounded-md border border-slate-200 shadow-xs"
+          title={`Your Local System Time: ${localTime} | Universal Coordinated Time: ${utcTime}`}
+        >
+          <Clock className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-bold text-slate-800 font-mono-numbers">{localTime}</span>
+            <span className="text-[10px] text-slate-500 font-medium font-mono-numbers">({utcTime})</span>
+          </div>
         </div>
 
         {/* Refresh Action */}

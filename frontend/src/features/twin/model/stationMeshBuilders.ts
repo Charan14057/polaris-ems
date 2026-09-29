@@ -1464,17 +1464,23 @@ export function buildMaitriStation(
   // --- C. DEDICATED MAITRI POWER HOUSE & BESS COMPOUND ---
   const dgUnit = createDieselGeneratorUnit(9.0, 3.8, 4.2, wireframe);
   dgUnit.group.position.set(-12, 0, 8.5);
-  dgUnit.group.userData = { deviceId: 'mt_diesel', label: 'Maitri Power House (3x62.5 kW Gensets)' };
+  dgUnit.group.userData = { deviceId: 'diesel_generator_1', label: 'Maitri Power House (3x62.5 kW Gensets)' };
   interactiveMeshes.set('mt_diesel', dgUnit.group);
-  statusIndicators.push({ mesh: dgUnit.statusLed, type: 'DG', id: 'mt_diesel' });
+  interactiveMeshes.set('diesel_generator_1', dgUnit.group);
+  interactiveMeshes.set('node_mt_diesel', dgUnit.group);
+  interactiveMeshes.set('mt_obj_diesel_house', dgUnit.group);
+  statusIndicators.push({ mesh: dgUnit.statusLed, type: 'DG', id: 'diesel_generator_1' });
   architectureGroup.add(dgUnit.group);
 
   // Maitri BESS Storage Unit
   const bessUnit = createBessContainer(5.5, 2.6, 2.4, wireframe);
   bessUnit.group.position.set(10, 0, 7.5);
-  bessUnit.group.userData = { deviceId: 'mt_bess', label: 'Maitri BESS Storage (80 kWh)' };
+  bessUnit.group.userData = { deviceId: 'bess_bank_1', label: 'Maitri BESS Storage (80 kWh)' };
   interactiveMeshes.set('mt_bess', bessUnit.group);
-  statusIndicators.push({ mesh: bessUnit.statusLed, type: 'BESS', id: 'mt_bess' });
+  interactiveMeshes.set('bess_bank_1', bessUnit.group);
+  interactiveMeshes.set('node_mt_battery', bessUnit.group);
+  interactiveMeshes.set('mt_obj_battery', bessUnit.group);
+  statusIndicators.push({ mesh: bessUnit.statusLed, type: 'BESS', id: 'bess_bank_1' });
   architectureGroup.add(bessUnit.group);
 
   // Central 415V Main Busbar PDC Hub
@@ -1482,7 +1488,9 @@ export function buildMaitriStation(
   busHub.group.position.set(0, 0, 4.5);
   busHub.group.userData = { deviceId: 'node_mt_main_bus', label: 'Maitri 415V Station Distribution Bus' };
   interactiveMeshes.set('node_mt_main_bus', busHub.group);
-  statusIndicators.push({ mesh: busHub.busStatusLed, type: 'BUS', id: 'node_mt_main_bus' });
+  interactiveMeshes.set('mt_obj_main_bus', busHub.group);
+  interactiveMeshes.set('c_main_bus', busHub.group);
+  statusIndicators.push({ mesh: busHub.busStatusLed, type: 'BUS', id: 'mt_obj_main_bus' });
   architectureGroup.add(busHub.group);
 
   // --- D. LAKE PRIYADARSHINI WATER PUMP HOUSE & OVERLAND PIPELINE ---
@@ -1492,8 +1500,11 @@ export function buildMaitriStation(
   );
   waterPumpHouse.position.set(26, 1.6, 22);
   waterPumpHouse.castShadow = true;
-  waterPumpHouse.userData = { deviceId: 'mt_pribarshini_water', label: 'Lake Priyadarshini Water Pump' };
+  waterPumpHouse.userData = { deviceId: 'mt_lake_water_pump', label: 'Lake Priyadarshini Water Pump House' };
   interactiveMeshes.set('mt_pribarshini_water', waterPumpHouse);
+  interactiveMeshes.set('mt_lake_water_pump', waterPumpHouse);
+  interactiveMeshes.set('node_mt_pribarshini_water', waterPumpHouse);
+  interactiveMeshes.set('mt_obj_lake_pump', waterPumpHouse);
   architectureGroup.add(waterPumpHouse);
 
   // Insulated water pipeline on A-frame trestles
@@ -1510,14 +1521,18 @@ export function buildMaitriStation(
   // --- E. RENEWABLES & EXPEDITION ASSETS ---
   const solarRack = createSolarRack(12, 4.5, 38, wireframe);
   solarRack.position.set(-22, 0, -12);
-  solarRack.userData = { deviceId: 'node_mt_solar', label: 'Maitri Solar PV Array (18 kWp)' };
+  solarRack.userData = { deviceId: 'solar_pv_array', label: 'Maitri Solar PV Array (18 kWp)' };
   interactiveMeshes.set('node_mt_solar', solarRack);
+  interactiveMeshes.set('solar_pv_array', solarRack);
+  interactiveMeshes.set('mt_obj_solar', solarRack);
   architectureGroup.add(solarRack);
 
   const turbine = createWindTurbine(13, 6.0, wireframe);
   turbine.group.position.set(-22, 0, 14);
-  turbine.group.userData = { deviceId: 'node_mt_wind', label: 'Maitri Wind Turbine (15 kW)' };
+  turbine.group.userData = { deviceId: 'wind_turbine_1', label: 'Maitri Wind Turbine (15 kW)' };
   interactiveMeshes.set('node_mt_wind', turbine.group);
+  interactiveMeshes.set('wind_turbine_1', turbine.group);
+  interactiveMeshes.set('mt_obj_wind', turbine.group);
   turbines.push({ rotorGroup: turbine.rotor, speedMultiplier: 1.0 });
   architectureGroup.add(turbine.group);
 
@@ -1632,17 +1647,22 @@ export function buildHimadriStation(
   // Microgrid Backup Genset
   const dgUnit = createDieselGeneratorUnit(6.0, 2.6, 2.8, wireframe);
   dgUnit.group.position.set(-14, 0, 5);
-  dgUnit.group.userData = { deviceId: 'node_hm_diesel', label: 'Himadri Backup Diesel Generator (40 kW)' };
+  dgUnit.group.userData = { deviceId: 'diesel_generator_1', label: 'Himadri Backup Diesel Generator (40 kW)' };
   interactiveMeshes.set('node_hm_diesel', dgUnit.group);
-  statusIndicators.push({ mesh: dgUnit.statusLed, type: 'DG', id: 'node_hm_diesel' });
+  interactiveMeshes.set('diesel_generator_1', dgUnit.group);
+  interactiveMeshes.set('hm_obj_district_grid', dgUnit.group);
+  statusIndicators.push({ mesh: dgUnit.statusLed, type: 'DG', id: 'diesel_generator_1' });
   architectureGroup.add(dgUnit.group);
 
   // Himadri Microgrid BESS
   const bessUnit = createBessContainer(5.0, 2.4, 2.2, wireframe);
   bessUnit.group.position.set(-14, 0, -4);
-  bessUnit.group.userData = { deviceId: 'node_hm_bess', label: 'Himadri BESS Storage (50 kWh)' };
+  bessUnit.group.userData = { deviceId: 'bess_bank_1', label: 'Himadri BESS Storage (50 kWh)' };
   interactiveMeshes.set('node_hm_bess', bessUnit.group);
-  statusIndicators.push({ mesh: bessUnit.statusLed, type: 'BESS', id: 'node_hm_bess' });
+  interactiveMeshes.set('bess_bank_1', bessUnit.group);
+  interactiveMeshes.set('node_hm_battery', bessUnit.group);
+  interactiveMeshes.set('hm_obj_battery', bessUnit.group);
+  statusIndicators.push({ mesh: bessUnit.statusLed, type: 'BESS', id: 'bess_bank_1' });
   architectureGroup.add(bessUnit.group);
 
   // Ny-Ålesund District 400V Grid Interconnect Kiosk
@@ -1650,20 +1670,26 @@ export function buildHimadriStation(
   distBus.group.position.set(-6, 0, -10);
   distBus.group.userData = { deviceId: 'node_hm_main_bus', label: 'District Energy & 400V Tie-in Bus' };
   interactiveMeshes.set('node_hm_main_bus', distBus.group);
-  statusIndicators.push({ mesh: distBus.busStatusLed, type: 'BUS', id: 'node_hm_main_bus' });
+  interactiveMeshes.set('hm_obj_main_bus', distBus.group);
+  interactiveMeshes.set('c_main_bus', distBus.group);
+  statusIndicators.push({ mesh: distBus.busStatusLed, type: 'BUS', id: 'hm_obj_main_bus' });
   architectureGroup.add(distBus.group);
 
   // --- E. RENEWABLES & EXPEDITION GEAR ---
   const solarRack = createSolarRack(10, 3.8, 48, wireframe);
   solarRack.position.set(14, 0, -6);
-  solarRack.userData = { deviceId: 'node_hm_solar', label: 'Himadri Solar PV (12 kWp)' };
+  solarRack.userData = { deviceId: 'solar_pv_array', label: 'Himadri Solar PV (12 kWp)' };
   interactiveMeshes.set('node_hm_solar', solarRack);
+  interactiveMeshes.set('solar_pv_array', solarRack);
+  interactiveMeshes.set('hm_obj_solar', solarRack);
   architectureGroup.add(solarRack);
 
   const turbine = createWindTurbine(11, 5.0, wireframe);
   turbine.group.position.set(15, 0, 10);
-  turbine.group.userData = { deviceId: 'node_hm_wind', label: 'Himadri Wind Turbine (10 kW)' };
+  turbine.group.userData = { deviceId: 'wind_turbine_1', label: 'Himadri Wind Turbine (10 kW)' };
   interactiveMeshes.set('node_hm_wind', turbine.group);
+  interactiveMeshes.set('wind_turbine_1', turbine.group);
+  interactiveMeshes.set('hm_obj_wind', turbine.group);
   turbines.push({ rotorGroup: turbine.rotor, speedMultiplier: 1.0 });
   architectureGroup.add(turbine.group);
 

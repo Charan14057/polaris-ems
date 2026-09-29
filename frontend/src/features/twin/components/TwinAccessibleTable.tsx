@@ -41,11 +41,44 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
   const station3D = STATION_SPATIAL_3D_PROFILES[viewModel.stationId] || STATION_SPATIAL_3D_PROFILES.BHARATI;
   const devicesList = Object.values(viewModel.devices);
 
+  const isWindTripped = viewModel.powerSummary.windGenerationKw <= 0.05;
   const sources = [
-    { name: 'Solar PV Array', type: 'SOLAR', kw: viewModel.powerSummary.solarGenerationKw, status: viewModel.powerSummary.solarGenerationKw > 0.1 ? 'ONLINE' : 'DORMANT' },
-    { name: 'Wind Turbine Fleet', type: 'WIND', kw: viewModel.powerSummary.windGenerationKw, status: viewModel.powerSummary.windGenerationKw > 0.1 ? 'ONLINE' : 'DORMANT' },
-    { name: 'Diesel Generator Bank', type: 'DIESEL', kw: viewModel.powerSummary.dieselGenerationKw, status: viewModel.powerSummary.dieselGenerationKw > 0.1 ? 'ONLINE' : 'STANDBY' },
-    { name: 'Battery Storage (BESS)', type: 'BATTERY', kw: Math.abs(viewModel.powerSummary.batteryPowerKw), status: `${viewModel.powerSummary.batterySocPct.toFixed(0)}% SoC` }
+    { 
+      name: 'Solar PV Array', 
+      type: 'SOLAR', 
+      kw: viewModel.powerSummary.solarGenerationKw, 
+      amps: viewModel.powerSummary.solarGenerationKw > 0.05 
+        ? Math.round(((viewModel.powerSummary.solarGenerationKw * 1000) / (Math.sqrt(3) * 400 * 0.9)) * 10) / 10 
+        : 0.0,
+      status: viewModel.powerSummary.solarGenerationKw > 0.1 ? 'ONLINE' : 'DORMANT' 
+    },
+    { 
+      name: 'Wind Turbine Fleet', 
+      type: 'WIND', 
+      kw: viewModel.powerSummary.windGenerationKw, 
+      amps: viewModel.powerSummary.windGenerationKw > 0.05 
+        ? Math.round(((viewModel.powerSummary.windGenerationKw * 1000) / (Math.sqrt(3) * 400 * 0.9)) * 10) / 10 
+        : 0.0,
+      status: isWindTripped ? 'FAULT / TRIPPED' : (viewModel.powerSummary.windGenerationKw > 0.1 ? 'ONLINE' : 'STANDBY') 
+    },
+    { 
+      name: 'Diesel Generator Bank', 
+      type: 'DIESEL', 
+      kw: viewModel.powerSummary.dieselGenerationKw, 
+      amps: viewModel.powerSummary.dieselGenerationKw > 0.05 
+        ? Math.round(((viewModel.powerSummary.dieselGenerationKw * 1000) / (Math.sqrt(3) * 400 * 0.9)) * 10) / 10 
+        : 0.0,
+      status: viewModel.powerSummary.dieselGenerationKw > 0.1 ? 'ACTIVE GENERATION' : 'STANDBY' 
+    },
+    { 
+      name: 'Battery Storage (BESS)', 
+      type: 'BATTERY', 
+      kw: Math.abs(viewModel.powerSummary.batteryPowerKw), 
+      amps: Math.abs(viewModel.powerSummary.batteryPowerKw) > 0.05 
+        ? Math.round(((Math.abs(viewModel.powerSummary.batteryPowerKw) * 1000) / (Math.sqrt(3) * 400 * 0.9)) * 10) / 10 
+        : 0.0,
+      status: `${viewModel.powerSummary.batterySocPct.toFixed(0)}% SoC (${viewModel.powerSummary.batteryPowerKw > 0.05 ? 'DISCHARGING' : (viewModel.powerSummary.batteryPowerKw < -0.05 ? 'CHARGING' : 'FLOAT')})` 
+    }
   ];
 
   return (
@@ -67,7 +100,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <ProvenanceTag provenance={viewModel.provenance} size="sm" />
-          <span className="text-[11px] font-mono px-2 py-1 rounded bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="text-[11px] font-mono px-2 py-1 rounded bg-slate-100 text-slate-700 border border-slate-200 font-bold">
             WCAG 2.1 AA COMPLIANT
           </span>
         </div>
@@ -85,27 +118,41 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
               <tr>
                 <th className="p-2.5">Asset Name</th>
                 <th className="p-2.5">Category</th>
-                <th className="p-2.5">Current Output (kW)</th>
+                <th className="p-2.5">Active Power (kW)</th>
+                <th className="p-2.5">Current (Amps)</th>
                 <th className="p-2.5">Operational Status</th>
                 <th className="p-2.5">Provenance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-800">
-              {sources.map((s, idx) => (
-                <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-2.5 font-bold font-sans">{s.name}</td>
-                  <td className="p-2.5 text-slate-500">{s.type}</td>
-                  <td className="p-2.5 font-bold">{s.kw.toFixed(1)} kW</td>
-                  <td className="p-2.5">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-                      {s.status}
-                    </span>
-                  </td>
-                  <td className="p-2.5">
-                    <ProvenanceTag provenance="COMPUTATIONAL_TWIN" size="xs" />
-                  </td>
-                </tr>
-              ))}
+              {sources.map((s, idx) => {
+                const isFaulted = s.type === 'WIND' && isWindTripped;
+                return (
+                  <tr key={idx} className={`transition-colors ${isFaulted ? 'bg-rose-50/80 border-y border-rose-200 animate-pulse' : 'hover:bg-slate-50/60'}`}>
+                    <td className="p-2.5 font-bold font-sans">
+                      <div className="flex items-center gap-1.5">
+                        {isFaulted && <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />}
+                        <span>{s.name}</span>
+                      </div>
+                    </td>
+                    <td className="p-2.5 text-slate-500">{s.type}</td>
+                    <td className={`p-2.5 font-bold ${isFaulted ? 'text-rose-600' : ''}`}>{s.kw.toFixed(1)} kW</td>
+                    <td className="p-2.5 font-semibold text-slate-700">{s.amps.toFixed(1)} A</td>
+                    <td className="p-2.5">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        isFaulted 
+                          ? 'bg-rose-600 text-white animate-pulse' 
+                          : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="p-2.5">
+                      <ProvenanceTag provenance="COMPUTATIONAL_TWIN" size="xs" />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -126,6 +173,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
                 <th className="p-2.5">Zone Location</th>
                 <th className="p-2.5">Rated Power</th>
                 <th className="p-2.5">Current Power</th>
+                <th className="p-2.5">Current (Amps)</th>
                 <th className="p-2.5">Circuit ID</th>
                 <th className="p-2.5">Status</th>
                 <th className="p-2.5">Action</th>
@@ -134,6 +182,9 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
             <tbody className="divide-y divide-slate-100 text-slate-800">
               {devicesList.map((dev: VisualDeviceState) => {
                 const isSelected = selectedDeviceId === dev.id;
+                const computedAmps = dev.currentAmps !== null 
+                  ? dev.currentAmps 
+                  : Math.round(((dev.currentPowerKw * 1000) / (Math.sqrt(3) * (dev.nominalVoltageV || 400) * 0.90)) * 10) / 10;
                 return (
                   <tr 
                     key={dev.id} 
@@ -157,11 +208,12 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
                     <td className="p-2.5 text-slate-600">{dev.zoneName}</td>
                     <td className="p-2.5">{dev.nominalPowerKw.toFixed(1)} kW</td>
                     <td className="p-2.5 font-bold text-slate-900">{dev.currentPowerKw.toFixed(1)} kW</td>
+                    <td className="p-2.5 font-bold text-sky-700">{computedAmps.toFixed(1)} A</td>
                     <td className="p-2.5 text-slate-400 text-[10px]">{dev.circuitId || '—'}</td>
                     <td className="p-2.5">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         dev.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700' :
-                        dev.status === 'FAULT' ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-600'
+                        dev.status === 'FAULT' ? 'bg-rose-50 text-rose-700 animate-pulse' : 'bg-slate-100 text-slate-600'
                       }`}>
                         {dev.status}
                       </span>
@@ -170,7 +222,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectDevice(dev.id)}
-                        className="px-2 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-[10px] font-bold"
+                        className="px-2 py-1 rounded bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-[10px] font-bold cursor-pointer"
                       >
                         Inspect
                       </button>

@@ -375,6 +375,10 @@ interface StationContextType {
   reSolveOptimizer: (mode?: 'EXPECTED' | 'CONSERVATIVE' | 'SCENARIO_ROBUST') => Promise<void>;
   refreshAll: () => Promise<void>;
   
+  // Operational Governance Mode
+  operatingMode: 'AUTO' | 'MANUAL';
+  setOperatingMode: (mode: 'AUTO' | 'MANUAL') => void;
+
   // Direct Cached Engine Responses
   resilienceData: ResilienceEvaluateResponseData | null;
   policyData: PolicyEvaluateResponseData | null;
@@ -407,6 +411,17 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [tracesData, setTracesData] = useState<TraceSummary[]>([]);
   const [operationalSnapshot, setOperationalSnapshot] = useState<OperationalSnapshot>(DEFAULT_SNAPSHOT);
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
+  const [operatingMode, setOperatingModeState] = useState<'AUTO' | 'MANUAL'>('AUTO');
+  const operatingModeRef = useRef<'AUTO' | 'MANUAL'>('AUTO');
+
+  const setOperatingMode = useCallback((mode: 'AUTO' | 'MANUAL') => {
+    operatingModeRef.current = mode;
+    setOperatingModeState(mode);
+    setOperationalSnapshot(prev => ({
+      ...prev,
+      operatingMode: mode
+    }));
+  }, []);
 
   // Toast notification state
   const [toast, setToast] = useState<ToastNotification | null>(null);
@@ -489,7 +504,9 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
       const powerFlow = liveData?.power_flow || null;
       const detail = detailRes?.data;
 
-      const actScen = metadata.active_scenario || activeScenario || null;
+      const rawScen = metadata.active_scenario || activeScenario || null;
+      const isBaseline = !rawScen || ['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL', 'NORMAL BASELINE'].includes(rawScen.toUpperCase().trim());
+      const actScen = isBaseline ? null : rawScen;
       setActiveScenario(actScen);
 
       // Extract Solar, Wind, Diesel, Battery from TwinState
@@ -544,7 +561,7 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
         stationRegion: detail?.region || 'Polar Sector',
         timestamp: metadata.simulation_timestamp || new Date().toISOString(),
         wallClockTimestamp: metadata.wall_clock_timestamp || new Date().toISOString(),
-        operatingMode: metadata.operating_mode === 'LIVE_MANUAL' ? 'MANUAL' : 'AUTO',
+        operatingMode: operatingModeRef.current,
         activeScenario: actScen,
         scenarioSeverity,
         scenarioDescription: actScen ? `Active perturbation regime: ${actScen}` : null,
@@ -687,7 +704,7 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
                   timestamp: metadata.simulation_timestamp || prev.timestamp,
                   wallClockTimestamp: metadata.wall_clock_timestamp || prev.wallClockTimestamp,
                   activeScenario: metadata.active_scenario || prev.activeScenario,
-                  operatingMode: metadata.operating_mode === 'LIVE_MANUAL' ? 'MANUAL' : 'AUTO',
+                  operatingMode: operatingModeRef.current,
                   ambientTemperatureC: envObj.ambient_temperature_c !== undefined ? Number(envObj.ambient_temperature_c) : prev.ambientTemperatureC,
                   windSpeedMs: envObj.wind_speed_ms !== undefined ? Number(envObj.wind_speed_ms) : prev.windSpeedMs,
                   irradianceWm2: envObj.irradiance_wm2 !== undefined ? Number(envObj.irradiance_wm2) : prev.irradianceWm2,
@@ -720,24 +737,6 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
     return () => clearInterval(timer);
   }, [currentStation]);
 
-  // Action: Activate Scenario
-  const activateScenario = useCallback(async (scenarioId: string, customParams?: Record<string, any>) => {
-    const id = scenarioId.toUpperCase();
-    setActiveScenario(id);
-    try {
-      await api.applyLiveScenario(currentStation, id);
-      await fetchStationData();
-      showToast(
-        `${id.replace(/_/g, ' ')} SCENARIO ACTIVATED`,
-        'Operational state updated across Energy, Forecast, Dispatch, Resilience and Assets.',
-        'warning'
-      );
-    } catch (err: any) {
-      console.error('Failed to activate scenario:', err);
-      throw err;
-    }
-  }, [currentStation, fetchStationData, showToast]);
-
   // Action: Clear Scenario
   const clearScenario = useCallback(async () => {
     setActiveScenario(null);
@@ -754,6 +753,28 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
       throw err;
     }
   }, [currentStation, fetchStationData, showToast]);
+
+  // Action: Activate Scenario
+  const activateScenario = useCallback(async (scenarioId: string, customParams?: Record<string, any>) => {
+    const id = scenarioId.toUpperCase().trim();
+    if (['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL', 'NORMAL BASELINE'].includes(id)) {
+      await clearScenario();
+      return;
+    }
+    setActiveScenario(id);
+    try {
+      await api.applyLiveScenario(currentStation, id);
+      await fetchStationData();
+      showToast(
+        `${id.replace(/_/g, ' ')} SCENARIO ACTIVATED`,
+        'Operational state updated across Energy, Forecast, Dispatch, Resilience and Assets.',
+        'warning'
+      );
+    } catch (err: any) {
+      console.error('Failed to activate scenario:', err);
+      throw err;
+    }
+  }, [currentStation, fetchStationData, showToast, clearScenario]);
 
   // Action: Apply Manual Control
   const applyManualControl = useCallback(async (actionId: string, parameters?: Record<string, any>) => {
@@ -820,6 +841,8 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
     error,
     lastUpdated,
     refreshStationData: fetchStationData,
+    operatingMode,
+    setOperatingMode,
     operationalSnapshot,
     activeScenario,
     activateScenario,
@@ -856,6 +879,8 @@ export const useOperationalSnapshot = () => {
   return {
     snapshot: context.operationalSnapshot,
     activeScenario: context.activeScenario,
+    operatingMode: context.operatingMode,
+    setOperatingMode: context.setOperatingMode,
     currentStation: context.currentStation,
     setStation: context.setStation,
     activateScenario: context.activateScenario,

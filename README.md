@@ -1,13 +1,13 @@
 # Polaris-EMS: Polar Energy Management & Resilience System 
-**Status**: 🟢 `PHASES_1_16_FROZEN` | `PHASE_17_RELEASE_READY` | `POLARIS_EMS_FINAL_RELEASE_READY` | `NEXT_ENGINEERING_STAGE = NONE`  
+**Status**: 🟢 `PRODUCTION_RELEASE_READY` | `POLARIS_EMS_FINAL_RELEASE`  
 **Core Philosophy**: Predict → Simulate → Stress Test → Optimize → Protect → Preserve  
 
-[![CI / Pytest Suite](https://img.shields.io/badge/pytest-366%20passed-brightgreen?logo=pytest)](tests)
-[![Frontend Vitest](https://img.shields.io/badge/vitest-12%20passed-success?logo=vitest)](frontend)
-[![Phase Status](https://img.shields.io/badge/Lifecycle-PHASE__17__RELEASE__READY-blue)](docs/master_walkthrough.md)
-[![Zero-Real-Grid-Breach](https://img.shields.io/badge/Air--Gap-100%25%20DISCONNECTED-red)](reports/phase17/PHASE17_EPISTEMIC_BOUNDARY_REPORT.md)
+[![CI / Pytest Suite](https://img.shields.io/badge/pytest-436%20passed-brightgreen?logo=pytest)](tests)
+[![Frontend Vitest](https://img.shields.io/badge/vitest-46%20passed-success?logo=vitest)](frontend)
+[![Release Status](https://img.shields.io/badge/Release-PRODUCTION__READY-blue)](README.md)
+[![Zero-Real-Grid-Breach](https://img.shields.io/badge/Air--Gap-100%25%20DISCONNECTED-red)](README.md)
 [![Provenance Strict](https://img.shields.io/badge/Provenance-6%20Locked%20Tiers-blueviolet)](backend/core/provenance.py)
-[![Docker Multi-Stage](https://img.shields.io/badge/Container-Docker%20Hardened-2496ED?logo=docker)](deployment/Dockerfile)
+[![Docker Multi-Stage](https://img.shields.io/badge/Container-Docker%20Hardened-2496ED?logo=docker)](Dockerfile)
 
 ---
 
@@ -22,33 +22,33 @@ Polar grids face steep operational challenges: severe wind volatility, complete 
 
 ---
 
-## 🏛 System Architecture & Authoritative Phase Ownership
+## 🏛 System Architecture & Subsystem Ownership
 
-Polaris-EMS adheres to strict contract-first boundaries and single-authority phase ownership:
+Polaris-EMS adheres to strict contract-first boundaries and single-authority subsystem ownership:
 
 ```text
 Predict → Simulate → Stress Test → Optimize → Protect → Preserve
 ```
 
-| Phase | Subsystem | Domain / Authority Ownership |
-|:---:|:---|:---|
-| **Phase 1** | Data Foundation | Historical station dataset schemas, physical units, sensor normalization |
-| **Phase 2** | Synthetic Environment | Physics-informed synthetic polar energy dataset generation |
-| **Phase 3** | **Predict** | ML forecasting: Physics-informed load decomposition + XGBoost residual forecaster, solar PV & wind turbine models, calibrated conformal uncertainty ($P_{10}, P_{50}, P_{90}, P_{95}$) with central interval $P_{10}–P_{90}$ |
-| **Phase 4** | **Simulate** | Computational Energy Digital Twin: Physics-based electrical power balance, building thermal dynamics, battery electrochemical state transitions, diesel fuel consumption |
-| **Phase 5** | **Stress Test** | Scenario & What-If Engine: 14 canonical polar stress scenarios (Blizzard, Polar Night, Extreme Cold, Generator Outage, Fuel Resupply Delay) |
-| **Phase 6** | **Optimize** | Risk-Aware Dispatch Optimizer: Multi-horizon rolling constrained MILP (Pyomo + HiGHS) with resupply-anchored survival constraints and flexible load shifting |
-| **Phase 7** | Assess Resilience | Resilience State Machine: 9-dimensional resilience radar, multi-horizon survival horizons, state precedence (Normal, Watch, Threatened, Critical, Recovery) |
-| **Phase 8** | Policy / Governance | Operational Governance: 8-level priority hierarchy (Life Safety P1 $\to$ Deferrable Research P8), supervisory override, hysteresis statefulness |
-| **Phase 9** | API / Integration | FastAPI gateway, asynchronous telemetry contracts, REST endpoints, CORS, security headers |
-| **Phase 10** | Mission Control UI | React 18 + Vite + TypeScript dashboard, Vitest test suite, operators' telemetry views |
-| **Phase 11** | Device / Edge Intelligence | Autonomous edge execution cycle, local persistence, offline failover, ring-buffered ingestion |
-| **Phase 12** | Decision Trace | Explainable "Why did Polaris-EMS do this?" trace, W3C TraceContext DAG lineage |
-| **Phase 13** | Scientific Validation | Conformal calibration audits, Tree SHAP additivity, cold archive lifecycle, fair optimizer benchmarks |
-| **Phase 14** | Deployment / Productization | Multi-stage non-root Docker (`polarisuser` UID 10001), Docker Compose, Nginx reverse proxy, Open-Meteo & NCPOR adapters |
-| **Phase 15** | Operational Validation | Reality drift monitoring, quarantine circuit breaker, epistemic safeguards, feed completeness tracking |
-| **Phase 16** | Field / HIL Validation | Abstracted `DeviceAdapter` hierarchy (`Simulator`, `Emulator`, `HIL`, `Lab`), actuation safety boundary, chaos fault injection |
-| **Phase 17** | Final Release & Demonstration | 14-stage automated end-to-end demonstration, reproducibility verification, public product release |
+| Layer / Subsystem | Architecture Domain | Domain / Authority Ownership |
+|:---|:---|:---|
+| **Data Foundation** | Data Architecture | Historical station dataset schemas, physical units, sensor normalization |
+| **Synthetic Environment** | Data Architecture | Physics-informed synthetic polar energy dataset generation |
+| **Predict** | Machine Learning | ML forecasting: Physics-informed load decomposition + XGBoost residual forecaster, solar PV & wind turbine models, calibrated conformal uncertainty ($P_{10}, P_{50}, P_{90}, P_{95}$) with CQR coverage guarantees |
+| **Simulate** | Digital Twin | Computational Energy Digital Twin: Physics-based electrical power balance, building thermal dynamics, battery electrochemical state transitions, diesel fuel consumption |
+| **Stress Test** | Scenario Engine | Scenario & What-If Engine: 14 canonical polar stress scenarios (Blizzard, Polar Night, Extreme Cold, Generator Outage, Fuel Resupply Delay) |
+| **Optimize** | Optimization | Risk-Aware Dispatch Optimizer: Multi-horizon rolling constrained MILP (Pyomo + HiGHS) with resupply-anchored survival constraints and flexible load shifting |
+| **Assess Resilience** | Resilience | Resilience State Machine: 10-dimensional resilience radar, multi-horizon survival horizons, state precedence (Normal, Watch, Threatened, Critical, Recovery) |
+| **Policy / Governance** | Policy Engine | Operational Governance: Priority load shedding hierarchy, supervisory override, hysteresis statefulness |
+| **API / Gateway** | API Gateway | FastAPI gateway, asynchronous telemetry contracts, REST endpoints, CORS, security headers |
+| **Mission Control UI** | Frontend HMI | React 18 + Vite + TypeScript dashboard, Three.js 3D PBR Spatial Twin, Vitest test suite |
+| **Device / Edge** | Edge Intelligence | Autonomous edge execution cycle, local persistence, offline failover, ring-buffered ingestion |
+| **Decision Trace** | Audit Ledger | Explainable "Why did Polaris-EMS do this?" trace, SHA-256 cryptographic lineage |
+| **Scientific Validation** | Validation | Conformal calibration audits, Tree SHAP additivity, cold archive lifecycle, fair optimizer benchmarks |
+| **Production Deployment** | Infrastructure | Multi-stage non-root Docker (`polarisuser` UID 10001), unified FastAPI static frontend serving, Render deployment |
+| **Operational Validation** | Validation | Reality drift monitoring, quarantine circuit breaker, epistemic safeguards, feed completeness tracking |
+| **Field / HIL Validation** | Hardware Interface | Abstracted `DeviceAdapter` hierarchy (`Simulator`, `Emulator`, `HIL`, `Lab`), actuation safety boundary, chaos fault injection |
+| **Product Release** | Release & Demo | Automated end-to-end demonstration, reproducibility verification, public product release |
 
 ---
 

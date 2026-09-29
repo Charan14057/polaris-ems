@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Camera, 
   MapPin, 
@@ -18,6 +18,7 @@ import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../
 interface PhysicalStationReferenceCardProps {
   stationId: string;
   onOpenComparisonModal: () => void;
+  onSelectStation?: (stationId: string) => void;
 }
 
 interface StationGroundTruthData {
@@ -96,23 +97,37 @@ const STATION_GROUND_TRUTH: Record<string, StationGroundTruthData> = {
 
 export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCardProps> = ({
   stationId,
-  onOpenComparisonModal
+  onOpenComparisonModal,
+  onSelectStation
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
-  const stationKey = normalizeStationKey(stationId);
+  const [activeStationKey, setActiveStationKey] = useState<string>(normalizeStationKey(stationId));
+
+  useEffect(() => {
+    setActiveStationKey(normalizeStationKey(stationId));
+  }, [stationId]);
+
+  const handleSelectStation = (key: string) => {
+    setActiveStationKey(key);
+    if (onSelectStation) {
+      onSelectStation(key);
+    }
+  };
+
+  const stationKey = activeStationKey;
   const data = STATION_GROUND_TRUTH[stationKey] || STATION_GROUND_TRUTH.BHARATI;
   const currentPhoto = getStationPhoto(stationKey);
 
   return (
     <div className="bg-white rounded-xl border border-teal-500/20 shadow-sm overflow-hidden font-sans transition-all">
-      {/* Header Bar with Station Provenance */}
-      <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white p-3.5 px-4 flex items-center justify-between border-b border-teal-500/30">
+      {/* Header Bar with Station Provenance & Switcher */}
+      <div className="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white p-3.5 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-500/30">
         <div className="flex items-center space-x-2.5">
-          <div className="p-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40">
+          <div className="p-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40 shrink-0">
             <Camera className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-mono font-bold tracking-wider uppercase text-teal-300">
                 PHYSICAL GROUND TRUTH REFERENCE
               </span>
@@ -120,13 +135,35 @@ export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCard
                 REAL PHOTO
               </span>
             </div>
-            <div className="text-sm font-bold text-white leading-tight">
+            <div className="text-sm font-bold text-white leading-tight mt-0.5">
               {data.name} <span className="text-teal-200/70 text-xs font-normal">({data.nativeName})</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2 self-end sm:self-center">
+          {/* Station Selection Pills */}
+          <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-lg border border-teal-500/30 font-mono text-xs">
+            {(['BHARATI', 'MAITRI', 'HIMADRI'] as const).map((key) => {
+              const isSelected = stationKey === key;
+              const label = key === 'BHARATI' ? 'Bharati' : (key === 'MAITRI' ? 'Maitri' : 'Himadri');
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleSelectStation(key)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                    isSelected
+                      ? 'bg-teal-500 text-slate-950 shadow-xs'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
           <button
             type="button"
             onClick={onOpenComparisonModal}

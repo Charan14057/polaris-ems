@@ -45,7 +45,11 @@ import {
   buildHimadriStation 
 } from '../model/stationMeshBuilders';
 import { createPolarEnvironment, PolarEnvironmentHandles } from '../model/polarEnvironment3D';
-import { createStructuralSteelMaterial } from '../model/pbrMaterialFactory';
+import { 
+  createStructuralSteelMaterial,
+  createGalvanizedLegMaterial,
+  createConcreteFoundationMaterial
+} from '../model/pbrMaterialFactory';
 import { ReferenceComparisonModal } from './ReferenceComparisonModal';
 import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
 
@@ -112,7 +116,8 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     points: THREE.Vector3[]; 
     progress: number; 
     speed: number; 
-    mesh: THREE.Mesh 
+    mesh: THREE.Object3D;
+    pIdx: number;
   }[]>([]);
   const turbinesRef = useRef<{ rotorGroup: THREE.Group; speedMultiplier: number }[]>([]);
   const statusIndicatorsRef = useRef<{ mesh: THREE.Mesh; type: 'DG' | 'BESS' | 'WIND' | 'SOLAR' | 'BUS'; id: string }[]>([]);
@@ -361,7 +366,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       meshesRef.current.set(`obj_${obj.id}`, group);
     });
 
-    // 3. Render 3D Directional Power Flow Paths
+    // 3. Render 3D Directional Power Flow Conduits & High-Visibility Cables
     stationProfile3D.powerFlowPaths.forEach(path => {
       if (path.points.length < 2) return;
 
@@ -369,75 +374,164 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const curve = new THREE.CatmullRomCurve3(vPoints);
 
       // Determine power flow color and dynamic state based on circuit telemetry
-      let lineColor = 0x38bdf8; // Sky blue
+      const isWindFaulted = Boolean(viewModel.powerSummary.windGenerationKw <= 0.05);
+      
+      let lineColor = 0x38bdf8; // Cyber Sky blue
       let activeFlow = path.defaultActive;
       let powerKw = path.nominalKw;
 
       if (path.circuitId.includes('solar')) {
-        lineColor = 0xf59e0b; // Gold
+        lineColor = 0xffe600; // Ultra-Vivid Electric Sunlight Gold
         activeFlow = viewModel.powerSummary.solarGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.solarGenerationKw;
       } else if (path.circuitId.includes('wind')) {
-        lineColor = 0x0284c7; // Deep blue
-        activeFlow = viewModel.powerSummary.windGenerationKw > 0.1;
+        lineColor = isWindFaulted ? 0xf43f5e : 0x00f7ff; // Laser Arctic Cyan (Neon Red when faulted)
+        activeFlow = !isWindFaulted && viewModel.powerSummary.windGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.windGenerationKw;
       } else if (path.circuitId.includes('diesel')) {
-        lineColor = 0xb45309; // Amber
+        lineColor = 0xff6600; // Ultra-Bright Safety Blaze Orange
         activeFlow = viewModel.powerSummary.dieselGenerationKw > 0.1;
         powerKw = viewModel.powerSummary.dieselGenerationKw;
       } else if (path.circuitId.includes('bess')) {
-        lineColor = 0x10b981; // Emerald
+        lineColor = 0x00ff88; // Neon Laser Emerald Green
         activeFlow = Math.abs(viewModel.powerSummary.batteryPowerKw) > 0.1;
         powerKw = Math.abs(viewModel.powerSummary.batteryPowerKw);
+      } else if (path.circuitId.includes('feeder') || path.circuitId.includes('bus')) {
+        lineColor = 0x38bdf8; // 415V Main Distribution Vivid Cyber Blue
+        activeFlow = viewModel.powerSummary.totalLoadKw > 0.1;
+        powerKw = path.nominalKw || 35.0;
+      } else {
+        lineColor = 0xd946ef; // Electric High-Voltage Neon Magenta / Violet
+        activeFlow = true;
+        powerKw = path.nominalKw || 15.0;
       }
 
       const isTraceMode = tracePowerActive || traceImpactActive || activeLayer === 'IMPACT';
       const isRelevantCircuit = !selectedDeviceId || path.circuitId.includes(selectedDeviceId) || path.fromId.includes(selectedDeviceId) || path.toId.includes(selectedDeviceId);
       
-      let pathOpacity = activeFlow ? 0.85 : 0.15;
+      let pathOpacity = activeFlow ? 0.95 : (isWindFaulted && path.circuitId.includes('wind') ? 0.8 : 0.25);
       if (activeLayer === 'ARCHITECTURE') {
-        pathOpacity = activeFlow ? 0.35 : 0.05;
+        pathOpacity = activeFlow ? 0.5 : 0.1;
       } else if (isTraceMode) {
-        pathOpacity = isRelevantCircuit ? (activeFlow ? 0.95 : 0.4) : 0.06;
+        pathOpacity = isRelevantCircuit ? (activeFlow ? 1.0 : 0.5) : 0.08;
       }
 
-      // 3D Tube for Power Conduits
-      const tubeRadius = Math.max(0.08, Math.min(0.24, 0.08 + (powerKw / 250) * 0.16));
-      const tubeGeo = new THREE.TubeGeometry(curve, 32, tubeRadius, 8, false);
+      // 3D Thickened Industrial Polar Armored Cable Conduit
+      const baseRadius = activeFlow ? 0.40 : 0.22;
+      const powerBoost = Math.min(0.25, (powerKw / 100) * 0.18);
+      const tubeRadius = baseRadius + powerBoost; // 0.40 to 0.65 units: heavy duty visible conduit
+
+      const tubeGeo = new THREE.TubeGeometry(curve, 48, tubeRadius, 10, false);
       const tubeMat = new THREE.MeshStandardMaterial({
-        color: activeFlow ? lineColor : 0x334155,
-        emissive: activeFlow ? new THREE.Color(lineColor) : new THREE.Color(0x000000),
-        emissiveIntensity: activeFlow ? 0.75 : 0.0,
-        roughness: 0.35,
-        metalness: 0.65,
+        color: (activeFlow || (isWindFaulted && path.circuitId.includes('wind'))) ? lineColor : 0x334155,
+        emissive: (activeFlow || (isWindFaulted && path.circuitId.includes('wind'))) ? new THREE.Color(lineColor) : new THREE.Color(0x000000),
+        emissiveIntensity: activeFlow ? 3.5 : (isWindFaulted && path.circuitId.includes('wind') ? 2.5 : 0.0),
+        roughness: 0.2,
+        metalness: 0.85,
         transparent: true,
         opacity: pathOpacity
       });
 
       const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+      (tubeMesh as any).isConduitMesh = true;
       scene.add(tubeMesh);
       flowLinesRef.current.push(tubeMesh);
 
-      // Active energy stream pulse particles along conduit
+      // High-Energy Emissive Plasma Core (Center neon white wire inside conduit)
+      if (activeFlow) {
+        const coreGeo = new THREE.TubeGeometry(curve, 36, tubeRadius * 0.45, 8, false);
+        const coreMat = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.85
+        });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(coreMesh);
+        flowLinesRef.current.push(coreMesh);
+      }
+
+      // Elevated Galvanized Steel Cable Tray Stanchions (Polar Permafrost & Snowdrift Protection)
+      const curveLen = curve.getLength();
+      if (curveLen > 8 && (path.type === 'SOURCE_FEED' || path.type === 'MAIN_BUS')) {
+        const numStanchions = Math.max(2, Math.floor(curveLen / 7.5));
+        for (let s = 1; s <= numStanchions; s++) {
+          const t = s / (numStanchions + 1);
+          const p = curve.getPoint(t);
+          if (p.y > 0.35) {
+            const stanchion = new THREE.Group();
+            stanchion.position.set(p.x, 0, p.z);
+
+            // Galvanized vertical pole
+            const poleMat = createGalvanizedLegMaterial({ wireframe: wireframeOnly });
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, p.y, 8), poleMat);
+            pole.position.y = p.y / 2;
+            stanchion.add(pole);
+
+            // Concrete ballast footing pad
+            const footMat = createConcreteFoundationMaterial({ wireframe: wireframeOnly });
+            const foot = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.7), footMat);
+            foot.position.y = 0.12;
+            stanchion.add(foot);
+
+            // Horizontal crossarm bracket
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.1, 0.15), poleMat);
+            arm.position.y = p.y;
+            stanchion.add(arm);
+
+            // High-voltage warning band on pole
+            const warnMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+            const warnBand = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.25, 8), warnMat);
+            warnBand.position.y = p.y * 0.7;
+            stanchion.add(warnBand);
+
+            scene.add(stanchion);
+            flowLinesRef.current.push(stanchion);
+          }
+        }
+      }
+
+      // Stream of Multiple Pulsating Energy Surge Orbs along Active Conduits
       if (activeFlow && (!isTraceMode || isRelevantCircuit)) {
-        const points = curve.getPoints(50);
-        const particleGeo = new THREE.SphereGeometry(activeLayer === 'ENERGY' ? 0.32 : 0.22, 8, 8);
-        const particleMat = new THREE.MeshBasicMaterial({ color: lineColor });
-        const particle = new THREE.Mesh(particleGeo, particleMat);
-        particle.position.copy(points[0]);
-        scene.add(particle);
+        // Spawn 3 to 6 surges per wire so energy flow is constantly, prominently visible!
+        const pulseCount = Math.max(3, Math.min(6, Math.floor(curveLen / 4.5)));
+        const points = curve.getPoints(Math.max(60, Math.floor(curveLen * 8)));
 
         // Direction: If battery is charging, reverse particle flow direction!
         const isBessCharging = path.circuitId.includes('bess') && viewModel.powerSummary.batteryPowerKw < -0.1;
-        const speed = (0.008 + Math.min(0.02, powerKw / 800)) * (isBessCharging ? -1 : 1);
+        const speed = (0.007 + Math.min(0.016, powerKw / 700)) * (isBessCharging ? -1 : 1);
 
-        flowParticlesRef.current.push({
-          line: tubeMesh,
-          points,
-          progress: Math.random(),
-          speed,
-          mesh: particle
-        });
+        for (let pIdx = 0; pIdx < pulseCount; pIdx++) {
+          const pulseGroup = new THREE.Group();
+
+          // Intense inner glowing core
+          const pCoreGeo = new THREE.SphereGeometry(0.46, 12, 12);
+          const pCoreMat = new THREE.MeshBasicMaterial({ color: lineColor });
+          const pCore = new THREE.Mesh(pCoreGeo, pCoreMat);
+          pulseGroup.add(pCore);
+
+          // Translucent additive glowing corona/halo
+          const pHaloGeo = new THREE.SphereGeometry(0.9, 12, 12);
+          const pHaloMat = new THREE.MeshBasicMaterial({
+            color: lineColor,
+            transparent: true,
+            opacity: 0.45,
+            blending: THREE.AdditiveBlending
+          });
+          const pHalo = new THREE.Mesh(pHaloGeo, pHaloMat);
+          pulseGroup.add(pHalo);
+
+          pulseGroup.position.copy(points[0]);
+          scene.add(pulseGroup);
+
+          flowParticlesRef.current.push({
+            line: tubeMesh,
+            points,
+            progress: pIdx / pulseCount, // Evenly spaced along the wire
+            speed,
+            mesh: pulseGroup,
+            pIdx
+          });
+        }
       }
     });
 
@@ -483,22 +577,37 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       }
 
       // 1. Animate Wind Turbine Rotors (Rotational speed scales with wind generation kW)
-      const windActive = viewModel.powerSummary.windGenerationKw > 0.1;
-      const baseRotorSpeed = windActive ? 0.045 : 0.002;
+      const isWindStopped = Boolean(viewModel.powerSummary.windGenerationKw <= 0.05);
+      const windActive = !isWindStopped && viewModel.powerSummary.windGenerationKw > 0.1;
+      const baseRotorSpeed = windActive ? 0.045 : 0.0; // Strictly 0 when faulted or tripped!
 
       turbinesRef.current.forEach(t => {
-        t.rotorGroup.rotation.z += baseRotorSpeed * t.speedMultiplier;
+        if (windActive) {
+          t.rotorGroup.rotation.z += baseRotorSpeed * t.speedMultiplier;
+        }
       });
 
-      // 2. Animate Power Flow Particles along Circuit Lines
+      // 2. Animate Power Flow Conduits & High-Visibility Energy Surge Streams
+      const cableGlow = 3.2 + 0.8 * Math.sin(Date.now() * 0.008);
+      flowLinesRef.current.forEach(line => {
+        if ((line as any).isConduitMesh) {
+          const mat = (line as THREE.Mesh).material as THREE.MeshStandardMaterial;
+          if (mat && mat.emissiveIntensity > 0.4) {
+            mat.emissiveIntensity = cableGlow;
+          }
+        }
+      });
+
       flowParticlesRef.current.forEach(p => {
         p.progress += p.speed;
-        if (p.progress >= 1.0) p.progress = 0.0;
-        if (p.progress < 0.0) p.progress = 1.0;
+        if (p.progress >= 1.0) p.progress -= 1.0;
+        if (p.progress < 0.0) p.progress += 1.0;
 
-        const idx = Math.floor(p.progress * (p.points.length - 1));
-        const nextIdx = Math.min(idx + 1, p.points.length - 1);
-        const segmentProgress = (p.progress * (p.points.length - 1)) - idx;
+        const numPts = p.points.length;
+        const floatIdx = p.progress * (numPts - 1);
+        const idx = Math.floor(floatIdx);
+        const nextIdx = Math.min(idx + 1, numPts - 1);
+        const segmentProgress = floatIdx - idx;
 
         const pos = new THREE.Vector3().lerpVectors(
           p.points[idx],
@@ -506,6 +615,10 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
           segmentProgress
         );
         p.mesh.position.copy(pos);
+
+        // Dynamic micro-pulsing scale on energy surge orbs
+        const pulse = 1.0 + 0.22 * Math.sin(Date.now() * 0.009 + p.pIdx * 1.5);
+        p.mesh.scale.set(pulse, pulse, pulse);
       });
 
       // 3. Dynamic Real-Time Industrial Equipment Status LEDs

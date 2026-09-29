@@ -216,7 +216,7 @@ export const ScenariosView: React.FC<{ onNavigate?: (tab: string) => void }> = (
       case 'FUEL_RESUPPLY_DELAY':
         return {
           whatChanges: 'Sea ice congestion or weather blocks resupply vessel/convoy for +168 hours (7 days).',
-          whyItMatters: 'Verifies strict fuel stock survival horizon enforcement in the Phase 6 MILP optimizer.',
+          whyItMatters: 'Verifies strict fuel stock survival horizon enforcement in the HiGHS MILP optimizer.',
           expectedEffect: 'Optimizer enforces conservative fuel conservation mode, maximizing renewable capture and shedding non-critical loads.',
           currentEffect: activeScenario === 'FUEL_RESUPPLY_DELAY'
             ? `Active in station: Fuel remaining ${snapshot.fuelRemainingL?.toLocaleString() || '—'} L; survival horizon: ${snapshot.survivalHorizons?.criticalLoadSurvivalH || '—'} h.`

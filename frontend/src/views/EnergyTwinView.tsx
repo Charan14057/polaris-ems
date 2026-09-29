@@ -59,8 +59,8 @@ import {
 } from 'lucide-react';
 
 export const EnergyTwinView: React.FC = () => {
-  const { currentStation, stationDetail } = useStation();
-  const { snapshot } = useOperationalSnapshot();
+  const { currentStation, stationDetail, setStation } = useStation();
+  const { snapshot, operatingMode, setOperatingMode } = useOperationalSnapshot();
   const { mode: comprehensionMode } = useComprehension();
 
   const [spatialProfile, setSpatialProfile] = useState<TwinSpatialProfile>(
@@ -83,7 +83,6 @@ export const EnergyTwinView: React.FC = () => {
 
   // Default to the flagship 3D Spatial Digital Twin
   const [viewMode, setViewMode] = useState<TwinViewMode>('3D_SPATIAL');
-  const [operatingMode, setOperatingMode] = useState<OperatingMode>('AUTO');
   const [simulationMode, setSimulationMode] = useState<'SIMULATION' | 'REAL-TIME SIMULATION'>('REAL-TIME SIMULATION');
   const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
   const [twinSnapshotUrl, setTwinSnapshotUrl] = useState<string | null>(null);
@@ -187,8 +186,6 @@ export const EnergyTwinView: React.FC = () => {
     trajectoryStates,
     initialHorizon: 24
   });
-
-  const [demoMode, setDemoMode] = useState<boolean>(false);
 
   // Real-time EventSource listener for authoritative state streaming
   useEffect(() => {
@@ -419,6 +416,35 @@ export const EnergyTwinView: React.FC = () => {
             <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
               Reference-aligned 3D spatial twin, thermal zone distribution, and real-time directional electrical flow.
             </p>
+
+            {/* Quick Station Switcher Tabs */}
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-800">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold mr-1">
+                RESEARCH STATION:
+              </span>
+              {[
+                { id: 'BHARATI', name: 'Bharati', region: 'Larsemann Hills (69°S)' },
+                { id: 'MAITRI', name: 'Maitri', region: 'Schirmacher Oasis (70°S)' },
+                { id: 'HIMADRI', name: 'Himadri', region: 'Ny-Ålesund, Svalbard (79°N)' },
+              ].map(st => {
+                const isSelected = currentStation === st.id;
+                return (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => setStation(st.id as any)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+                      isSelected
+                        ? 'bg-sky-500 text-slate-950 font-bold shadow-md ring-1 ring-sky-300'
+                        : 'bg-slate-800/80 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700/60'
+                    }`}
+                  >
+                    <span className="font-bold">{st.name}</span>
+                    <span className={`text-[10px] ${isSelected ? 'text-slate-900/80' : 'text-slate-400'}`}>• {st.region}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flex flex-col items-start lg:items-end gap-2.5">
@@ -560,25 +586,6 @@ export const EnergyTwinView: React.FC = () => {
                 </div>
               )}
 
-              {/* Executive Presentation Demo Mode Toggle */}
-              <button
-                type="button"
-                onClick={() => {
-                  const nextMode = !demoMode;
-                  setDemoMode(nextMode);
-                  if (nextMode) setViewMode('3D_SPATIAL');
-                }}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all shadow-xs ${
-                  demoMode
-                    ? 'bg-purple-600 text-white shadow-purple-900/50'
-                    : 'bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30'
-                }`}
-                title="Toggle Executive Presentation Demo Mode"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{demoMode ? 'EXIT DEMO' : 'DEMO MODE'}</span>
-              </button>
-
               {/* Force Recalculate Button */}
               <button
                 type="button"
@@ -597,28 +604,8 @@ export const EnergyTwinView: React.FC = () => {
       {/* 2. Executive Summary Strip */}
       <TwinSummaryStrip viewModel={viewModel} />
 
-      {/* Demo Mode Presentation Banner */}
-      {demoMode && (
-        <div className="bg-purple-950/80 border border-purple-500/40 rounded-xl p-3 text-xs font-mono flex items-center justify-between text-purple-200 shadow-lg backdrop-blur-sm">
-          <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
-            <span className="font-bold text-white">EXECUTIVE PRESENTATION DEMO MODE</span>
-            <span className="text-purple-400">•</span>
-            <span className="text-purple-300 text-[11px]">Displaying reference-aligned 3D spatial twin, live directional power flow, source mix, and automated advisory recommendation.</span>
-          </div>
-          <button 
-            type="button" 
-            onClick={() => setDemoMode(false)}
-            className="text-[11px] font-bold text-purple-300 hover:text-white underline shrink-0 ml-3"
-          >
-            Exit Demo Mode
-          </button>
-        </div>
-      )}
-
       {/* 3. Master View Mode Selector Toolbar */}
-      {!demoMode && (
-        <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
           <div className="flex items-center space-x-2">
             <span className="text-slate-500 text-[11px] font-bold">TWIN PERSPECTIVE:</span>
             <div className="flex items-center rounded border border-slate-200 bg-slate-50 p-0.5">
@@ -678,7 +665,6 @@ export const EnergyTwinView: React.FC = () => {
             <span className="font-semibold text-slate-800">{viewModel.geometryBasis}</span>
           </div>
         </div>
-      )}
 
 
       {/* 8. Main Twin Canvas & Side Inspector Layout */}
@@ -689,6 +675,7 @@ export const EnergyTwinView: React.FC = () => {
           <PhysicalStationReferenceCard
             stationId={viewModel.stationId}
             onOpenComparisonModal={handleOpenReferenceComparison}
+            onSelectStation={(s) => setStation(s as any)}
           />
 
           {viewMode === '3D_SPATIAL' && (
@@ -860,6 +847,7 @@ export const EnergyTwinView: React.FC = () => {
         isOpen={showReferenceModal}
         onClose={() => setShowReferenceModal(false)}
         renderedTwinCanvasUrl={twinSnapshotUrl}
+        onStationChange={(s) => setStation(s as any)}
       />
     </div>
   );

@@ -18,7 +18,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { X, Sliders, Columns, Eye, ShieldCheck, AlertCircle, ExternalLink, RotateCcw } from 'lucide-react';
-import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
+import { getStationPhoto, getPublicStationPhoto, normalizeStationKey, StationKey } from '../model/stationPhotos';
 import { buildBharatiStation, buildMaitriStation, buildHimadriStation } from '../model/stationMeshBuilders';
 
 interface ReferenceComparisonModalProps {
@@ -26,18 +26,36 @@ interface ReferenceComparisonModalProps {
   isOpen: boolean;
   onClose: () => void;
   renderedTwinCanvasUrl?: string | null;
+  onStationChange?: (stationId: StationKey) => void;
 }
 
 export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> = ({
   stationId,
   isOpen,
   onClose,
-  renderedTwinCanvasUrl
+  renderedTwinCanvasUrl,
+  onStationChange
 }) => {
   const [viewMode, setViewMode] = useState<'SPLIT' | 'SLIDER' | 'OVERLAY'>('SPLIT');
   const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100%
   const [opacity, setOpacity] = useState<number>(0.5); // 0.0 to 1.0
   const [referenceType, setReferenceType] = useState<'PHOTO' | 'BLUEPRINT'>('PHOTO');
+
+  // Active Station within the comparison modal (defaults to parent station, freely switchable)
+  const [activeStation, setActiveStation] = useState<StationKey>(normalizeStationKey(stationId));
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveStation(normalizeStationKey(stationId));
+    }
+  }, [stationId, isOpen]);
+
+  const handleSwitchStation = (key: StationKey) => {
+    setActiveStation(key);
+    if (onStationChange) {
+      onStationChange(key);
+    }
+  };
 
   const threeCanvasRef = useRef<HTMLCanvasElement>(null);
   const threeContainerRef = useRef<HTMLDivElement>(null);
@@ -56,8 +74,6 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
-
-  const stationKey = normalizeStationKey(stationId);
 
   // Initial Camera Angles & Target for Each Station
   const getInitialAngles = useCallback((key: string) => {
@@ -84,7 +100,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
   }, []);
 
   const resetCamera = useCallback(() => {
-    const init = getInitialAngles(stationKey);
+    const init = getInitialAngles(activeStation);
     cameraAngleRef.current = { theta: init.theta, phi: init.phi, radius: init.radius };
     targetRef.current = init.target;
     updateCameraPosition();
@@ -95,7 +111,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         if (snap && snap.length > 50) setInternalSnapshotUrl(snap);
       } catch {}
     }
-  }, [stationKey, getInitialAngles, updateCameraPosition]);
+  }, [activeStation, getInitialAngles, updateCameraPosition]);
 
   // Self-contained Three.js renderer lifecycle inside the modal
   useEffect(() => {
@@ -115,7 +131,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
     sceneRef.current = scene;
 
     // 2. Camera
-    const init = getInitialAngles(stationKey);
+    const init = getInitialAngles(activeStation);
     cameraAngleRef.current = { theta: init.theta, phi: init.phi, radius: init.radius };
     targetRef.current = init.target;
 
@@ -157,9 +173,9 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
 
     // 5. Build Station Architecture & Terrain
     let stationResult;
-    if (stationKey === 'MAITRI') {
+    if (activeStation === 'MAITRI') {
       stationResult = buildMaitriStation('ENERGY', false);
-    } else if (stationKey === 'HIMADRI') {
+    } else if (activeStation === 'HIMADRI') {
       stationResult = buildHimadriStation('ENERGY', false);
     } else {
       stationResult = buildBharatiStation('ENERGY', false);
@@ -227,7 +243,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       }
       renderer.dispose();
     };
-  }, [isOpen, stationKey, getInitialAngles, updateCameraPosition]);
+  }, [isOpen, activeStation, getInitialAngles, updateCameraPosition]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;
@@ -454,7 +470,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         </svg>
       )
     }
-  }[stationKey] || {
+  }[activeStation] || {
     name: 'Polar Research Station',
     location: 'Polar Region',
     architect: 'National Polar Research Programme',
@@ -473,14 +489,14 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       return (
         <div className="w-full h-full relative flex items-center justify-center p-3 bg-slate-950">
           <img
-            key={stationKey}
-            src={getStationPhoto(stationKey)}
+            key={activeStation}
+            src={getStationPhoto(activeStation)}
             alt={stationData.name}
             onError={(e) => {
               const target = e.currentTarget;
               if (!target.dataset.fallback) {
                 target.dataset.fallback = 'true';
-                target.src = getPublicStationPhoto(stationKey);
+                target.src = getPublicStationPhoto(activeStation);
               }
             }}
             className="max-h-full max-w-full object-contain rounded-lg border border-slate-700 shadow-xl"
@@ -516,13 +532,32 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
               <Columns className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h3 className="text-base font-semibold text-white tracking-tight">
                   Real Ground Truth ↔ 3D Digital Twin Comparison
                 </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-teal-950 text-teal-300 border border-teal-800 font-bold">
-                  {stationId}
-                </span>
+                
+                {/* Station Selection Tabs */}
+                <div className="flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg border border-slate-700">
+                  {(['BHARATI', 'MAITRI', 'HIMADRI'] as StationKey[]).map((key) => {
+                    const isSelected = activeStation === key;
+                    const label = key === 'BHARATI' ? 'Bharati (69°S)' : (key === 'MAITRI' ? 'Maitri (70°S)' : 'Himadri (79°N)');
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => handleSwitchStation(key)}
+                        className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                          isSelected
+                            ? 'bg-teal-500 text-slate-950 shadow-xs'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-700/60'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <p className="text-xs text-slate-400">
                 Authentic field photograph & NCPOR survey blueprint vs 3D spatial digital reconstruction

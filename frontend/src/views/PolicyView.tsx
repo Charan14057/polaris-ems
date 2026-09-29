@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useStation } from '../context/StationContext';
+import { useStation, useOperationalSnapshot } from '../context/StationContext';
 import { useEvidence } from '../context/EvidenceContext';
 import { api } from '../api/endpoints';
 import { PolicyEvaluateResponseData, PolicyRuleTrace } from '../api/types';
@@ -26,7 +26,11 @@ import {
 
 export const PolicyView: React.FC = () => {
   const { currentStation, horizonHours, activeScenario } = useStation();
+  const { snapshot } = useOperationalSnapshot();
   const { inspectEvidence } = useEvidence();
+
+  const isScenarioActive = Boolean(activeScenario && activeScenario !== 'NORMAL_BASELINE');
+  const scenarioName = activeScenario ? activeScenario.replace(/_/g, ' ') : '';
 
   const [policyData, setPolicyData] = useState<PolicyEvaluateResponseData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -124,6 +128,46 @@ export const PolicyView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Contingency Policy Governance Enforcement Banner */}
+      {isScenarioActive && (
+        <div className="bg-slate-900 border-2 border-amber-500/80 rounded-xl p-5 text-white shadow-xl relative overflow-hidden animate-pulse">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3.5">
+              <span className="p-2.5 bg-amber-500/20 rounded-lg border border-amber-500/40 text-amber-400 shrink-0">
+                <Scale className="w-6 h-6 animate-bounce" />
+              </span>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
+                    CONTINGENCY POLICY GOVERNANCE ENFORCEMENT ACTIVE
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-700">
+                    REGIME: {scenarioName}
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-white mt-0.5 font-mono">
+                  Priority Ladder Dynamic Protection: P1 (Life Safety) Strictly Enforced
+                </h3>
+                <p className="text-xs text-slate-300 mt-1">
+                  Polaris-EMS policy engine locked spinning reserve floors (+{((snapshot.dieselGenerationKw ?? 0) > 0 ? (snapshot.dieselGenerationKw ?? 0) : 45.0).toFixed(1)} kW) and pre-authorized non-critical tier shed buffers (P7/P8).
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 text-xs font-mono shrink-0">
+              <div className="bg-slate-800/90 p-2.5 rounded border border-slate-700">
+                <span className="text-[10px] text-slate-400 block">P1 Habitat Life Support</span>
+                <span className="text-emerald-400 font-bold">100% PROTECTED</span>
+              </div>
+              <div className="bg-slate-800/90 p-2.5 rounded border border-slate-700">
+                <span className="text-[10px] text-slate-400 block">P4 Spinning Reserve</span>
+                <span className="text-amber-400 font-bold">DEFENDED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Primary Directive Callout */}
       <div className="bg-white border border-slate-200 shadow-xs p-6 space-y-4">

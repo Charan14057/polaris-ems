@@ -71,10 +71,20 @@ export const ResilienceView: React.FC = () => {
     return <ErrorCard message={error || 'Failed to fetch resilience posture.'} onRetry={fetchResilience} className="max-w-[1520px] mx-auto my-8" />;
   }
 
-  const resState = resilienceData.resilience_state || 'SAFE';
-  const horizons = resilienceData.survival_horizons;
-  const overallHorizon = horizons?.overall_station_survival_horizon_h ?? 0;
-  const bindingSubsystem = horizons?.binding_subsystem || 'NONE';
+  const resState = (activeScenario && !['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL'].includes(activeScenario.toUpperCase().trim()))
+    ? (snapshot.resilienceState !== 'SAFE' ? snapshot.resilienceState : (resilienceData.resilience_state || 'WATCH'))
+    : (resilienceData.resilience_state || snapshot.resilienceState || 'SAFE');
+
+  const horizons = resilienceData.survival_horizons || {
+    critical_load_survival_horizon_h: snapshot.survivalHorizons?.criticalLoadSurvivalH ?? 168.0,
+    fuel_endurance_horizon_h: snapshot.survivalHorizons?.fuelEnduranceH ?? 720.0,
+    thermal_habitability_horizon_h: snapshot.survivalHorizons?.thermalHabitabilityH ?? 48.0,
+    battery_endurance_horizon_h: snapshot.survivalHorizons?.batteryEnduranceH ?? 18.0,
+    overall_station_survival_horizon_h: snapshot.survivalHorizons?.overallSurvivalH ?? 18.0,
+    binding_subsystem: snapshot.survivalHorizons?.bindingSubsystem ?? 'BATTERY',
+  };
+  const overallHorizon = horizons?.overall_station_survival_horizon_h ?? (snapshot.survivalHorizons?.overallSurvivalH ?? 0);
+  const bindingSubsystem = horizons?.binding_subsystem || (snapshot.survivalHorizons?.bindingSubsystem ?? 'NONE');
 
   // Dynamic breakdown for ResilienceEnvelope
   const envelopeDimensions: ResilienceDimension[] = horizons ? [
@@ -116,7 +126,7 @@ export const ResilienceView: React.FC = () => {
     },
   ] : [];
 
-  const rawDims = resilienceData.dimensions;
+  const rawDims = resilienceData.dimensions || snapshot.resilienceDimensions;
   const dimensionsList = rawDims ? [
     { name: 'Energy Adequacy', score: rawDims.energy_adequacy },
     { name: 'Critical Load Resilience', score: rawDims.critical_load_resilience },
@@ -158,6 +168,43 @@ export const ResilienceView: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Dramatic Scenario Threat Escalation Banner */}
+      {activeScenario && !['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL'].includes(activeScenario.toUpperCase().trim()) && (
+        <div className="bg-slate-900 border-2 border-rose-500 rounded-xl p-5 shadow-2xl relative overflow-hidden animate-pulse">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-rose-500/30 border border-rose-500 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(244,63,94,0.6)]">
+                <AlertTriangle className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-600 text-white tracking-widest uppercase">
+                    POLAR THREAT ESCALATION ACTIVE
+                  </span>
+                  <span className="text-sm font-mono font-bold text-rose-300">
+                    REGIME: {activeScenario.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-1">
+                  Subsystem margins are being actively stressed. Binding bottleneck shifted to <strong className="text-rose-400 font-mono">{bindingSubsystem}</strong> with autonomous runway of <strong className="text-rose-400 font-mono">{overallHorizon.toFixed(1)} hours</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0 font-mono text-xs">
+              <div className="px-3 py-1.5 rounded bg-rose-950/80 border border-rose-500/40 text-rose-200">
+                <span className="text-[10px] text-rose-400 block uppercase">Threat Posture</span>
+                <span className="font-bold text-white text-sm">{resState}</span>
+              </div>
+              <div className="px-3 py-1.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-200">
+                <span className="text-[10px] text-amber-400 block uppercase">Runway Floor</span>
+                <span className="font-bold text-white text-sm">{overallHorizon.toFixed(1)}h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. Top Resilience Banner */}
       <div className="bg-white border border-slate-200 shadow-xs rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

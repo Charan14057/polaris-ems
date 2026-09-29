@@ -24,7 +24,8 @@ import {
   RotateCw,
   Zap,
   Activity,
-  Check
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 
 export const OptimizationView: React.FC = () => {
@@ -135,6 +136,42 @@ export const OptimizationView: React.FC = () => {
       </div>
 
       {error && <ErrorCard title="Optimization Error" message={error} onRetry={runOptimizer} />}
+
+      {/* Scenario Contingency Emergency Dispatch Banner */}
+      {activeScenario && !['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL'].includes(activeScenario.toUpperCase().trim()) && (
+        <div className="bg-slate-900 border-2 border-rose-500 rounded-xl p-5 shadow-2xl relative overflow-hidden animate-pulse">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-rose-500/30 border border-rose-500 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(244,63,94,0.6)]">
+                <AlertTriangle className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-600 text-white tracking-widest uppercase">
+                    CONTINGENCY RE-DISPATCH ACTIVE
+                  </span>
+                  <span className="text-sm font-mono font-bold text-rose-300">
+                    REGIME: {activeScenario.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-1">
+                  HiGHS MILP optimizer has re-solved the microgrid schedule to compensate for asset outage / weather stress. Reserve dispatch guarantees life-support habitat continuity.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0 font-mono text-xs">
+              <div className="px-3 py-1.5 rounded bg-rose-950/80 border border-rose-500/40 text-rose-200">
+                <span className="text-[10px] text-rose-400 block uppercase">Spinning Reserve</span>
+                <span className="font-bold text-white text-sm">+25.0 kW FORCED</span>
+              </div>
+              <div className="px-3 py-1.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-200">
+                <span className="text-[10px] text-amber-400 block uppercase">BESS Offset</span>
+                <span className="font-bold text-white text-sm">DYNAMIC DISCHARGE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. Dynamic Human Decision Summary */}
       <HumanDecisionSummary
