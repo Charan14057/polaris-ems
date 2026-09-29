@@ -6,19 +6,20 @@
  * blueprints / surveys and the 3D digital spatial reconstruction.
  * 
  * Supports:
- * - 50/50 Side-by-Side split
+ * - 50/50 Side-by-Side split with live interactive Three.js 3D viewport (orbit/zoom/reset)
  * - Interactive horizontal wipe slider (0% to 100%)
  * - Crossfade alpha opacity overlay
  * 
  * STRICT FACTUAL COMPLIANCE:
- * - Real reference: Survey Elevation / Architectural Blueprint from NCPOR/NCAOR
+ * - Real reference: Survey Elevation / Architectural Blueprint from NCPOR/NCAOR & Official Expedition Photos
  * - Digital twin: Procedural 3D reconstruction configured from spatial metadata
- * - Explicitly tags "REFERENCE IMAGE ASSET REQUIRED" when external photo asset is missing
  */
 
-import React, { useState } from 'react';
-import { X, Sliders, Columns, Eye, ShieldCheck, AlertCircle, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import * as THREE from 'three';
+import { X, Sliders, Columns, Eye, ShieldCheck, AlertCircle, ExternalLink, RotateCcw } from 'lucide-react';
 import { getStationPhoto, getPublicStationPhoto, normalizeStationKey } from '../model/stationPhotos';
+import { buildBharatiStation, buildMaitriStation, buildHimadriStation } from '../model/stationMeshBuilders';
 
 interface ReferenceComparisonModalProps {
   stationId: string;
@@ -36,8 +37,239 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
   const [viewMode, setViewMode] = useState<'SPLIT' | 'SLIDER' | 'OVERLAY'>('SPLIT');
   const [sliderPos, setSliderPos] = useState<number>(50); // 0 to 100%
   const [opacity, setOpacity] = useState<number>(0.5); // 0.0 to 1.0
-
   const [referenceType, setReferenceType] = useState<'PHOTO' | 'BLUEPRINT'>('PHOTO');
+
+  const threeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const threeContainerRef = useRef<HTMLDivElement>(null);
+  const [internalSnapshotUrl, setInternalSnapshotUrl] = useState<string | null>(renderedTwinCanvasUrl || null);
+  const [is3DReady, setIs3DReady] = useState<boolean>(false);
+  const isDraggingRef = useRef<boolean>(false);
+  const prevMouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const cameraAngleRef = useRef<{ theta: number; phi: number; radius: number }>({
+    theta: Math.PI * 0.32,
+    phi: Math.PI * 0.44,
+    radius: 70
+  });
+  const targetRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 3, 0));
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const animFrameIdRef = useRef<number | null>(null);
+
+  const stationKey = normalizeStationKey(stationId);
+
+  // Initial Camera Angles & Target for Each Station
+  const getInitialAngles = useCallback((key: string) => {
+    if (key === 'MAITRI') {
+      return { theta: Math.PI * 0.28, phi: Math.PI * 0.42, radius: 65, target: new THREE.Vector3(0, 2, 0) };
+    }
+    if (key === 'HIMADRI') {
+      return { theta: Math.PI * 0.30, phi: Math.PI * 0.43, radius: 55, target: new THREE.Vector3(0, 2.5, 0) };
+    }
+    // Default BHARATI: Low-angle Northwest elevation matching authentic photo
+    return { theta: Math.PI * 0.32, phi: Math.PI * 0.44, radius: 70, target: new THREE.Vector3(0, 3, 0) };
+  }, []);
+
+  const updateCameraPosition = useCallback(() => {
+    if (!cameraRef.current) return;
+    const { theta, phi, radius } = cameraAngleRef.current;
+    const target = targetRef.current;
+    const x = target.x + radius * Math.sin(phi) * Math.sin(theta);
+    const y = Math.max(1.5, target.y + radius * Math.cos(phi));
+    const z = target.z + radius * Math.sin(phi) * Math.cos(theta);
+
+    cameraRef.current.position.set(x, y, z);
+    cameraRef.current.lookAt(target);
+  }, []);
+
+  const resetCamera = useCallback(() => {
+    const init = getInitialAngles(stationKey);
+    cameraAngleRef.current = { theta: init.theta, phi: init.phi, radius: init.radius };
+    targetRef.current = init.target;
+    updateCameraPosition();
+    if (rendererRef.current && sceneRef.current && cameraRef.current) {
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+      try {
+        const snap = threeCanvasRef.current?.toDataURL('image/png');
+        if (snap && snap.length > 50) setInternalSnapshotUrl(snap);
+      } catch {}
+    }
+  }, [stationKey, getInitialAngles, updateCameraPosition]);
+
+  // Self-contained Three.js renderer lifecycle inside the modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const canvas = threeCanvasRef.current;
+    const container = threeContainerRef.current;
+    if (!canvas || !container) return;
+
+    const width = container.clientWidth || 560;
+    const height = container.clientHeight || 480;
+
+    // 1. Scene
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060c18); // Deep polar dusk
+    scene.fog = new THREE.FogExp2(0x0a1628, 0.005);
+    sceneRef.current = scene;
+
+    // 2. Camera
+    const init = getInitialAngles(stationKey);
+    cameraAngleRef.current = { theta: init.theta, phi: init.phi, radius: init.radius };
+    targetRef.current = init.target;
+
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 500);
+    cameraRef.current = camera;
+    updateCameraPosition();
+
+    // 3. Renderer with ACES Filmic Tone Mapping and preserveDrawingBuffer
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: false,
+      preserveDrawingBuffer: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
+    rendererRef.current = renderer;
+
+    // 4. Lighting: Polar daylight + low-angle sun + soft glacial fill
+    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.7);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
+    sunLight.position.set(40, 50, 30);
+    sunLight.castShadow = true;
+    scene.add(sunLight);
+
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.5);
+    fillLight.position.set(-35, 25, -35);
+    scene.add(fillLight);
+
+    const groundBounce = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.5);
+    scene.add(groundBounce);
+
+    // 5. Build Station Architecture & Terrain
+    let stationResult;
+    if (stationKey === 'MAITRI') {
+      stationResult = buildMaitriStation('ENERGY', false);
+    } else if (stationKey === 'HIMADRI') {
+      stationResult = buildHimadriStation('ENERGY', false);
+    } else {
+      stationResult = buildBharatiStation('ENERGY', false);
+    }
+
+    scene.add(stationResult.terrainMesh);
+    scene.add(stationResult.architectureGroup);
+
+    // Initial render & snapshot capture
+    renderer.render(scene, camera);
+    try {
+      const snap = canvas.toDataURL('image/png');
+      if (snap && snap.length > 50) {
+        setInternalSnapshotUrl(snap);
+      }
+    } catch {}
+    setIs3DReady(true);
+
+    // 6. Animation loop (turbine rotation, subtle motion)
+    let lastSnapTime = Date.now();
+    const animate = () => {
+      animFrameIdRef.current = requestAnimationFrame(animate);
+
+      // Rotate wind turbines if present
+      if (stationResult.turbines && stationResult.turbines.length > 0) {
+        stationResult.turbines.forEach(t => {
+          t.rotorGroup.rotation.z += 0.03 * t.speedMultiplier;
+        });
+      }
+
+      renderer.render(scene, camera);
+
+      // Update internal snapshot periodically if not dragging (for slider & overlay)
+      const now = Date.now();
+      if (!isDraggingRef.current && now - lastSnapTime > 3000) {
+        lastSnapTime = now;
+        try {
+          const snap = canvas.toDataURL('image/png');
+          if (snap && snap.length > 50) {
+            setInternalSnapshotUrl(snap);
+          }
+        } catch {}
+      }
+    };
+    animFrameIdRef.current = requestAnimationFrame(animate);
+
+    // Handle Resize
+    const handleResize = () => {
+      if (!container || !renderer || !camera) return;
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight;
+      if (newWidth > 0 && newHeight > 0) {
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
+        renderer.render(scene, camera);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current);
+      }
+      renderer.dispose();
+    };
+  }, [isOpen, stationKey, getInitialAngles, updateCameraPosition]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDraggingRef.current = true;
+    prevMouseRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    const dx = e.clientX - prevMouseRef.current.x;
+    const dy = e.clientY - prevMouseRef.current.y;
+    prevMouseRef.current = { x: e.clientX, y: e.clientY };
+
+    cameraAngleRef.current.theta += dx * 0.008;
+    cameraAngleRef.current.phi = Math.max(
+      0.08,
+      Math.min(Math.PI / 2 - 0.02, cameraAngleRef.current.phi - dy * 0.008)
+    );
+    updateCameraPosition();
+  };
+
+  const handleMouseUp = () => {
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      // Capture snapshot upon orbit release so slider/overlay reflect the user's chosen angle
+      if (rendererRef.current && sceneRef.current && cameraRef.current && threeCanvasRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+        try {
+          const snap = threeCanvasRef.current.toDataURL('image/png');
+          if (snap && snap.length > 50) setInternalSnapshotUrl(snap);
+        } catch {}
+      }
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    cameraAngleRef.current.radius = Math.max(
+      25,
+      Math.min(140, cameraAngleRef.current.radius + e.deltaY * 0.05)
+    );
+    updateCameraPosition();
+  };
 
   if (!isOpen) return null;
 
@@ -222,7 +454,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         </svg>
       )
     }
-  }[normalizeStationKey(stationId)] || {
+  }[stationKey] || {
     name: 'Polar Research Station',
     location: 'Polar Region',
     architect: 'National Polar Research Programme',
@@ -234,8 +466,6 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
     features: ['Engineering Deck', 'Habitation Deck'],
     blueprintSvg: null
   };
-
-  const stationKey = normalizeStationKey(stationId);
 
   // Render the chosen reference (real photo or technical blueprint)
   const renderReferenceContent = () => {
@@ -271,6 +501,9 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       </div>
     );
   };
+
+  // Effective snapshot used for Wipe Slider and Opacity Overlay
+  const effectiveSnapshot = internalSnapshotUrl || renderedTwinCanvasUrl || null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
@@ -382,80 +615,111 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
         </div>
 
         {/* Comparison Stage */}
-        <div className="flex-1 min-h-[400px] sm:min-h-[480px] relative bg-slate-950 overflow-hidden select-none">
-          {viewMode === 'SPLIT' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 h-full divide-y md:divide-y-0 md:divide-x divide-slate-800">
-              {/* Left Side: Real Ground Truth Reference */}
-              <div className="relative h-full flex flex-col">
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-teal-300 border border-teal-500/40 flex items-center gap-1.5 shadow">
-                  <span className="w-2 h-2 rounded-full bg-teal-400" />
-                  <span>{referenceType === 'PHOTO' ? 'AUTHENTIC GROUND TRUTH PHOTO' : 'SURVEY BLUEPRINT'}</span>
-                </div>
-                <div className="w-full h-full flex items-center justify-center">
-                  {renderReferenceContent()}
-                </div>
-                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300">
-                  <div className="font-semibold text-white">{stationData.name}</div>
-                  <div className="text-slate-400 text-[10px] mt-0.5">Source: {stationData.source}</div>
-                </div>
+        <div className="flex-1 min-h-[440px] sm:min-h-[500px] relative bg-slate-950 overflow-hidden select-none">
+          
+          {/* SPLIT MODE CONTAINER (Always kept in DOM so WebGL canvas does not unmount) */}
+          <div className={`grid grid-cols-1 md:grid-cols-2 h-full divide-y md:divide-y-0 md:divide-x divide-slate-800 ${viewMode === 'SPLIT' ? 'relative' : 'absolute inset-0 pointer-events-none opacity-0 z-0'}`}>
+            {/* Left Side: Real Ground Truth Reference */}
+            <div className="relative h-full flex flex-col">
+              <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-teal-300 border border-teal-500/40 flex items-center gap-1.5 shadow">
+                <span className="w-2 h-2 rounded-full bg-teal-400" />
+                <span>{referenceType === 'PHOTO' ? 'AUTHENTIC GROUND TRUTH PHOTO' : 'SURVEY BLUEPRINT'}</span>
+              </div>
+              <div className="w-full h-full flex items-center justify-center">
+                {renderReferenceContent()}
+              </div>
+              <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300">
+                <div className="font-semibold text-white">{stationData.name}</div>
+                <div className="text-slate-400 text-[10px] mt-0.5">Source: {stationData.source}</div>
+              </div>
+            </div>
+
+            {/* Right Side: Digital 3D Twin Reconstruction (Live Three.js Viewport) */}
+            <div ref={threeContainerRef} className="relative h-full flex flex-col bg-slate-950">
+              <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow">
+                <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                DIGITAL 3D TWIN RECONSTRUCTION
               </div>
 
-              {/* Right Side: Digital 3D Twin Reconstruction */}
-              <div className="relative h-full flex flex-col">
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40 flex items-center gap-1.5 shadow">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-                  DIGITAL 3D TWIN RECONSTRUCTION
-                </div>
-                <div className="w-full h-full flex items-center justify-center bg-slate-950 p-4">
-                  {renderedTwinCanvasUrl ? (
-                    <img src={renderedTwinCanvasUrl} alt="3D Digital Twin Snapshot" className="max-h-full rounded-lg object-contain shadow-lg border border-slate-800" />
-                  ) : (
-                    <div className="text-center p-6 text-slate-400">
-                      <div className="text-sm font-semibold text-slate-200 mb-1">Interactive 3D WebGL Digital Model</div>
-                      <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-                        High-precision procedural Three.js reconstruction. Matches stilt pilings, aerodynamic envelope, renewable arrays, and 415V bus distribution topology.
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300">
+              {/* Orbit HUD & Reset Camera Button */}
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-2 font-mono text-[10px]">
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-900/80 text-slate-400 border border-slate-800">
+                  Drag: Orbit • Scroll: Zoom
+                </span>
+                <button
+                  type="button"
+                  onClick={resetCamera}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-900/90 hover:bg-slate-800 text-sky-300 hover:text-white border border-sky-600/50 shadow-sm transition-colors"
+                  title="Reset Camera to Match Elevation Reference"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Reset View</span>
+                </button>
+              </div>
+
+              {/* Three.js Canvas */}
+              <div className="w-full h-full flex items-center justify-center relative">
+                <canvas
+                  ref={threeCanvasRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onWheel={handleWheel}
+                  className="w-full h-full block cursor-grab active:cursor-grabbing"
+                />
+              </div>
+
+              <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
+                <div>
                   <div className="font-semibold text-sky-400">Computational Spatial Projection</div>
                   <div className="text-slate-400 text-[10px] mt-0.5">Basis: {stationData.geometryBasis}</div>
                 </div>
+                <div className="text-[10px] font-mono text-slate-400">
+                  Procedural Three.js Model
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
+          {/* SLIDER MODE (Wipe Slider) */}
           {viewMode === 'SLIDER' && (
-            <div className="relative w-full h-full overflow-hidden">
+            <div className="relative z-10 w-full h-full overflow-hidden flex items-center justify-center bg-slate-950">
               {/* Reference in background */}
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 flex items-center justify-center p-3">
                 {renderReferenceContent()}
               </div>
 
-              {/* Digital Twin in foreground clipped to slider */}
+              {/* Digital Twin in foreground clipped by slider */}
               <div 
-                className="absolute inset-0 bg-slate-950 overflow-hidden border-r-2 border-sky-400 shadow-2xl"
-                style={{ width: `${sliderPos}%` }}
+                className="absolute inset-0 flex items-center justify-center p-3 pointer-events-none"
+                style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
               >
-                <div className="absolute top-3 left-3 z-10 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40">
-                  3D TWIN RECONSTRUCTION ({sliderPos}%)
-                </div>
-                <div className="w-full h-full flex items-center justify-center p-4">
-                  {renderedTwinCanvasUrl ? (
-                    <img src={renderedTwinCanvasUrl} alt="Twin" className="max-h-full object-contain" />
-                  ) : (
-                    <div className="text-slate-400 text-xs font-mono">DIGITAL TWIN PROJECTION</div>
-                  )}
-                </div>
+                {effectiveSnapshot ? (
+                  <img 
+                    src={effectiveSnapshot} 
+                    alt="3D Digital Twin Reconstruction" 
+                    className="max-h-full max-w-full object-contain rounded-lg border border-sky-500/30 shadow-2xl" 
+                  />
+                ) : (
+                  <div className="text-slate-400 text-xs font-mono">3D TWIN SNAPSHOT GENERATING...</div>
+                )}
               </div>
 
-              {/* Draggable Slider Control Handle */}
+              {/* Badges */}
+              <div className="absolute top-3 left-3 z-20 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-teal-300 border border-teal-500/40">
+                REAL GROUND TRUTH
+              </div>
+              <div className="absolute top-3 right-3 z-20 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40">
+                3D DIGITAL TWIN ({sliderPos}%)
+              </div>
+
+              {/* Draggable Slider Control Line */}
               <div 
-                className="absolute top-0 bottom-0 z-30 cursor-ew-resize flex items-center justify-center"
-                style={{ left: `calc(${sliderPos}% - 16px)` }}
+                className="absolute top-0 bottom-0 z-30 pointer-events-none border-r-2 border-teal-400 shadow-[0_0_12px_rgba(45,212,191,0.8)]"
+                style={{ left: `${sliderPos}%` }}
               >
-                <div className="w-8 h-8 rounded-full bg-teal-500 text-slate-950 shadow-lg flex items-center justify-center border-2 border-white">
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-teal-500 text-slate-950 shadow-xl flex items-center justify-center border-2 border-white pointer-events-auto cursor-ew-resize">
                   <Sliders className="w-4 h-4" />
                 </div>
               </div>
@@ -463,34 +727,50 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
               {/* Slider Input range overlay */}
               <input
                 type="range"
-                min="5"
-                max="95"
+                min="0"
+                max="100"
                 value={sliderPos}
                 onChange={e => setSliderPos(Number(e.target.value))}
-                className="absolute inset-x-4 bottom-4 z-40 w-full opacity-60 hover:opacity-100 transition-opacity accent-teal-500 cursor-ew-resize"
+                className="absolute inset-x-6 bottom-4 z-40 w-[calc(100%-48px)] opacity-70 hover:opacity-100 transition-opacity accent-teal-500 cursor-ew-resize"
               />
             </div>
           )}
 
+          {/* OVERLAY MODE (Crossfade Opacity) */}
           {viewMode === 'OVERLAY' && (
-            <div className="relative w-full h-full">
-              <div className="absolute inset-0">
+            <div className="relative z-10 w-full h-full overflow-hidden flex items-center justify-center bg-slate-950">
+              {/* Reference in background */}
+              <div className="absolute inset-0 flex items-center justify-center p-3">
                 {renderReferenceContent()}
               </div>
+
+              {/* Digital Twin overlaid with variable opacity */}
               <div 
-                className="absolute inset-0 bg-slate-950 flex items-center justify-center transition-opacity"
+                className="absolute inset-0 flex items-center justify-center p-3 pointer-events-none transition-opacity duration-75"
                 style={{ opacity }}
               >
-                {renderedTwinCanvasUrl ? (
-                  <img src={renderedTwinCanvasUrl} alt="Twin" className="max-h-full object-contain" />
+                {effectiveSnapshot ? (
+                  <img 
+                    src={effectiveSnapshot} 
+                    alt="3D Digital Twin Reconstruction" 
+                    className="max-h-full max-w-full object-contain rounded-lg border border-sky-500/30 shadow-2xl" 
+                  />
                 ) : (
-                  <div className="text-slate-300 text-sm font-mono">DIGITAL RECONSTRUCTION OVERLAY ({Math.round(opacity * 100)}%)</div>
+                  <div className="text-slate-400 text-xs font-mono">3D TWIN SNAPSHOT GENERATING...</div>
                 )}
+              </div>
+
+              {/* Badges */}
+              <div className="absolute top-3 left-3 z-20 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-teal-300 border border-teal-500/40">
+                REAL PHOTO: {Math.round((1 - opacity) * 100)}%
+              </div>
+              <div className="absolute top-3 right-3 z-20 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded text-xs font-mono text-sky-300 border border-sky-500/40">
+                3D TWIN: {Math.round(opacity * 100)}%
               </div>
 
               {/* Opacity Control slider */}
               <div className="absolute bottom-4 left-6 right-6 z-30 bg-slate-900/90 backdrop-blur px-4 py-2 rounded-lg border border-slate-800 flex items-center gap-3">
-                <span className="text-xs font-mono text-teal-300">REAL PHOTO ({Math.round((1 - opacity) * 100)}%)</span>
+                <span className="text-xs font-mono text-teal-300 whitespace-nowrap">REAL PHOTO</span>
                 <input
                   type="range"
                   min="0"
@@ -500,7 +780,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
                   onChange={e => setOpacity(Number(e.target.value))}
                   className="flex-1 accent-teal-500"
                 />
-                <span className="text-xs font-mono text-sky-400">3D DIGITAL TWIN ({Math.round(opacity * 100)}%)</span>
+                <span className="text-xs font-mono text-sky-400 whitespace-nowrap">3D DIGITAL TWIN</span>
               </div>
             </div>
           )}

@@ -769,6 +769,7 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
     >
       {/* Three.js Canvas */}
       <canvas
+        id="polaris-twin-canvas-3d"
         ref={canvasRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

@@ -86,6 +86,20 @@ export const EnergyTwinView: React.FC = () => {
   const [operatingMode, setOperatingMode] = useState<OperatingMode>('AUTO');
   const [simulationMode, setSimulationMode] = useState<'SIMULATION' | 'REAL-TIME SIMULATION'>('REAL-TIME SIMULATION');
   const [showReferenceModal, setShowReferenceModal] = useState<boolean>(false);
+  const [twinSnapshotUrl, setTwinSnapshotUrl] = useState<string | null>(null);
+
+  const handleOpenReferenceComparison = () => {
+    const canvas = document.getElementById('polaris-twin-canvas-3d') as HTMLCanvasElement | null;
+    if (canvas) {
+      try {
+        const snap = canvas.toDataURL('image/png');
+        setTwinSnapshotUrl(snap);
+      } catch {
+        setTwinSnapshotUrl(null);
+      }
+    }
+    setShowReferenceModal(true);
+  };
 
   // Interactive Selection Hook
   const {
@@ -674,7 +688,7 @@ export const EnergyTwinView: React.FC = () => {
           {/* Authentic Real-World Base Station Ground Truth Reference */}
           <PhysicalStationReferenceCard
             stationId={viewModel.stationId}
-            onOpenComparisonModal={() => setShowReferenceModal(true)}
+            onOpenComparisonModal={handleOpenReferenceComparison}
           />
 
           {viewMode === '3D_SPATIAL' && (
@@ -845,6 +859,7 @@ export const EnergyTwinView: React.FC = () => {
         stationId={viewModel.stationId}
         isOpen={showReferenceModal}
         onClose={() => setShowReferenceModal(false)}
+        renderedTwinCanvasUrl={twinSnapshotUrl}
       />
     </div>
   );
