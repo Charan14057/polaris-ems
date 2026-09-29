@@ -30,17 +30,26 @@ import {
 } from 'lucide-react';
 
 export const ResilienceView: React.FC = () => {
-  const { currentStation, horizonHours, activeScenario } = useStation();
+  const { currentStation, horizonHours, activeScenario, resilienceData: contextResilience } = useStation();
   const { snapshot } = useOperationalSnapshot();
   const { inspectEvidence } = useEvidence();
 
-  const [resilienceData, setResilienceData] = useState<ResilienceEvaluateResponseData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [resilienceData, setResilienceData] = useState<ResilienceEvaluateResponseData | null>(contextResilience);
+  const [loading, setLoading] = useState<boolean>(!contextResilience && !snapshot.survivalHorizons);
   const [error, setError] = useState<string | null>(null);
   const [showNineDimensions, setShowNineDimensions] = useState<boolean>(true);
 
+  // Sync with context resilience updates
+  useEffect(() => {
+    if (contextResilience) {
+      setResilienceData(contextResilience);
+    }
+  }, [contextResilience]);
+
   const fetchResilience = useCallback(async () => {
-    setLoading(true);
+    if (!resilienceData && !contextResilience) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await api.evaluateResilience({
@@ -53,29 +62,33 @@ export const ResilienceView: React.FC = () => {
         setResilienceData(res.data);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to evaluate resilience posture');
+      if (!resilienceData && !contextResilience) {
+        setError(err.message || 'Failed to evaluate resilience posture');
+      }
     } finally {
       setLoading(false);
     }
-  }, [currentStation, horizonHours, activeScenario]);
+  }, [currentStation, horizonHours, activeScenario, resilienceData, contextResilience]);
 
   useEffect(() => {
     fetchResilience();
-  }, [fetchResilience]);
+  }, [currentStation, horizonHours, activeScenario]);
 
-  if (loading) {
+  if (loading && !resilienceData && !contextResilience) {
     return <LoadingSkeleton height="h-32" rows={3} className="max-w-[1520px] mx-auto py-8" />;
   }
 
-  if (error || !resilienceData) {
+  const effectiveData = resilienceData || contextResilience;
+
+  if (error && !effectiveData) {
     return <ErrorCard message={error || 'Failed to fetch resilience posture.'} onRetry={fetchResilience} className="max-w-[1520px] mx-auto my-8" />;
   }
 
   const resState = (activeScenario && !['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL'].includes(activeScenario.toUpperCase().trim()))
-    ? (snapshot.resilienceState !== 'SAFE' ? snapshot.resilienceState : (resilienceData.resilience_state || 'WATCH'))
-    : (resilienceData.resilience_state || snapshot.resilienceState || 'SAFE');
+    ? (snapshot.resilienceState !== 'SAFE' ? snapshot.resilienceState : (effectiveData?.resilience_state || 'WATCH'))
+    : (effectiveData?.resilience_state || snapshot.resilienceState || 'SAFE');
 
-  const horizons = resilienceData.survival_horizons || {
+  const horizons = effectiveData?.survival_horizons || {
     critical_load_survival_horizon_h: snapshot.survivalHorizons?.criticalLoadSurvivalH ?? 168.0,
     fuel_endurance_horizon_h: snapshot.survivalHorizons?.fuelEnduranceH ?? 720.0,
     thermal_habitability_horizon_h: snapshot.survivalHorizons?.thermalHabitabilityH ?? 48.0,
@@ -126,7 +139,7 @@ export const ResilienceView: React.FC = () => {
     },
   ] : [];
 
-  const rawDims = resilienceData.dimensions || snapshot.resilienceDimensions;
+  const rawDims = effectiveData?.dimensions || snapshot.resilienceDimensions;
   const dimensionsList = rawDims ? [
     { name: 'Energy Adequacy', score: rawDims.energy_adequacy },
     { name: 'Critical Load Resilience', score: rawDims.critical_load_resilience },
@@ -139,7 +152,7 @@ export const ResilienceView: React.FC = () => {
     { name: 'Recovery Resilience', score: rawDims.recovery_resilience },
   ] : [];
 
-  const recoveryOptions = resilienceData.candidate_recovery_options || [];
+  const recoveryOptions = effectiveData?.candidate_recovery_options || [];
 
   const fuelLiters = snapshot?.fuelRemainingL != null ? `${snapshot.fuelRemainingL.toLocaleString()} L` : '0 L';
   const bessSoc = snapshot?.bessSocPct != null ? `${snapshot.bessSocPct.toFixed(0)}%` : '0%';

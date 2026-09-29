@@ -25,21 +25,30 @@ import {
 } from 'lucide-react';
 
 export const PolicyView: React.FC = () => {
-  const { currentStation, horizonHours, activeScenario } = useStation();
+  const { currentStation, horizonHours, activeScenario, policyData: contextPolicy } = useStation();
   const { snapshot } = useOperationalSnapshot();
   const { inspectEvidence } = useEvidence();
 
   const isScenarioActive = Boolean(activeScenario && activeScenario !== 'NORMAL_BASELINE');
   const scenarioName = activeScenario ? activeScenario.replace(/_/g, ' ') : '';
 
-  const [policyData, setPolicyData] = useState<PolicyEvaluateResponseData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [policyResponse, setPolicyResponse] = useState<PolicyEvaluateResponseData | null>(contextPolicy);
+  const [loading, setLoading] = useState<boolean>(!contextPolicy);
   const [error, setError] = useState<string | null>(null);
   const [showSuppressed, setShowSuppressed] = useState<boolean>(false);
   const [expandedTier, setExpandedTier] = useState<string | null>(null);
 
+  // Sync with context policy updates
+  useEffect(() => {
+    if (contextPolicy) {
+      setPolicyResponse(contextPolicy);
+    }
+  }, [contextPolicy]);
+
   const fetchPolicy = useCallback(async () => {
-    setLoading(true);
+    if (!policyResponse && !contextPolicy) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await api.evaluatePolicy({
@@ -50,20 +59,24 @@ export const PolicyView: React.FC = () => {
         include_evaluation_trace: true,
       });
       if (res.data) {
-        setPolicyData(res.data);
+        setPolicyResponse(res.data);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to evaluate policy governance');
+      if (!policyResponse && !contextPolicy) {
+        setError(err.message || 'Failed to evaluate policy governance');
+      }
     } finally {
       setLoading(false);
     }
-  }, [currentStation, horizonHours, activeScenario]);
+  }, [currentStation, horizonHours, activeScenario, policyResponse, contextPolicy]);
 
   useEffect(() => {
     fetchPolicy();
-  }, [fetchPolicy]);
+  }, [currentStation, horizonHours, activeScenario]);
 
-  if (loading) {
+  const effectivePolicy = policyResponse || contextPolicy;
+
+  if (loading && !effectivePolicy) {
     return (
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
         <LoadingSkeleton height="h-36" rows={2} />
@@ -71,7 +84,7 @@ export const PolicyView: React.FC = () => {
     );
   }
 
-  if (error || !policyData) {
+  if (error && !effectivePolicy) {
     return (
       <div className="p-6 max-w-4xl mx-auto">
         <ErrorCard title="Policy Engine Error" message={error || 'Policy governance telemetry unavailable'} onRetry={fetchPolicy} />
@@ -79,8 +92,9 @@ export const PolicyView: React.FC = () => {
     );
   }
 
+  const policyData = effectivePolicy!;
   const handoff = policyData.optimizer_handoff;
-  const tiers = handoff.enforcement_tiers || {};
+  const tiers = handoff?.enforcement_tiers || {};
 
   // Canonical 8-tier Priority Ladder definitions
   const priorityLadder = [
