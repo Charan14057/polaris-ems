@@ -24,6 +24,9 @@ import {
   createPhotovoltaicMaterial,
   createConcreteFoundationMaterial,
   createIndustrialGlassMaterial,
+  createPolarCompositeMaterial,
+  createPolarSnowMaterial,
+  createBedrockMaterial,
   getDiamondPlateTexture,
   getCorrugatedTexture
 } from './pbrMaterialFactory';
@@ -877,25 +880,19 @@ export function buildPolarTerrain(
   }
   geo.computeVertexNormals();
 
-  let groundColor = 0xdbeafe; // Snowy polar ice
-  let roughness = 0.85;
-  let metalness = 0.05;
-
-  if (terrainType === 'ROCKY_OASIS') {
-    groundColor = 0x78716c; // Schirmacher Oasis warm stone grey/brown
-    roughness = 0.95;
-    metalness = 0.02;
-  } else if (terrainType === 'ARCTIC_TUNDRA') {
-    groundColor = 0xcfd8dc; // High Arctic tundra gravel & snow
-    roughness = 0.9;
+  let mat: THREE.MeshStandardMaterial;
+  if (terrainType === 'BEDROCK_ICE') {
+    mat = createPolarSnowMaterial({ wireframe });
+  } else if (terrainType === 'ROCKY_OASIS') {
+    mat = createBedrockMaterial({ wireframe });
+  } else {
+    mat = new THREE.MeshStandardMaterial({
+      color: 0xcfd8dc,
+      roughness: 0.88,
+      metalness: 0.08,
+      wireframe
+    });
   }
-
-  const mat = new THREE.MeshStandardMaterial({
-    color: groundColor,
-    roughness,
-    metalness,
-    wireframe
-  });
 
   const terrainMesh = new THREE.Mesh(geo, mat);
   terrainMesh.position.y = -0.1;
@@ -903,12 +900,7 @@ export function buildPolarTerrain(
   terrainGroup.add(terrainMesh);
 
   // 1. SCATTERED GRANITE BEDROCK NUNATAK BOULDERS
-  const boulderMat = new THREE.MeshStandardMaterial({
-    color: 0x334155, // Dark Antarctic gneiss / charnockite bedrock
-    roughness: 0.9,
-    metalness: 0.15,
-    flatShading: true
-  });
+  const boulderMat = createBedrockMaterial({ wireframe });
   const boulderCoords = [
     [-38, -25, 2.5], [-44, 18, 3.2], [42, -28, 4.0], [50, 15, 3.5],
     [-18, 42, 2.8], [25, 45, 3.0], [-52, -8, 4.5], [38, -45, 5.0]
@@ -1036,31 +1028,32 @@ export function buildBharatiStation(
   const hullOpacity = isArchMode ? 0.98 : 0.42;
 
   // PBR Materials (bof Architekten / NCPOR Architectural Specs)
-  const hullWhiteMat = createInsulatedCladdingMaterial(0xf1f5f9, {
+  const hullOrangeMat = createPolarCompositeMaterial(0xea580c, {
     wireframe,
     transparent: !isArchMode,
     opacity: hullOpacity
   });
 
-  const orangeStripeMat = createInsulatedCladdingMaterial(0xea580c, {
+  const hullSilverMat = createPolarCompositeMaterial(0xf1f5f9, {
     wireframe,
     transparent: !isArchMode,
     opacity: hullOpacity
   });
 
   const darkSteelMat = createStructuralSteelMaterial(0x334155, { wireframe });
-  const glassMat = createIndustrialGlassMaterial(true, isArchMode ? 0.85 : 0.55, {
+  const windowFrameMat = createStructuralSteelMaterial(0x0f172a, { wireframe });
+  const glassMat = createIndustrialGlassMaterial(true, isArchMode ? 0.92 : 0.65, {
     wireframe,
-    opacity: isArchMode ? 0.88 : 0.45
+    opacity: isArchMode ? 0.9 : 0.55
   });
 
   // --- A. HEAVY STEEL FOUNDATION STILTS (24 Heavy Columns with Cross-Bracing) ---
   const stiltGroup = new THREE.Group();
-  const colHeight = 3.6;
-  const colRadius = 0.32;
-  const colGeo = new THREE.CylinderGeometry(colRadius, colRadius, colHeight, 14);
+  const colHeight = 3.8;
+  const colRadius = 0.35;
+  const colGeo = new THREE.CylinderGeometry(colRadius, colRadius, colHeight, 16);
   const footingMat = createConcreteFoundationMaterial({ wireframe });
-  const footingGeo = new THREE.BoxGeometry(1.4, 0.45, 1.4);
+  const footingGeo = new THREE.BoxGeometry(1.6, 0.5, 1.6);
 
   const stiltGridX = [-20, -14, -8, -2, 4, 10, 16, 20];
   const stiltGridZ = [-10, 0, 10];
@@ -1072,107 +1065,215 @@ export function buildBharatiStation(
       col.castShadow = true;
       stiltGroup.add(col);
 
+      // Steel flange collar
+      const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.15, 16), darkSteelMat);
+      collar.position.set(x, 0.45, z);
+      stiltGroup.add(collar);
+
       const footing = new THREE.Mesh(footingGeo, footingMat);
-      footing.position.set(x, 0.22, z);
+      footing.position.set(x, 0.25, z);
       footing.receiveShadow = true;
       stiltGroup.add(footing);
     });
   });
 
   // Diagonal steel cross-bracing along perimeter columns
-  const braceMat = createGalvanizedLegMaterial();
   for (let i = 0; i < stiltGridX.length - 1; i++) {
     const x1 = stiltGridX[i];
     const x2 = stiltGridX[i + 1];
     [-10, 10].forEach(z => {
-      const p1 = [new THREE.Vector3(x1, 0.3, z), new THREE.Vector3(x2, colHeight, z)];
-      const p2 = [new THREE.Vector3(x1, colHeight, z), new THREE.Vector3(x2, 0.3, z)];
-      stiltGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p1), new THREE.LineBasicMaterial({ color: 0x475569 })));
-      stiltGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p2), new THREE.LineBasicMaterial({ color: 0x475569 })));
+      const p1 = [new THREE.Vector3(x1, 0.45, z), new THREE.Vector3(x2, colHeight, z)];
+      const p2 = [new THREE.Vector3(x1, colHeight, z), new THREE.Vector3(x2, 0.45, z)];
+      stiltGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p1), new THREE.LineBasicMaterial({ color: 0x64748b })));
+      stiltGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p2), new THREE.LineBasicMaterial({ color: 0x64748b })));
     });
   }
   architectureGroup.add(stiltGroup);
 
   // --- B. AERODYNAMIC MAIN HULL SUPERSTRUCTURE ---
+  // Authentic Bharati Design: Orange Aerodynamic Pods on both ends, silver insulated panels in center!
   const hullGroup = new THREE.Group();
 
-  // Deck 1 (Lower Engineering Level, +3.6m to +7.2m)
-  const d1Length = 43;
-  const d1Width = 24;
-  const d1Height = 3.6;
-  const d1Mesh = new THREE.Mesh(new THREE.BoxGeometry(d1Length, d1Height, d1Width), hullWhiteMat);
-  d1Mesh.position.set(0, 3.6 + d1Height / 2, 0);
-  d1Mesh.castShadow = true;
-  d1Mesh.receiveShadow = true;
-  hullGroup.add(d1Mesh);
+  const totalLength = 46;
+  const centerLength = 26;
+  const podLength = 10;
+  const hullWidth = 24;
 
-  // Orange identification band between Deck 1 and Deck 2
-  const bandMesh = new THREE.Mesh(new THREE.BoxGeometry(d1Length + 0.15, 0.55, d1Width + 0.15), orangeStripeMat);
-  bandMesh.position.set(0, 7.2, 0);
-  hullGroup.add(bandMesh);
+  // Deck 1 (Lower Engineering Level, +3.8m to +7.4m)
+  // Center silver insulated block
+  const d1Center = new THREE.Mesh(new THREE.BoxGeometry(centerLength, 3.6, hullWidth), hullSilverMat);
+  d1Center.position.set(0, 3.8 + 1.8, 0);
+  d1Center.castShadow = true;
+  d1Center.receiveShadow = true;
+  hullGroup.add(d1Center);
 
-  // Deck 2 (Middle Habitation & Operations Level, +7.2m to +10.8m)
-  const d2Length = 41;
-  const d2Width = 22;
-  const d2Height = 3.6;
-  const d2Mesh = new THREE.Mesh(new THREE.BoxGeometry(d2Length, d2Height, d2Width), hullWhiteMat);
-  d2Mesh.position.set(0, 7.2 + d2Height / 2, 0);
-  d2Mesh.castShadow = true;
-  hullGroup.add(d2Mesh);
+  // Northwest curved aerodynamic orange bow pod
+  const bowOrange = new THREE.Mesh(new THREE.BoxGeometry(podLength, 3.6, hullWidth), hullOrangeMat);
+  bowOrange.position.set(-centerLength / 2 - podLength / 2, 3.8 + 1.8, 0);
+  bowOrange.castShadow = true;
+  bowOrange.receiveShadow = true;
+  hullGroup.add(bowOrange);
 
-  // Ribbon Windows on Habitation Level (Warm interior tungsten glow)
-  const winFront = new THREE.Mesh(new THREE.BoxGeometry(32, 1.2, 0.2), glassMat);
-  winFront.position.set(0, 8.8, d2Width / 2 + 0.05);
-  hullGroup.add(winFront);
+  // Southeast curved aerodynamic orange stern pod
+  const sternOrange = new THREE.Mesh(new THREE.BoxGeometry(podLength, 3.6, hullWidth), hullOrangeMat);
+  sternOrange.position.set(centerLength / 2 + podLength / 2, 3.8 + 1.8, 0);
+  sternOrange.castShadow = true;
+  sternOrange.receiveShadow = true;
+  hullGroup.add(sternOrange);
 
-  const winBack = new THREE.Mesh(new THREE.BoxGeometry(32, 1.2, 0.2), glassMat);
-  winBack.position.set(0, 8.8, -d2Width / 2 - 0.05);
-  hullGroup.add(winBack);
+  // Aerodynamic nose chamfer bevel on front
+  const noseConeGeo = new THREE.CylinderGeometry(5.0, 5.0, 3.6, 16, 1, false, 0, Math.PI);
+  const noseCone = new THREE.Mesh(noseConeGeo, hullOrangeMat);
+  noseCone.rotation.y = -Math.PI / 2;
+  noseCone.position.set(-totalLength / 2, 3.8 + 1.8, 0);
+  noseCone.castShadow = true;
+  hullGroup.add(noseCone);
 
-  // Deck 3 (Upper Science & Observation Deck, +10.8m to +14.2m)
-  const d3Length = 28;
-  const d3Width = 16;
+  const tailCone = new THREE.Mesh(noseConeGeo, hullOrangeMat);
+  tailCone.rotation.y = Math.PI / 2;
+  tailCone.position.set(totalLength / 2, 3.8 + 1.8, 0);
+  tailCone.castShadow = true;
+  hullGroup.add(tailCone);
+
+  // Deck 2 (Middle Habitation & Mission Operations Bridge, +7.4m to +11.0m)
+  const d2Center = new THREE.Mesh(new THREE.BoxGeometry(centerLength, 3.6, hullWidth - 1.5), hullSilverMat);
+  d2Center.position.set(0, 7.4 + 1.8, 0);
+  d2Center.castShadow = true;
+  d2Center.receiveShadow = true;
+  hullGroup.add(d2Center);
+
+  const d2Bow = new THREE.Mesh(new THREE.BoxGeometry(podLength, 3.6, hullWidth - 1.5), hullOrangeMat);
+  d2Bow.position.set(-centerLength / 2 - podLength / 2, 7.4 + 1.8, 0);
+  d2Bow.castShadow = true;
+  hullGroup.add(d2Bow);
+
+  const d2Stern = new THREE.Mesh(new THREE.BoxGeometry(podLength, 3.6, hullWidth - 1.5), hullOrangeMat);
+  d2Stern.position.set(centerLength / 2 + podLength / 2, 7.4 + 1.8, 0);
+  d2Stern.castShadow = true;
+  hullGroup.add(d2Stern);
+
+  // Recessed Ribbon Observation Windows on Habitation Level with Individual Mullions
+  const winZOffset = (hullWidth - 1.5) / 2 + 0.08;
+  const winStripGeo = new THREE.BoxGeometry(centerLength + 8, 1.4, 0.2);
+  const winStripFront = new THREE.Mesh(winStripGeo, glassMat);
+  winStripFront.position.set(0, 9.2, winZOffset);
+  hullGroup.add(winStripFront);
+
+  const winStripBack = new THREE.Mesh(winStripGeo, glassMat);
+  winStripBack.position.set(0, 9.2, -winZOffset);
+  hullGroup.add(winStripBack);
+
+  // Individual dark window frame mullions
+  for (let mx = -16; mx <= 16; mx += 2.4) {
+    const mullionGeo = new THREE.BoxGeometry(0.12, 1.45, 0.25);
+    const mFront = new THREE.Mesh(mullionGeo, windowFrameMat);
+    mFront.position.set(mx, 9.2, winZOffset);
+    hullGroup.add(mFront);
+    const mBack = new THREE.Mesh(mullionGeo, windowFrameMat);
+    mBack.position.set(mx, 9.2, -winZOffset);
+    hullGroup.add(mBack);
+  }
+
+  // Deck 3 (Upper Science Observatory & Clean Labs, +11.0m to +14.2m)
+  const d3Length = 30;
+  const d3Width = 17;
   const d3Height = 3.2;
-  const d3Mesh = new THREE.Mesh(new THREE.BoxGeometry(d3Length, d3Height, d3Width), hullWhiteMat);
-  d3Mesh.position.set(2, 10.8 + d3Height / 2, 0);
+  const d3Mesh = new THREE.Mesh(new THREE.BoxGeometry(d3Length, d3Height, d3Width), hullSilverMat);
+  d3Mesh.position.set(1, 11.0 + d3Height / 2, 0);
   d3Mesh.castShadow = true;
   hullGroup.add(d3Mesh);
 
-  // Panoramic Observation Bridge Window (Northward ocean view)
-  const obsWindow = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.8, 14), glassMat);
-  obsWindow.position.set(d3Length / 2 + 2.05, 12.4, 0);
-  hullGroup.add(obsWindow);
+  // Deck 3 Orange Accent Facade Trim
+  const d3Trim = new THREE.Mesh(new THREE.BoxGeometry(d3Length + 0.2, 0.45, d3Width + 0.2), hullOrangeMat);
+  d3Trim.position.set(1, 11.0 + d3Height + 0.2, 0);
+  hullGroup.add(d3Trim);
 
-  // Aerodynamic nose chamfer (Windward aerodynamic bevel on northwest edge)
-  const noseGeo = new THREE.CylinderGeometry(4.0, 4.0, 7.2, 12, 1, false, 0, Math.PI);
-  const noseMesh = new THREE.Mesh(noseGeo, hullWhiteMat);
-  noseMesh.rotation.y = -Math.PI / 2;
-  noseMesh.position.set(d1Length / 2 - 1, 7.2, 0);
-  hullGroup.add(noseMesh);
+  // Deck 3 Panoramic Science Windows
+  const obsWindowFront = new THREE.Mesh(new THREE.BoxGeometry(d3Length - 4, 1.6, 0.2), glassMat);
+  obsWindowFront.position.set(1, 12.6, d3Width / 2 + 0.08);
+  hullGroup.add(obsWindowFront);
 
-  // External Access Gangway Staircase leading from ground to Deck 2
-  const stairMat = createStructuralSteelMaterial(0x475569);
-  const stairPoints = [
-    new THREE.Vector3(d1Length / 2 + 1, 0, 8),
-    new THREE.Vector3(d1Length / 2 + 6, 4.0, 8),
-    new THREE.Vector3(d1Length / 2 + 1, 7.2, 8)
-  ];
-  const stairLine = new THREE.Mesh(
-    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(stairPoints), 16, 0.2, 8, false),
-    stairMat
-  );
-  hullGroup.add(stairLine);
+  // --- C. ELEVATED PEDESTRIAN ACCESS BRIDGE & STAIRS ---
+  // In the real station photo, an impressive steel bridge leads down to ground
+  const bridgeMat = createStructuralSteelMaterial(0x475569);
+  const bridgeTreadMat = createGalvanizedLegMaterial();
+  const bridgeFloor = new THREE.Mesh(new THREE.BoxGeometry(16, 0.3, 2.2), bridgeTreadMat);
+  bridgeFloor.position.set(18, 4.8, 14);
+  bridgeFloor.rotation.y = 0.55;
+  bridgeFloor.rotation.z = -0.32;
+  bridgeFloor.castShadow = true;
+  hullGroup.add(bridgeFloor);
+
+  // Bridge Support Stilts
+  [12, 18, 24].forEach((bx, idx) => {
+    const bHeight = Math.max(1.0, 7.2 - idx * 2.2);
+    const bStilt = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, bHeight, 10), darkSteelMat);
+    bStilt.position.set(bx, bHeight / 2, 10 + idx * 2.8);
+    hullGroup.add(bStilt);
+  });
+
+  // Blue Insulated Seawater Intake Pipeline
+  const pipeMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4, metalness: 0.6 });
+  const pipeGeo = new THREE.CylinderGeometry(0.22, 0.22, 18, 12);
+  const pipeMesh = new THREE.Mesh(pipeGeo, pipeMat);
+  pipeMesh.position.set(-16, 2.4, -14);
+  pipeMesh.rotation.z = 0.45;
+  pipeMesh.rotation.x = -0.3;
+  hullGroup.add(pipeMesh);
 
   architectureGroup.add(hullGroup);
 
-  // --- C. ROOFTOP RADOME & COMMUNICATIONS ---
-  const radome = createRadome(2.4, wireframe);
-  radome.position.set(6, 14.0, 0);
-  architectureGroup.add(radome);
+  // --- D. ROOFTOP MULTI-DOME RADOME COMPLEX & COMMS TOWER ---
+  // 1. Primary White Geodesic Satellite Radome (North forward deck)
+  const radomeMain = createRadome(2.5, wireframe);
+  radomeMain.position.set(5, 14.4, -1);
+  architectureGroup.add(radomeMain);
 
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 6.0, 8), darkSteelMat);
-  mast.position.set(-6, 17.0, -3);
-  architectureGroup.add(mast);
+  // 2. Secondary Bright Yellow Radome Dome (Exact match to official ground truth photo!)
+  const yellowDomeMat = new THREE.MeshStandardMaterial({
+    color: 0xfacc15, // High-vis polar yellow
+    roughness: 0.35,
+    metalness: 0.25,
+    wireframe
+  });
+  const yellowDomeGeo = new THREE.SphereGeometry(1.8, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.55);
+  const yellowDome = new THREE.Mesh(yellowDomeGeo, yellowDomeMat);
+  yellowDome.position.set(-6, 14.4, 2.5);
+  yellowDome.castShadow = true;
+  architectureGroup.add(yellowDome);
+
+  const yellowDomeBase = new THREE.Mesh(new THREE.CylinderGeometry(1.85, 1.85, 0.4, 16), darkSteelMat);
+  yellowDomeBase.position.set(-6, 14.4, 2.5);
+  architectureGroup.add(yellowDomeBase);
+
+  // 3. Tertiary Pale Grey Dome
+  const greyDomeMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.4, metalness: 0.3 });
+  const greyDome = new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), greyDomeMat);
+  greyDome.position.set(12, 14.4, 3);
+  greyDome.castShadow = true;
+  architectureGroup.add(greyDome);
+
+  // 4. Structural Steel Communications Tower with Aviation Warning Beacon
+  const towerGroup = new THREE.Group();
+  towerGroup.position.set(-2, 14.4, -4);
+  const mastCore = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 7.5, 8), darkSteelMat);
+  mastCore.position.y = 3.75;
+  mastCore.castShadow = true;
+  towerGroup.add(mastCore);
+
+  // Lattice cross arms
+  [-1.5, 0, 1.5].forEach(dy => {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.08), darkSteelMat);
+    arm.position.y = 4.5 + dy;
+    towerGroup.add(arm);
+  });
+
+  // Red blinking aviation warning beacon at tip
+  const beaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), beaconMat);
+  beacon.position.y = 7.6;
+  towerGroup.add(beacon);
+  architectureGroup.add(towerGroup);
 
   // --- D. POWERHOUSE COMPOUND: DIESEL GENSET & BESS CONTAINER ---
   // Heavy Acoustic Diesel Genset Compound on East Pad

@@ -289,3 +289,154 @@ export function createIndustrialGlassMaterial(
     wireframe: options.wireframe ?? false
   });
 }
+
+/**
+ * 6. High-Fidelity Polar Aerodynamic Composite Cladding Texture
+ * Generates realistic architectural composite cassette panels with recessed joints & rivets.
+ */
+let compositePanelTextureCache: THREE.CanvasTexture | null = null;
+export function getCompositePanelTexture(): THREE.CanvasTexture {
+  if (compositePanelTextureCache) return compositePanelTextureCache;
+
+  compositePanelTextureCache = createProceduralTexture(256, 256, (ctx) => {
+    // Base metallic panel sheen
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Subtle brushed horizontal gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0.0, 'rgba(255,255,255,0.4)');
+    grad.addColorStop(0.5, 'rgba(200,215,230,0.1)');
+    grad.addColorStop(1.0, 'rgba(150,170,190,0.3)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Panel Seams / Reveals
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(2, 2, 252, 252);
+    ctx.beginPath();
+    ctx.moveTo(128, 0); ctx.lineTo(128, 256);
+    ctx.moveTo(0, 128); ctx.lineTo(256, 128);
+    ctx.stroke();
+
+    // Rivet / fastener points
+    ctx.fillStyle = '#475569';
+    const rivets = [
+      [8, 8], [120, 8], [136, 8], [248, 8],
+      [8, 120], [120, 120], [136, 120], [248, 120],
+      [8, 136], [120, 136], [136, 136], [248, 136],
+      [8, 248], [120, 248], [136, 248], [248, 248]
+    ];
+    rivets.forEach(([rx, ry]) => {
+      ctx.beginPath();
+      ctx.arc(rx, ry, 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }, 4, 2);
+
+  return compositePanelTextureCache;
+}
+
+/**
+ * 7. Wind-Carved Sastrugi Snow & Ice Crust Texture
+ */
+let sastrugiTextureCache: THREE.CanvasTexture | null = null;
+export function getSastrugiTexture(): THREE.CanvasTexture {
+  if (sastrugiTextureCache) return sastrugiTextureCache;
+
+  sastrugiTextureCache = createProceduralTexture(256, 256, (ctx) => {
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Wind wave streaks (sastrugi drifts)
+    for (let y = 0; y < 256; y += 12) {
+      const grad = ctx.createLinearGradient(0, y, 256, y + 8);
+      grad.addColorStop(0.0, '#ffffff');
+      grad.addColorStop(0.4, '#dbeafe');
+      grad.addColorStop(0.7, '#cbd5e1');
+      grad.addColorStop(1.0, '#f1f5f9');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.bezierCurveTo(80, y + Math.sin(y) * 4, 180, y - Math.cos(y) * 4, 256, y);
+      ctx.lineTo(256, y + 10);
+      ctx.bezierCurveTo(180, y + 10, 80, y + 10, 0, y + 10);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }, 8, 8);
+
+  return sastrugiTextureCache;
+}
+
+/**
+ * 8. Antarctic Gneiss & Charnockite Bedrock Texture
+ */
+let bedrockTextureCache: THREE.CanvasTexture | null = null;
+export function getBedrockTexture(): THREE.CanvasTexture {
+  if (bedrockTextureCache) return bedrockTextureCache;
+
+  bedrockTextureCache = createProceduralTexture(256, 256, (ctx) => {
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Speckles of feldspar & quartz crystals
+    for (let i = 0; i < 800; i++) {
+      const x = Math.random() * 256;
+      const y = Math.random() * 256;
+      const r = Math.random() * 2;
+      const c = Math.floor(100 + Math.random() * 120);
+      ctx.fillStyle = `rgb(${c},${c - 15},${c - 20})`;
+      ctx.fillRect(x, y, r, r);
+    }
+  }, 4, 4);
+
+  return bedrockTextureCache;
+}
+
+export function createPolarCompositeMaterial(
+  color: number,
+  options: MaterialOptions = {}
+): THREE.MeshStandardMaterial {
+  const bump = getCompositePanelTexture();
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.35,
+    metalness: 0.45,
+    bumpMap: bump,
+    bumpScale: 0.03,
+    wireframe: options.wireframe ?? false,
+    transparent: options.transparent ?? false,
+    opacity: options.opacity ?? 1.0
+  });
+}
+
+export function createPolarSnowMaterial(
+  options: MaterialOptions = {}
+): THREE.MeshStandardMaterial {
+  const bump = getSastrugiTexture();
+  return new THREE.MeshStandardMaterial({
+    color: 0xeff6ff,
+    roughness: 0.72,
+    metalness: 0.08,
+    bumpMap: bump,
+    bumpScale: 0.06,
+    wireframe: options.wireframe ?? false
+  });
+}
+
+export function createBedrockMaterial(
+  options: MaterialOptions = {}
+): THREE.MeshStandardMaterial {
+  const bump = getBedrockTexture();
+  return new THREE.MeshStandardMaterial({
+    color: 0x334155,
+    roughness: 0.92,
+    metalness: 0.15,
+    bumpMap: bump,
+    bumpScale: 0.05,
+    wireframe: options.wireframe ?? false
+  });
+}
+

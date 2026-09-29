@@ -3,7 +3,8 @@
  * Phase 18: Spatial Digital Twin Engine
  * 
  * Renders generation sources, Main AC switchboards, sub-distribution panels,
- * and electrical devices with category-colored rings and status indicators.
+ * and electrical devices with animated rotating wind rotors, pulsing solar glint,
+ * engine indicators, and dynamic SCADA/Blueprint styling.
  */
 
 import React from 'react';
@@ -44,7 +45,9 @@ interface TwinNodesProps {
     batteryPowerKw: number;
     batterySocPct: number;
     totalLoadKw: number;
+    totalGenerationKw?: number;
   };
+  theme?: 'SCADA' | 'BLUEPRINT';
   onSelectNode: (nodeId: string) => void;
   onSelectDevice: (deviceId: string) => void;
 }
@@ -56,9 +59,12 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
   selectedDeviceId,
   activeFilter,
   powerSummary,
+  theme = 'SCADA',
   onSelectNode,
   onSelectDevice
 }) => {
+  const isScada = theme === 'SCADA';
+
   const renderIcon = (iconKey?: string, className = 'w-4 h-4') => {
     switch (iconKey) {
       case 'Sun': return <Sun className={className} />;
@@ -108,23 +114,33 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
           let genKw = 0;
           let badgeText = '';
           let sourceColor = '#B45309';
+          let isSourceActive = false;
 
           if (node.id.includes('solar')) {
             genKw = powerSummary.solarGenerationKw;
+            isSourceActive = genKw > 0.1;
             badgeText = `${genKw.toFixed(1)} kW`;
-            sourceColor = '#D97706';
+            sourceColor = isScada ? '#F59E0B' : '#D97706';
           } else if (node.id.includes('wind')) {
             genKw = powerSummary.windGenerationKw;
+            isSourceActive = genKw > 0.1;
             badgeText = `${genKw.toFixed(1)} kW`;
-            sourceColor = '#0F766E';
+            sourceColor = isScada ? '#34D399' : '#0F766E';
           } else if (node.id.includes('diesel')) {
             genKw = powerSummary.dieselGenerationKw;
+            isSourceActive = genKw > 0.1;
             badgeText = `${genKw.toFixed(1)} kW`;
-            sourceColor = '#B45309';
+            sourceColor = isScada ? '#F97316' : '#B45309';
           } else if (node.id.includes('battery')) {
-            badgeText = `${powerSummary.batterySocPct.toFixed(0)}% SOC`;
-            sourceColor = '#0284C7';
+            const p = powerSummary.batteryPowerKw;
+            isSourceActive = Math.abs(p) > 0.1;
+            const flowTag = p < -0.1 ? ' [CHG]' : p > 0.1 ? ' [DIS]' : '';
+            badgeText = `${powerSummary.batterySocPct.toFixed(0)}% SOC${flowTag}`;
+            sourceColor = isScada ? '#38BDF8' : '#0284C7';
           }
+
+          const boxBg = isScada ? '#0f172a' : '#ffffff';
+          const boxStroke = isSelected ? '#38bdf8' : (isScada ? '#1e293b' : '#e2e8f0');
 
           return (
             <g
@@ -136,36 +152,63 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
             >
               {/* Outer Pad Box */}
               <rect
-                x={x - 48}
-                y={y - 24}
-                width={96}
-                height={48}
-                rx={6}
-                className={`transition-all duration-200 ${
-                  isSelected
-                    ? 'fill-surface stroke-copper stroke-2 shadow-md'
-                    : 'fill-surface/95 hover:fill-surface stroke-border hover:stroke-ink-secondary stroke-1 shadow-xs'
-                }`}
+                x={x - 52}
+                y={y - 25}
+                width={104}
+                height={50}
+                rx={8}
+                fill={boxBg}
+                stroke={boxStroke}
+                strokeWidth={isSelected ? 2 : 1.5}
+                className="transition-all duration-200 shadow-sm"
               />
 
-              {/* Source Icon Emblem */}
-              <g transform={`translate(${x - 38}, ${y - 12})`}>
-                <circle cx={12} cy={12} r={12} fill={`${sourceColor}20`} />
-                <g transform="translate(4, 4)" color={sourceColor}>
-                  {renderIcon(node.iconKey, 'w-4 h-4')}
-                </g>
+              {/* Source Icon Emblem with Live Animation */}
+              <g transform={`translate(${x - 42}, ${y - 12})`}>
+                <circle cx={12} cy={12} r={14} fill={`${sourceColor}25`} />
+
+                {/* Animated spinning wind turbine rotor blades */}
+                {node.id.includes('wind') && isSourceActive ? (
+                  <g
+                    transform="translate(12, 12)"
+                    style={{
+                      animation: 'spinRotor 1.4s linear infinite',
+                      transformOrigin: '0px 0px'
+                    }}
+                  >
+                    <line x1="0" y1="0" x2="0" y2="-9" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                    <line x1="0" y1="0" x2="7.8" y2="4.5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                    <line x1="0" y1="0" x2="-7.8" y2="4.5" stroke={sourceColor} strokeWidth="2.5" strokeLinecap="round" />
+                    <circle cx="0" cy="0" r="2.5" fill="#ffffff" />
+                  </g>
+                ) : node.id.includes('solar') && isSourceActive ? (
+                  /* Animated Solar Glint Rays */
+                  <g transform="translate(4, 4)" color={sourceColor} style={{ animation: 'solarPulse 2s ease-in-out infinite' }}>
+                    {renderIcon(node.iconKey, 'w-4 h-4')}
+                  </g>
+                ) : node.id.includes('diesel') && isSourceActive ? (
+                  /* Animated Diesel Running Glow */
+                  <g transform="translate(4, 4)" color={sourceColor} style={{ animation: 'pulseEngine 0.8s ease-in-out infinite' }}>
+                    {renderIcon(node.iconKey, 'w-4 h-4')}
+                  </g>
+                ) : (
+                  <g transform="translate(4, 4)" color={sourceColor}>
+                    {renderIcon(node.iconKey, 'w-4 h-4')}
+                  </g>
+                )}
               </g>
 
               {/* Source Label & Power Badge */}
               <text
-                x={x - 8}
+                x={x - 6}
                 y={y - 4}
-                className="font-mono text-[9px] font-bold fill-ink-primary"
+                className="font-mono text-[9px] font-bold"
+                fill={isScada ? '#f1f5f9' : '#0f172a'}
               >
                 {node.label.split(' ')[0]}
               </text>
               <text
-                x={x - 8}
+                x={x - 6}
                 y={y + 12}
                 className="font-mono text-[10px] font-bold"
                 fill={sourceColor}
@@ -178,6 +221,10 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
 
         // 2. MAIN AC SWITCHBOARD BUS
         if (node.kind === 'BUS' && node.id === 'node_main_bus') {
+          const busBg = isScada ? '#0b1329' : '#ffffff';
+          const busStroke = isSelected ? '#38bdf8' : (isScada ? '#0284c7' : '#d97706');
+          const totalLoad = powerSummary.totalLoadKw;
+
           return (
             <g
               key={node.id}
@@ -187,34 +234,34 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
             >
               {/* Central Switchboard Enclosure */}
               <rect
-                x={x - 65}
-                y={y - 30}
-                width={130}
-                height={60}
+                x={x - 72}
+                y={y - 32}
+                width={144}
+                height={64}
                 rx={8}
-                className={`transition-all duration-200 ${
-                  isSelected
-                    ? 'fill-surface stroke-copper stroke-2 shadow-raised'
-                    : 'fill-surface stroke-copper/70 hover:stroke-copper stroke-1.5 shadow-sm'
-                }`}
+                fill={busBg}
+                stroke={busStroke}
+                strokeWidth={isSelected ? 2.5 : 1.8}
+                className="transition-all duration-200 shadow-md"
               />
 
               {/* Main Bus Header Strip */}
               <rect
-                x={x - 65}
-                y={y - 30}
-                width={130}
+                x={x - 72}
+                y={y - 32}
+                width={144}
                 height={18}
                 rx={8}
-                className="fill-copper-soft/80"
+                fill={isScada ? '#0369a1' : '#fef3c7'}
               />
               <text
                 x={x}
-                y={y - 18}
+                y={y - 20}
                 textAnchor="middle"
-                className="font-mono text-[9px] font-bold uppercase tracking-wider fill-copper"
+                className="font-mono text-[9px] font-bold uppercase tracking-wider"
+                fill={isScada ? '#e0f2fe' : '#92400e'}
               >
-                400V 50Hz MAIN BUS
+                400V 50Hz MAIN BUSBAR
               </text>
 
               {/* Total Active Load & Status */}
@@ -222,17 +269,19 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
                 x={x}
                 y={y + 6}
                 textAnchor="middle"
-                className="font-serif text-sm font-bold fill-ink-primary"
+                className="font-mono text-sm font-bold"
+                fill={isScada ? '#38bdf8' : '#0f172a'}
               >
-                {powerSummary.totalLoadKw.toFixed(1)} kW
+                {totalLoad.toFixed(1)} kW
               </text>
               <text
                 x={x}
-                y={y + 20}
+                y={y + 21}
                 textAnchor="middle"
-                className="font-mono text-[8px] fill-moss font-semibold uppercase tracking-wide"
+                className="font-mono text-[8px] font-semibold uppercase tracking-wider"
+                fill="#10b981"
               >
-                ● 100% BALANCED
+                ● 100% BALANCED • 3-PHASE
               </text>
             </g>
           );
@@ -249,15 +298,19 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
               <circle
                 cx={x}
                 cy={y}
-                r={10}
-                className="fill-surface stroke-border stroke-1.5 shadow-xs"
+                r={11}
+                fill={isScada ? '#0f172a' : '#ffffff'}
+                stroke={isScada ? '#38bdf8' : '#94a3b8'}
+                strokeWidth={1.5}
+                className="shadow-xs"
               />
-              <circle cx={x} cy={y} r={3} className="fill-copper" />
+              <circle cx={x} cy={y} r={3.5} fill={isScada ? '#38bdf8' : '#b45309'} />
               <text
                 x={x}
-                y={y - 14}
+                y={y - 15}
                 textAnchor="middle"
-                className="font-mono text-[8px] font-semibold fill-ink-muted uppercase"
+                className="font-mono text-[8px] font-semibold uppercase"
+                fill={isScada ? '#94a3b8' : '#64748b'}
               >
                 {node.label.split(' ')[0]}
               </text>
@@ -271,7 +324,15 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
           const isFault = device.status === 'FAULT';
           const isOnline = device.status === 'ONLINE';
 
-          const categoryColor = isCritical ? '#166534' : device.category === 'IMPORTANT' ? '#0284C7' : '#71717A';
+          const categoryColor = isCritical 
+            ? (isScada ? '#34d399' : '#166534') 
+            : device.category === 'IMPORTANT' 
+            ? (isScada ? '#38bdf8' : '#0284c7') 
+            : '#94a3b8';
+
+          const padBg = isFault 
+            ? (isScada ? '#450a0a' : '#fee2e2') 
+            : (isScada ? '#0f172a' : '#ffffff');
 
           return (
             <g
@@ -286,12 +347,13 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
                 <circle
                   cx={x}
                   cy={y}
-                  r={22}
+                  r={23}
                   fill="none"
-                  stroke="#B45309"
+                  stroke={isScada ? '#38bdf8' : '#b45309'}
                   strokeWidth={2}
-                  strokeDasharray="3 2"
-                  className="animate-spin-slow"
+                  strokeDasharray="4 3"
+                  className="animate-spin"
+                  style={{ animationDuration: '8s' }}
                 />
               )}
 
@@ -300,28 +362,25 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
                 cx={x}
                 cy={y}
                 r={16}
-                className={`transition-all duration-200 ${
-                  isFault
-                    ? 'fill-red-100 stroke-red-600 stroke-2'
-                    : isSelected
-                    ? 'fill-surface stroke-copper stroke-2 shadow-sm'
-                    : 'fill-surface hover:fill-canvas stroke-border hover:stroke-ink-secondary stroke-1 shadow-xs'
-                }`}
+                fill={padBg}
+                stroke={isFault ? '#ef4444' : isSelected ? '#38bdf8' : (isScada ? '#334155' : '#cbd5e1')}
+                strokeWidth={isFault ? 2 : isSelected ? 2 : 1}
+                className="transition-all duration-200 shadow-xs"
               />
 
               {/* Category Ring Indicator */}
               <circle
                 cx={x}
                 cy={y}
-                r={14}
+                r={13.5}
                 fill="none"
                 stroke={categoryColor}
                 strokeWidth={isCritical ? 2 : 1}
-                opacity={0.8}
+                opacity={0.85}
               />
 
               {/* Device Icon */}
-              <g transform={`translate(${x - 8}, ${y - 8})`} color={isFault ? '#DC2626' : categoryColor}>
+              <g transform={`translate(${x - 8}, ${y - 8})`} color={isFault ? '#ef4444' : categoryColor}>
                 {renderIcon(node.iconKey, 'w-4 h-4')}
               </g>
 
@@ -329,34 +388,18 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
               <circle
                 cx={x + 12}
                 cy={y - 12}
-                r={3.5}
-                className={
-                  isFault
-                    ? 'fill-red-500 animate-ping'
-                    : isOnline
-                    ? 'fill-moss'
-                    : 'fill-ink-muted'
-                }
-              />
-              <circle
-                cx={x + 12}
-                cy={y - 12}
                 r={3}
-                className={
-                  isFault
-                    ? 'fill-red-500'
-                    : isOnline
-                    ? 'fill-moss'
-                    : 'fill-ink-muted'
-                }
+                fill={isFault ? '#ef4444' : isOnline ? '#10b981' : '#64748b'}
+                className={isFault ? 'animate-ping' : undefined}
               />
 
               {/* Device Name Label */}
               <text
                 x={x}
-                y={y + 25}
+                y={y + 26}
                 textAnchor="middle"
-                className="font-sans text-[9px] font-semibold fill-ink-primary pointer-events-none"
+                className="font-sans text-[9px] font-semibold pointer-events-none"
+                fill={isScada ? '#e2e8f0' : '#0f172a'}
               >
                 {device.name.length > 20 ? `${device.name.substring(0, 18)}...` : device.name}
               </text>
@@ -364,13 +407,12 @@ export const TwinNodes: React.FC<TwinNodesProps> = ({
               {/* Device Power Telemetry Badge */}
               <text
                 x={x}
-                y={y + 36}
+                y={y + 37}
                 textAnchor="middle"
-                className={`font-mono text-[9px] font-bold pointer-events-none ${
-                  isFault ? 'fill-red-600' : isOnline ? 'fill-ink-secondary' : 'fill-ink-muted'
-                }`}
+                className="font-mono text-[9px] font-bold pointer-events-none"
+                fill={isFault ? '#ef4444' : isOnline ? (isScada ? '#38bdf8' : '#334155') : '#64748b'}
               >
-                {isFault ? 'FAULT' : `${device.currentPowerKw.toFixed(1)} kW`}
+                {isFault ? 'TRIPPED' : `${device.currentPowerKw.toFixed(1)} kW`}
               </text>
             </g>
           );

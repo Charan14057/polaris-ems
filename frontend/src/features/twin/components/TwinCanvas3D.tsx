@@ -176,28 +176,28 @@ export const TwinCanvas3D: React.FC<TwinCanvas3DProps> = ({
       const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.65);
       scene.add(ambientLight);
 
-      // Warm low-angle Antarctic sunlight
-      const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.35);
-      sunLight.position.set(38, 55, 30);
+      // Warm low-angle Antarctic sunlight (18-30° grazing polar sun casting realistic shadows)
+      const sunLight = new THREE.DirectionalLight(0xffedd5, 1.45);
+      sunLight.position.set(45, 32, 28);
       sunLight.castShadow = true;
       sunLight.shadow.mapSize.width = 2048;
       sunLight.shadow.mapSize.height = 2048;
       sunLight.shadow.camera.near = 10;
-      sunLight.shadow.camera.far = 160;
-      sunLight.shadow.camera.left = -50;
-      sunLight.shadow.camera.right = 50;
-      sunLight.shadow.camera.top = 50;
-      sunLight.shadow.camera.bottom = -50;
-      sunLight.shadow.bias = -0.0005;
+      sunLight.shadow.camera.far = 180;
+      sunLight.shadow.camera.left = -60;
+      sunLight.shadow.camera.right = 60;
+      sunLight.shadow.camera.top = 60;
+      sunLight.shadow.camera.bottom = -60;
+      sunLight.shadow.bias = -0.0003;
       scene.add(sunLight);
 
       // Cool glacial blue fill light
-      const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
-      fillLight.position.set(-35, 25, -35);
+      const fillLight = new THREE.DirectionalLight(0x7dd3fc, 0.55);
+      fillLight.position.set(-40, 20, -35);
       scene.add(fillLight);
 
-      // Subtle upward ground bounce light
-      const groundBounce = new THREE.HemisphereLight(0x93c5fd, 0x1e293b, 0.5);
+      // Subtle upward ground bounce light from sastrugi snow crust
+      const groundBounce = new THREE.HemisphereLight(0xbae6fd, 0x1e293b, 0.55);
       scene.add(groundBounce);
 
       // Handle Resize

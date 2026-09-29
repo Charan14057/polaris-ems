@@ -4,7 +4,7 @@
  * 
  * Renders physical electrical conduits and dynamic source-to-load flow paths.
  * Enforces the non-renewable flow rule: lines with diesel contribution turn copper/alert.
- * Implements SVG path dash animations with directional awareness.
+ * Implements SVG path dash animations with directional awareness and moving electron energy packets.
  */
 
 import React from 'react';
@@ -12,13 +12,17 @@ import { VisualEdgeState } from '../model/twinTypes';
 
 interface TwinFlowLayerProps {
   edges: VisualEdgeState[];
+  theme?: 'SCADA' | 'BLUEPRINT';
   onSelectEdge?: (edgeId: string) => void;
 }
 
 export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
   edges,
+  theme = 'SCADA',
   onSelectEdge
 }) => {
+  const isScada = theme === 'SCADA';
+
   const getPathData = (geometry: VisualEdgeState['geometry']): string => {
     if (geometry.type === 'path' && geometry.d) {
       return geometry.d;
@@ -32,22 +36,31 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
   const getFlowStrokeColor = (edge: VisualEdgeState): string => {
     switch (edge.flowSemantic) {
       case 'FAULT':
-        return '#DC2626'; // Danger Red
+        return '#EF4444'; // Danger Red
       case 'NON_RENEWABLE':
-        return '#B45309'; // Burnished Copper (Diesel active)
+        return isScada ? '#F59E0B' : '#B45309'; // Warm Amber / Burnished Copper
       case 'BATTERY':
-        return '#0284C7'; // Glacial Ice
+        return isScada ? '#38BDF8' : '#0284C7'; // Cyan / Glacial Ice
       case 'RENEWABLE':
-        return '#0F766E'; // Deep Teal / Polar Moss
+        return isScada ? '#34D399' : '#0F766E'; // Polar Emerald / Teal
       case 'DORMANT':
       default:
-        return '#CBD5E1'; // Muted Stone
+        return isScada ? '#334155' : '#CBD5E1'; // Muted Stone / Slate
     }
   };
 
   return (
     <g className="twin-flow-layer select-none">
       <defs>
+        {/* Glow filter for neon SCADA conduits and electron pulses */}
+        <filter id="flow-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
         {/* SVG Marker for Flow Direction Arrows */}
         <marker
           id="flow-arrow-teal"
@@ -58,7 +71,7 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
           markerHeight="4"
           orient="auto-start-reverse"
         >
-          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0F766E" />
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10B981" />
         </marker>
         <marker
           id="flow-arrow-copper"
@@ -69,7 +82,7 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
           markerHeight="4"
           orient="auto-start-reverse"
         >
-          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#B45309" />
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#F59E0B" />
         </marker>
         <marker
           id="flow-arrow-ice"
@@ -80,7 +93,7 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
           markerHeight="4"
           orient="auto-start-reverse"
         >
-          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284C7" />
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38BDF8" />
         </marker>
       </defs>
 
@@ -89,22 +102,24 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
         const pathData = getPathData(edge.geometry);
         if (!pathData) return null;
 
+        const trayColor = isScada ? '#1e293b' : '#E2E8F0';
+
         return (
           <path
             key={`conduit-${edge.id}`}
             d={pathData}
             fill="none"
-            stroke="#E2E8F0"
-            strokeWidth={edge.lineWidthPx + 2.5}
+            stroke={trayColor}
+            strokeWidth={edge.lineWidthPx + 3}
             strokeLinecap="round"
             strokeLinejoin="round"
             className="transition-opacity duration-300"
-            opacity={edge.dimmed ? 0.2 : 0.9}
+            opacity={edge.dimmed ? 0.2 : (isScada ? 0.8 : 0.9)}
           />
         );
       })}
 
-      {/* Layer 2: Active Dynamic Power Flow Lines */}
+      {/* Layer 2: Active Dynamic Power Flow Lines & Electron Pulses */}
       {edges.map(edge => {
         const pathData = getPathData(edge.geometry);
         if (!pathData) return null;
@@ -112,6 +127,10 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
         const color = getFlowStrokeColor(edge);
         const isActive = edge.active && edge.direction !== 'NONE';
         const isReverse = edge.direction === 'REVERSE';
+        const powerKw = edge.powerKw || 0;
+
+        // Flow duration scales smoothly with power level: higher kW = faster animation
+        const baseDuration = Math.max(0.5, Math.min(1.8, 1.4 - (powerKw / 120)));
 
         return (
           <g
@@ -120,12 +139,12 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
             onClick={() => onSelectEdge?.(edge.id)}
             className="cursor-pointer group"
           >
-            {/* Click hit area */}
+            {/* Expanded Hit Area */}
             <path
               d={pathData}
               fill="none"
               stroke="transparent"
-              strokeWidth={14}
+              strokeWidth={16}
             />
 
             {/* Base electrical conductor line */}
@@ -136,7 +155,7 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
               strokeWidth={edge.lineWidthPx}
               strokeLinecap="round"
               strokeLinejoin="round"
-              opacity={edge.dimmed ? 0.15 : (edge.highlighted ? 1.0 : 0.85)}
+              opacity={edge.dimmed ? 0.15 : (edge.highlighted ? 1.0 : (isScada ? 0.85 : 0.75))}
               className="transition-all duration-200"
             />
 
@@ -146,17 +165,56 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
                 d={pathData}
                 fill="none"
                 stroke={color}
-                strokeWidth={edge.lineWidthPx}
+                strokeWidth={edge.lineWidthPx + 0.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray="8 6"
+                filter={isScada ? "url(#flow-glow)" : undefined}
                 className={`twin-flow-path transition-opacity duration-300 ${
                   edge.dimmed ? 'opacity-20' : 'opacity-100'
                 }`}
                 style={{
-                  animation: `twinFlow 1.2s linear infinite ${isReverse ? 'reverse' : 'normal'}`
+                  animation: `twinFlow ${baseDuration}s linear infinite ${isReverse ? 'reverse' : 'normal'}`
                 }}
               />
+            )}
+
+            {/* Moving Electron Energy Packets along Active Conduits */}
+            {isActive && powerKw > 0.2 && (
+              <g pointerEvents="none">
+                <circle
+                  r={Math.min(3.5, Math.max(2.2, edge.lineWidthPx * 0.7))}
+                  fill={isScada ? '#ffffff' : color}
+                  stroke={color}
+                  strokeWidth={1}
+                  filter="url(#flow-glow)"
+                >
+                  <animateMotion
+                    path={pathData}
+                    dur={`${baseDuration * 1.6}s`}
+                    repeatCount="indefinite"
+                    keyPoints={isReverse ? "1;0" : "0;1"}
+                    keyTimes="0;1"
+                  />
+                </circle>
+
+                {powerKw > 15 && (
+                  <circle
+                    r={Math.min(2.8, Math.max(1.8, edge.lineWidthPx * 0.55))}
+                    fill={color}
+                    opacity={0.85}
+                  >
+                    <animateMotion
+                      path={pathData}
+                      dur={`${baseDuration * 1.6}s`}
+                      begin={`${(baseDuration * 1.6) / 2}s`}
+                      repeatCount="indefinite"
+                      keyPoints={isReverse ? "1;0" : "0;1"}
+                      keyTimes="0;1"
+                    />
+                  </circle>
+                )}
+              </g>
             )}
 
             {/* Fault indicator line pattern */}
@@ -164,8 +222,8 @@ export const TwinFlowLayer: React.FC<TwinFlowLayerProps> = ({
               <path
                 d={pathData}
                 fill="none"
-                stroke="#DC2626"
-                strokeWidth={edge.lineWidthPx + 1}
+                stroke="#EF4444"
+                strokeWidth={edge.lineWidthPx + 1.5}
                 strokeDasharray="4 4"
                 className="animate-pulse"
               />
