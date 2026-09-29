@@ -13,7 +13,7 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
   size = 'xs',
   className = '' 
 }) => {
-  const norm = (provenance || 'CONFIGURED').toUpperCase() as ProvenanceTier;
+  const norm = (provenance || 'CONFIGURED').toUpperCase() as ProvenanceTier | string;
 
   const getMeta = () => {
     switch (norm) {
@@ -52,13 +52,20 @@ export const ProvenanceTag: React.FC<ProvenanceTagProps> = ({
           label: 'FORECAST',
           title: 'Machine learning prediction with calibrated conformal uncertainty (provenance: FORECAST)',
         };
+      case 'COMPUTATIONAL_TWIN':
+        return {
+          bg: 'bg-purple-50 border-purple-200 text-purple-800',
+          icon: <Activity className="w-3 h-3 text-purple-700" />,
+          label: 'COMPUTATIONAL TWIN',
+          title: 'Computed digital twin state — no physical SCADA connection',
+        };
       case 'SIMULATED':
       default:
         return {
           bg: 'bg-purple-50 border-purple-200 text-purple-800',
           icon: <Activity className="w-3 h-3 text-purple-700" />,
           label: 'DIGITAL TWIN',
-          title: 'Computed dynamic physics trajectory (provenance: SIMULATED)',
+          title: 'Computed digital twin state — no physical SCADA connection',
         };
     }
   };

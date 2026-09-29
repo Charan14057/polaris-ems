@@ -17,7 +17,7 @@ export interface DecisionNode {
   stageName: string;
   subsystem: string;
   value: string;
-  provenance: 'REAL' | 'CONFIGURED' | 'ASSUMED' | 'SYNTHETIC' | 'FORECAST' | 'SIMULATED';
+  provenance: 'REAL' | 'CONFIGURED' | 'ASSUMED' | 'SYNTHETIC' | 'FORECAST' | 'COMPUTATIONAL_TWIN';
   state: 'NORMAL' | 'ACTIVE' | 'PERTURBED' | 'OPTIMAL' | 'VERIFIED' | 'PROTECT';
   narrative: string;
   evidence: EvidenceRecord;
@@ -100,14 +100,14 @@ export const DecisionRibbon: React.FC<DecisionRibbonProps> = ({
       stageName: '04 OPTIMIZER',
       subsystem: 'Rolling MILP',
       value: 'G1: 65kW | G2: 45kW',
-      provenance: 'SIMULATED',
+      provenance: 'COMPUTATIONAL_TWIN',
       state: 'OPTIMAL',
       narrative: 'Pyomo/HiGHS solver schedules dual diesel generators with 35% spinning reserve to protect critical life-support.',
       evidence: {
         title: 'Optimal Dispatch Vector',
         value: 'G1: 65kW | G2: 45kW | BESS: 30kW',
         source: 'HiGHS Mixed-Integer Linear Solver',
-        provenance: 'SIMULATED',
+        provenance: 'COMPUTATIONAL_TWIN',
         station: stationId,
         modelOrSubsystem: 'Constrained Dispatch Optimizer',
         validationState: 'Primal-dual gap = 0.00%',
@@ -118,16 +118,16 @@ export const DecisionRibbon: React.FC<DecisionRibbonProps> = ({
     {
       id: 'twin',
       stageName: '05 TWIN',
-      subsystem: 'Simulation Replay',
+      subsystem: 'Twin Physics Replay',
       value: 'Conserved (0.0% gap)',
-      provenance: 'SIMULATED',
+      provenance: 'COMPUTATIONAL_TWIN',
       state: 'VERIFIED',
       narrative: 'Digital Twin replay computes multi-physics electrical conservation, battery electrochemical limits, and thermal loss.',
       evidence: {
         title: 'Digital Twin Energy Conservation',
         value: '100% Balanced',
         source: 'Computational Energy Digital Twin',
-        provenance: 'SIMULATED',
+        provenance: 'COMPUTATIONAL_TWIN',
         station: stationId,
         modelOrSubsystem: 'Thermodynamic & Electrochemical Replay Engine',
         validationState: 'Physically Validated Replay',
@@ -140,7 +140,7 @@ export const DecisionRibbon: React.FC<DecisionRibbonProps> = ({
       stageName: '06 RESILIENCE',
       subsystem: 'Survival Envelope',
       value: 'T_surv: 84 hours',
-      provenance: 'SIMULATED',
+      provenance: 'COMPUTATIONAL_TWIN',
       state: 'ACTIVE',
       narrative: '9-dimensional radar confirms critical-load survival horizon of 84 hours, bounded primarily by fuel tank reserve.',
       evidence: {
@@ -148,7 +148,7 @@ export const DecisionRibbon: React.FC<DecisionRibbonProps> = ({
         value: '84.0',
         unit: 'hours',
         source: 'Resilience State Machine',
-        provenance: 'SIMULATED',
+        provenance: 'COMPUTATIONAL_TWIN',
         station: stationId,
         modelOrSubsystem: 'Multi-Horizon Survival Calculus',
         uncertainty: 'Fuel binding: 84h | Battery: 9.5h | Thermal: 14h',

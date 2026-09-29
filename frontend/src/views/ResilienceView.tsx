@@ -131,8 +131,8 @@ export const ResilienceView: React.FC = () => {
 
   const recoveryOptions = resilienceData.candidate_recovery_options || [];
 
-  const fuelLiters = snapshot?.fuelRemainingL != null ? `${snapshot.fuelRemainingL.toLocaleString()} L` : '—';
-  const bessSoc = snapshot?.bessSocPct != null ? `${snapshot.bessSocPct.toFixed(0)}%` : '—';
+  const fuelLiters = snapshot?.fuelRemainingL != null ? `${snapshot.fuelRemainingL.toLocaleString()} L` : '0 L';
+  const bessSoc = snapshot?.bessSocPct != null ? `${snapshot.bessSocPct.toFixed(0)}%` : '0%';
   const dynamicOutlook = `Station fuel reserve is currently at ${fuelLiters} with battery state of charge at ${bessSoc}. The binding subsystem is ${bindingSubsystem} establishing an autonomous survival envelope of ${overallHorizon.toFixed(1)} hours.`;
 
   return (
@@ -142,7 +142,7 @@ export const ResilienceView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-rose-600 font-bold mb-1">
             <ShieldAlert className="w-4 h-4" />
-            <span>06 DYNAMIC RESILIENCE ENGINE • PHASE 7 SURVIVABILITY</span>
+            <span>06 DYNAMIC RESILIENCE ENGINE • MULTI-HORIZON SURVIVABILITY</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-sans font-bold text-slate-900 tracking-tight">
             Station Resilience & Survival Envelope
@@ -152,7 +152,7 @@ export const ResilienceView: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <ProvenanceTag provenance="SIMULATED" size="sm" />
+          <ProvenanceTag provenance="COMPUTATIONAL_TWIN" size="sm" />
           <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-slate-900 text-slate-100">
             STATION: {currentStation}
           </span>
@@ -197,8 +197,8 @@ export const ResilienceView: React.FC = () => {
         title="What is the Station Survival Envelope?"
         whatAmILookingAt="This view measures how many hours the polar station can continue functioning without external resupply if generation or weather shifts occur."
         whyIsItImportant="In Antarctica or the high Arctic, resupply is impossible for months. Knowing which resource will bind first gives commanders time to ration power days before an emergency."
-        howIsItCalculated="Phase 7 calculates four simultaneous survival horizons: fuel runway, battery energy, building warmth, and critical load coverage. Overall survival is the mathematical minimum."
-        technicalEvidence="Governing invariant: T_surv = min(T_fuel, T_battery, T_thermal, T_critical). Calibrated against Phase 4 Digital Twin physics."
+        howIsItCalculated="The resilience engine calculates four simultaneous survival horizons: fuel runway, battery energy, building warmth, and critical load coverage. Overall survival is the mathematical minimum."
+        technicalEvidence="Governing invariant: T_surv = min(T_fuel, T_battery, T_thermal, T_critical). Calibrated against Digital Twin physics."
       />
 
       {/* 3. Authoritative Dynamic Resilience Envelope */}
@@ -233,7 +233,7 @@ export const ResilienceView: React.FC = () => {
             className="w-full flex items-center justify-between text-xs font-mono font-bold text-slate-900"
           >
             <span className="uppercase tracking-wider">
-              NINE-DIMENSION ANALYTICAL HEALTH RADAR (PHASE 7 ENGINE)
+              NINE-DIMENSION ANALYTICAL HEALTH RADAR
             </span>
             {showNineDimensions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>

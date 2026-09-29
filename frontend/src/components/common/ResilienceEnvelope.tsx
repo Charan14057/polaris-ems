@@ -82,7 +82,7 @@ export const ResilienceEnvelope: React.FC<ResilienceEnvelopeProps> = ({
               title: 'Resilience Binding Constraint',
               value: `${overallHorizonHours.toFixed(1)} hours (${bindingConstraint})`,
               source: 'Polaris Resilience State Machine',
-              provenance: 'SIMULATED',
+              provenance: 'COMPUTATIONAL_TWIN',
               station: stationId,
               modelOrSubsystem: 'Multi-Horizon Survival Calculus',
               mathematicalBasis: '$T_{\\text{surv}} = \\min(T_{\\text{fuel}}, T_{\\text{battery}}, T_{\\text{thermal}}, T_{\\text{critical}})$',

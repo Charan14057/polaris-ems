@@ -48,7 +48,7 @@ Predict → Simulate → Stress Test → Optimize → Protect → Preserve
 | **Phase 14** | Deployment / Productization | Multi-stage non-root Docker (`polarisuser` UID 10001), Docker Compose, Nginx reverse proxy, Open-Meteo & NCPOR adapters |
 | **Phase 15** | Operational Validation | Reality drift monitoring, quarantine circuit breaker, epistemic safeguards, feed completeness tracking |
 | **Phase 16** | Field / HIL Validation | Abstracted `DeviceAdapter` hierarchy (`Simulator`, `Emulator`, `HIL`, `Lab`), actuation safety boundary, chaos fault injection |
-| **Phase 17** | Final Release & Demonstration | 14-stage automated master demonstration, reproducibility verification, final submission hardening |
+| **Phase 17** | Final Release & Demonstration | 14-stage automated end-to-end demonstration, reproducibility verification, public product release |
 
 ---
 

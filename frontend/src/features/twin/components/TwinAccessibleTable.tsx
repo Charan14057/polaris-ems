@@ -102,7 +102,7 @@ export const TwinAccessibleTable: React.FC<TwinAccessibleTableProps> = ({
                     </span>
                   </td>
                   <td className="p-2.5">
-                    <ProvenanceTag provenance="SIMULATED" size="xs" />
+                    <ProvenanceTag provenance="COMPUTATIONAL_TWIN" size="xs" />
                   </td>
                 </tr>
               ))}
