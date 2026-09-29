@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Info
 } from 'lucide-react';
+import { getStationPhoto, getPublicStationPhoto } from '../model/stationPhotos';
 
 interface PhysicalStationReferenceCardProps {
   stationId: string;
@@ -43,7 +44,7 @@ const STATION_GROUND_TRUTH: Record<string, StationGroundTruthData> = {
     mandate: 'Oceanography, continental breakup, atmospheric & space physics',
     agency: 'National Centre for Polar and Ocean Research (NCPOR)',
     envelope: 'Aerodynamic modular envelope on 24 heavy-duty stilts (134 standard shipping containers)',
-    imageSrc: '/assets/stations/bharati_real.jpg',
+    imageSrc: getStationPhoto('BHARATI'),
     caption: 'Official field photographic record: Bharati elevated aerodynamic superstructure, Larsemann Hills.',
     verifiedFeatures: [
       'Stilt-mounted aerodynamic structure shedding severe katabatic snowdrifts',
@@ -62,7 +63,7 @@ const STATION_GROUND_TRUTH: Record<string, StationGroundTruthData> = {
     mandate: 'Geology, glaciology, terrestrial biology, human physiology',
     agency: 'National Centre for Polar and Ocean Research (NCPOR)',
     envelope: 'Central heated corridor connecting modular steel living & science blocks',
-    imageSrc: '/assets/stations/maitri_real.jpg',
+    imageSrc: getStationPhoto('MAITRI'),
     caption: 'Official field photographic record: Maitri modular research habitat at Schirmacher Oasis.',
     verifiedFeatures: [
       'Central heated enclosed spine corridor linking living and operations blocks',
@@ -81,7 +82,7 @@ const STATION_GROUND_TRUTH: Record<string, StationGroundTruthData> = {
     mandate: 'Arctic climate change, marine biology, aerosol radiative forcing',
     agency: 'National Centre for Polar and Ocean Research (NCPOR)',
     envelope: 'Two-storey Nordic timber and steel research lodge with steep snow-shedding gables',
-    imageSrc: '/assets/stations/himadri_real.jpg',
+    imageSrc: getStationPhoto('HIMADRI'),
     caption: 'Official field photographic record: Himadri Arctic research station at Ny-Ålesund, Svalbard.',
     verifiedFeatures: [
       'Nordic timber research building with steep snow-shedding pitched roof',
@@ -99,6 +100,7 @@ export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCard
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const data = STATION_GROUND_TRUTH[stationId.toUpperCase()] || STATION_GROUND_TRUTH.BHARATI;
+  const currentPhoto = getStationPhoto(stationId);
 
   return (
     <div className="bg-white rounded-xl border border-teal-500/20 shadow-sm overflow-hidden font-sans transition-all">
@@ -150,8 +152,15 @@ export const PhysicalStationReferenceCard: React.FC<PhysicalStationReferenceCard
             {/* Medium-Sized Authentic Photo */}
             <div className="md:col-span-6 relative group overflow-hidden rounded-lg border border-slate-200 shadow-xs bg-slate-900">
               <img
-                src={data.imageSrc}
+                src={currentPhoto}
                 alt={data.name}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.dataset.fallback) {
+                    target.dataset.fallback = 'true';
+                    target.src = getPublicStationPhoto(stationId);
+                  }
+                }}
                 className="w-full h-56 sm:h-64 object-cover object-center group-hover:scale-102 transition-transform duration-300"
                 loading="eager"
               />

@@ -18,6 +18,7 @@
 
 import React, { useState } from 'react';
 import { X, Sliders, Columns, Eye, ShieldCheck, AlertCircle, ExternalLink } from 'lucide-react';
+import { getStationPhoto, getPublicStationPhoto } from '../model/stationPhotos';
 
 interface ReferenceComparisonModalProps {
   stationId: string;
@@ -47,7 +48,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       architect: 'bof Architekten / IMS Ingenieurgesellschaft / NCPOR',
       source: 'NCPOR / NCAOR Official Architectural Archive & Expedition Photography',
       geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
-      imageSrc: '/assets/stations/bharati_real.jpg',
+      imageSrc: getStationPhoto('BHARATI'),
       photoCaption: 'Official field photograph: Elevated aerodynamic superstructure on 24 heavy-duty stilts at Larsemann Hills.',
       spec: 'Elevated multi-deck aerodynamic envelope on 24 heavy-duty stilts to shed katabatic wind snowdrifts.',
       features: [
@@ -121,7 +122,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       architect: 'DRDO / NCAOR (Indian Antarctic Programme)',
       source: 'NCAOR Indian Antarctic Programme Master Plan & Expedition Photography',
       geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
-      imageSrc: '/assets/stations/maitri_real.jpg',
+      imageSrc: getStationPhoto('MAITRI'),
       photoCaption: 'Official field photograph: Modular living and laboratory blocks linked by central heated spine corridor at Schirmacher Oasis.',
       spec: 'Central enclosed heated corridor connecting modular living, utility, and powerhouse modules.',
       features: [
@@ -173,7 +174,7 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       architect: 'Kings Bay AS / NCPOR Arctic Research Programme',
       source: 'Kings Bay Ny-Ålesund Settlement Master Layout & Expedition Photography',
       geometryBasis: 'AUTHENTIC GROUND TRUTH FIELD PHOTO & ARCHITECTURAL REFERENCE',
-      imageSrc: '/assets/stations/himadri_real.jpg',
+      imageSrc: getStationPhoto('HIMADRI'),
       photoCaption: 'Official field photograph: Two-storey Nordic timber research lodge with steep snow-shedding gables at Ny-Ålesund, Svalbard.',
       spec: 'Two-storey Nordic timber research station with steep gable roof and settlement district energy tie-in.',
       features: [
@@ -240,8 +241,15 @@ export const ReferenceComparisonModal: React.FC<ReferenceComparisonModalProps> =
       return (
         <div className="w-full h-full relative flex items-center justify-center p-3 bg-slate-950">
           <img
-            src={stationData.imageSrc}
+            src={getStationPhoto(stationId)}
             alt={stationData.name}
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.dataset.fallback) {
+                target.dataset.fallback = 'true';
+                target.src = getPublicStationPhoto(stationId);
+              }
+            }}
             className="max-h-full max-w-full object-contain rounded-lg border border-slate-700 shadow-xl"
           />
           <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 pointer-events-none">
