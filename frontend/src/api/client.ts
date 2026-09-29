@@ -25,7 +25,9 @@ export class PolarisAPIError extends Error {
 
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retries = 2,
+  backoffMs = 1200
 ): Promise<APIResponse<T>> {
   const reqId = `req-ui-${Math.random().toString(36).substring(2, 10)}`;
   
@@ -43,6 +45,12 @@ export async function apiRequest<T>(
       headers,
     });
 
+    // Auto-retry transient gateway cold-start errors (typical during Render deployments / wakeups)
+    if ((response.status === 502 || response.status === 503 || response.status === 504) && retries > 0) {
+      await new Promise((r) => setTimeout(r, backoffMs));
+      return apiRequest<T>(endpoint, options, retries - 1, backoffMs * 1.5);
+    }
+
     let body: APIResponse<T> | null = null;
     try {
       body = await response.json();
@@ -54,7 +62,7 @@ export async function apiRequest<T>(
       const errCode = body?.error?.code || `HTTP_${response.status}`;
       let errMsg = body?.error?.message;
       if (!errMsg) {
-        if (response.status === 502 || response.status === 503) {
+        if (response.status === 502 || response.status === 503 || response.status === 504) {
           errMsg = 'Polaris-EMS service is initializing on Render. Please wait a moment and retry.';
         } else if (response.status === 404) {
           errMsg = `Requested endpoint not found (${endpoint}).`;
@@ -74,6 +82,11 @@ export async function apiRequest<T>(
   } catch (err: any) {
     if (err instanceof PolarisAPIError) {
       throw err;
+    }
+    // Auto-retry transient network dropouts if server is warming up
+    if (retries > 0) {
+      await new Promise((r) => setTimeout(r, backoffMs));
+      return apiRequest<T>(endpoint, options, retries - 1, backoffMs * 1.5);
     }
     throw new PolarisAPIError('NETWORK_ERROR', err.message || 'Network connection failed', 0);
   }

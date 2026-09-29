@@ -62,6 +62,16 @@ export const ForecastView: React.FC = () => {
     fetchForecast();
   }, [fetchForecast]);
 
+  // Automatic gentle re-poll if server was warming up during initial page load
+  useEffect(() => {
+    if (error && (error.includes('initializing') || error.includes('wait a moment'))) {
+      const timer = setTimeout(() => {
+        fetchForecast();
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [error, fetchForecast]);
+
   const targets = [
     { id: 'total_load_kw', label: 'Station Load (kW)', icon: <Activity className="w-3.5 h-3.5 text-indigo-600" /> },
     { id: 'solar_generation_kw', label: 'Solar PV (kW)', icon: <Sun className="w-3.5 h-3.5 text-amber-600" /> },
