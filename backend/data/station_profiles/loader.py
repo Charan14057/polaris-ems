@@ -7,7 +7,7 @@ Loads and validates verified public station parameters for Bharati, Maitri, and 
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -126,3 +126,16 @@ class StationProfileRegistry:
 
     def list_stations(self) -> List[str]:
         return list(self._profiles.keys())
+
+    def __getstate__(self) -> Dict[str, Any]:
+        """Sanitize state for cross-platform, cross-Python serialization."""
+        state = self.__dict__.copy()
+        if "config_path" in state and state["config_path"] is not None:
+            state["config_path"] = str(state["config_path"])
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state safely with portable Path conversion."""
+        if "config_path" in state and state["config_path"] is not None:
+            state["config_path"] = Path(state["config_path"])
+        self.__dict__.update(state)

@@ -43,13 +43,31 @@ export async function apiRequest<T>(
       headers,
     });
 
-    const body: APIResponse<T> = await response.json();
+    let body: APIResponse<T> | null = null;
+    try {
+      body = await response.json();
+    } catch {
+      body = null;
+    }
 
     if (!response.ok) {
       const errCode = body?.error?.code || `HTTP_${response.status}`;
-      const errMsg = body?.error?.message || response.statusText || 'API request failed';
+      let errMsg = body?.error?.message;
+      if (!errMsg) {
+        if (response.status === 502 || response.status === 503) {
+          errMsg = 'Polaris-EMS service is initializing on Render. Please wait a moment and retry.';
+        } else if (response.status === 404) {
+          errMsg = `Requested endpoint not found (${endpoint}).`;
+        } else {
+          errMsg = response.statusText || 'API request failed';
+        }
+      }
       const correlationId = response.headers.get('x-request-id') || body?.request_id;
       throw new PolarisAPIError(errCode, errMsg, response.status, body?.error?.details, correlationId);
+    }
+
+    if (!body) {
+      throw new PolarisAPIError('PARSE_ERROR', 'Unexpected non-JSON response from server', response.status);
     }
 
     return body;
