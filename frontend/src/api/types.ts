@@ -105,7 +105,7 @@ export interface CapabilitiesResponse {
 }
 
 // Station Details
-export interface DeviceSummary {
+export interface StationLoadDevice {
   id: string;
   name: string;
   category: string;
@@ -160,7 +160,7 @@ export interface StationDetail {
   electrical: ElectricalDetail;
   thermal: ThermalDetail;
   fuel: FuelDetail;
-  devices: DeviceSummary[];
+  devices: StationLoadDevice[];
   provenance: ProvenanceTier;
 }
 
