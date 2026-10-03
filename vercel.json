@@ -1,6 +1,20 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
+  "services": {
+    "polaris": {
+      "root": "./",
+      "runtime": "container",
+      "entrypoint": "Dockerfile.vercel"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "polaris"
+      }
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -21,3 +35,4 @@
     }
   ]
 }
+
