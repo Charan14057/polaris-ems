@@ -65,13 +65,20 @@ def create_app(config: Optional[APIConfig] = None) -> FastAPI:
         yield
         logger.info("Polaris-EMS API shutting down gracefully.")
 
+    # Production Hardening: Disable Swagger UI, ReDoc, and OpenAPI schema in PRODUCTION unless explicitly enabled
+    is_prod = cfg.settings.deployment.environment.upper() == "PRODUCTION"
+    enable_docs = cfg.debug or os.getenv("POLARIS_ENABLE_DOCS", "false").lower() in ("true", "1", "yes")
+    docs_url = "/docs" if (enable_docs or not is_prod) else None
+    redoc_url = "/redoc" if (enable_docs or not is_prod) else None
+    openapi_url = "/openapi.json" if (enable_docs or not is_prod) else None
+
     app = FastAPI(
         title=cfg.title,
         description=cfg.description,
         version=cfg.version,
-        docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_url="/openapi.json",
+        docs_url=docs_url,
+        redoc_url=redoc_url,
+        openapi_url=openapi_url,
         lifespan=lifespan
     )
 
