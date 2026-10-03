@@ -49,3 +49,5 @@ dist/
 # Test generated runtime traces
 reports/traces/
 
+# Vercel CLI local configuration and metadata
+.vercel/

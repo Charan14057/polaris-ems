@@ -5,9 +5,10 @@
 [![CI / Pytest Suite](https://img.shields.io/badge/pytest-436%20passed-brightgreen?logo=pytest)](tests)
 [![Frontend Vitest](https://img.shields.io/badge/vitest-46%20passed-success?logo=vitest)](frontend)
 [![Release Status](https://img.shields.io/badge/Release-PRODUCTION__READY-blue)](README.md)
+[![Vercel Production](https://img.shields.io/badge/Vercel-polaris--ems.vercel.app-black?logo=vercel)](https://polaris-ems.vercel.app)
 [![Zero-Real-Grid-Breach](https://img.shields.io/badge/Air--Gap-100%25%20DISCONNECTED-red)](README.md)
 [![Provenance Strict](https://img.shields.io/badge/Provenance-6%20Locked%20Tiers-blueviolet)](backend/core/provenance.py)
-[![Docker Multi-Stage](https://img.shields.io/badge/Container-Docker%20Hardened-2496ED?logo=docker)](Dockerfile)
+[![Docker Multi-Stage](https://img.shields.io/badge/Container-Docker%20Hardened-2496ED?logo=docker)](Dockerfile.vercel)
 
 ---
 
@@ -45,7 +46,7 @@ Predict → Simulate → Stress Test → Optimize → Protect → Preserve
 | **Device / Edge** | Edge Intelligence | Autonomous edge execution cycle, local persistence, offline failover, ring-buffered ingestion |
 | **Decision Trace** | Audit Ledger | Explainable "Why did Polaris-EMS do this?" trace, SHA-256 cryptographic lineage |
 | **Scientific Validation** | Validation | Conformal calibration audits, Tree SHAP additivity, cold archive lifecycle, fair optimizer benchmarks |
-| **Production Deployment** | Infrastructure | Multi-stage non-root Docker (`polarisuser` UID 10001), unified FastAPI static frontend serving, Render deployment |
+| **Production Deployment** | Infrastructure | Multi-stage non-root Docker (`polarisuser` UID 10001), unified FastAPI static frontend serving, Vercel Container deployment: [https://polaris-ems.vercel.app](https://polaris-ems.vercel.app) |
 | **Operational Validation** | Validation | Reality drift monitoring, quarantine circuit breaker, epistemic safeguards, feed completeness tracking |
 | **Field / HIL Validation** | Hardware Interface | Abstracted `DeviceAdapter` hierarchy (`Simulator`, `Emulator`, `HIL`, `Lab`), actuation safety boundary, chaos fault injection |
 | **Product Release** | Release & Demo | Automated end-to-end demonstration, reproducibility verification, public product release |
@@ -151,7 +152,21 @@ python scripts/final_demo.py
 ```
 This executes the full pipeline: station profile resolution, adapter discovery, ML forecasting ($P_{10}..P_{95}$), scenario perturbation, rolling MILP optimization, digital twin replay, resilience radar evaluation, policy governance, edge intelligence, chaos fault injection, state reconciliation, actuation safety boundary enforcement, decision trace DAG emission, and epistemic boundary verification.
 
-### 4. Running Backend & Frontend Locally
+### 4. Live Production Deployment & Local Execution
+
+#### 🌐 Live Vercel Production Deployment
+Polaris-EMS is deployed in production container runtime at:
+**[https://polaris-ems.vercel.app](https://polaris-ems.vercel.app)**
+
+Features:
+- Multi-stage OCI container (`Dockerfile.vercel`) on Vercel Fluid Compute
+- Unified single-port React 18 HMI + FastAPI serving
+- Hardened non-root runtime (`polarisuser` UID 10001)
+- Automated HTTP liveness/readiness probes (`/health`, `/health/ready`)
+- Strict noindex / nofollow and security headers (`X-Robots-Tag`, `X-Frame-Options`, `X-Content-Type-Options`)
+- Disabled Swagger/OpenAPI docs in production environment
+
+#### 💻 Running Backend & Frontend Locally
 ```bash
 # Terminal 1: Backend API
 uvicorn backend.api.main:app --host 0.0.0.0 --port 8000 --reload
