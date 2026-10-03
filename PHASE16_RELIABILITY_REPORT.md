@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 16 Long-Duration Reliability Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Field / Hardware-in-the-Loop Validation & Reliability  
 **Report Subject:** 24h & 72h Continuous Operational & Buffer Stress Profile  
 **Status:** 🟢 **`RELIABILITY_VERIFIED`**  

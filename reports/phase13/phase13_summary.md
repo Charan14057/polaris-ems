@@ -1,5 +1,5 @@
 # PHASE 13 — VALIDATION & BENCHMARKING EXECUTIVE SUMMARY
-SIH26061: Polar Energy Management & Resilience System
+Polaris-EMS: Polar Energy Management & Resilience System
 
 ## Executive Status
 - **Phase Status:** 🟢 `PHASE_13_FROZEN`

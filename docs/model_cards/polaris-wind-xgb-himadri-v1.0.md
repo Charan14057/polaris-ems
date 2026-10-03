@@ -1,6 +1,6 @@
 # Polaris-EMS Model Card: polaris-wind-xgb-himadri-v1.0
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Model Name**: `polaris-wind-xgb-himadri-v1.0`  
 **Model Version**: `v1.0`  
 **Station**: `HIMADRI`  

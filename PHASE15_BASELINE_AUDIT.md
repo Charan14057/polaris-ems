@@ -2,7 +2,7 @@
 **Real-World Integration, Calibration & Operational Validation Baseline Audit**
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Phase 15 Baseline Audit
 **Phase Status:** 🟢 **`PHASE_15_FROZEN`**
 **Prior Frozen Baseline:** 🟢 **`PHASE_14_FROZEN`** | **`PHASES_1_14_COMPLETE`**

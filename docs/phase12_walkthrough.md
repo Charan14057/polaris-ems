@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 12 Operational Walkthrough
 ## Decision Trace, Explainability & End-to-End Auditability
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 12 (Decision Trace & Auditability)  
 **Status**: COMPLETE & VERIFIED (READY FOR FREEZE)  
 

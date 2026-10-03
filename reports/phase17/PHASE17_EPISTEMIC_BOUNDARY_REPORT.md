@@ -1,8 +1,8 @@
 # Polaris-EMS: Phase 17 Epistemic Boundary & Truthfulness Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
-**Phase Identity:** Phase 17 — Final Release, Demonstration & Submission Hardening  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
+**Phase Identity:** Phase 17 — Final Release, Demonstration & Platform Hardening  
 **Report Focus:** Epistemic Truthfulness, Provenance Taxonomy, & Physical Boundaries  
 **Status:** 🟢 **`EPISTEMICALLY_VERIFIED`**  
 

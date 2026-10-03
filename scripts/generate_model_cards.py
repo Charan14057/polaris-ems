@@ -31,7 +31,7 @@ def generate_all_model_cards():
 
             content = f"""# Polaris-EMS Model Card: {m_name}
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System**: Polaris-EMS — Polar Energy Management & Resilience System  
 **Model Name**: `{m_name}`  
 **Model Version**: `{meta['model_version']}`  
 **Station**: `{meta['station']}`  

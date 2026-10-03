@@ -43,7 +43,7 @@ from backend.integrations.replay import get_replay_orchestrator
 def run_phase15_operational_demo():
     print("\n" + "=" * 84)
     print("POLARIS-EMS: PHASE 15 REAL-WORLD INTEGRATION & OPERATIONAL VALIDATION DEMO")
-    print("SIH26061: Polar Energy Management & Resilience System")
+    print("Polaris-EMS: Polar Energy Management & Resilience System")
     print("Governing Principle: Connect reality to the existing brain. Do not build another brain.")
     print("=" * 84)
 

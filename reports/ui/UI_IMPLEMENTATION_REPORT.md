@@ -86,7 +86,7 @@ Polaris-EMS introduces dedicated, novel interaction and comprehension primitives
 7. **`NextStepExplanation` Component:** Proactive operational outlooks informing operators and visitors what the system will do over the next 12 to 48 hours.
 8. **`HumanDecisionSummary` Component:** 4-part structured decision card (`DECISION`, `BECAUSE`, `TO PROTECT`, `CONFIDENCE / EVIDENCE`).
 9. **`JargonTooltip` System:** First-use jargon translation with inline plain-language definitions for Digital Twin, MILP, Resilience, Telemetry, HIL, SCADA, Edge, and Provenance.
-10. **`QuickOrientationModal` (60-Second Understanding Test):** An interactive 7-point orientation deck accessible at any time from the masthead, enabling any judge or non-technical evaluator to understand the problem, the AI, the Twin, the Optimizer, and system trust within 60 seconds.
+10. **`QuickOrientationModal` (60-Second Understanding Test):** An interactive 7-point orientation deck accessible at any time from the masthead, enabling any technical reviewer or evaluator to understand the problem, the AI, the Twin, the Optimizer, and system trust within 60 seconds.
 11. **Two-Layer Comprehension Mode Switch:** Masthead toggle between "Plain English" (Simple/Operational View) and "Engineering Mode" (Deep Auditing).
 
 ---

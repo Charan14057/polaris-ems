@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 13 Scientific Validation Specification & Protocol
 
 **System**: Polaris-EMS — Polar Energy Management & Resilience System  
-**Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 13 (Validation, Benchmarking, Explainability & Reproducibility Protocol)  
 
 ---

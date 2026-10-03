@@ -1,5 +1,5 @@
 # POLARIS-EMS — Digital Twin Causal Dependency Map
-**SIH26061: Polar Energy Management & Resilience System**  
+**Polaris-EMS: Polar Energy Management & Resilience System**  
 **Air-Gap Status:** `PHYSICAL_CONNECTIVITY = DISCONNECTED`  
 **Authoritative Engine:** Phase 4 `TwinEngine` + Phase 5 `ScenarioEngine` + Phase 6 `OptimizerEngine` + Phase 8 `PolicyEngine`
 

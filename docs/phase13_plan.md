@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 13 Implementation Plan
 ## Validation, Benchmarking, Model Explainability & Reproducibility
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 13 (Validation, Benchmarking, Explainability & Reproducibility)  
 **Baseline**: Phases 1–12 Complete & Frozen (227 backend tests passed, 12 frontend tests passed)  
 **Core Purpose**: Prove, measure, explain, and benchmark the existing system without modifying any decision authority.

@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 12 Architecture Specification
 ## Decision Trace, Explainability & End-to-End Auditability Layer
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 12 (Decision Trace & Auditability)  
 **Status**: COMPLETE & READY FOR FREEZE  
 **Core Mandate**: Build an observational audit, lineage, and explainability layer over existing decision engines (Phases 3–11) to answer: *What did the system decide? Why? Based on what evidence? What was physically validated vs. estimated? What policy applied? What changed from previous decisions?*

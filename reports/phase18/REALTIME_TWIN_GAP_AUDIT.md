@@ -1,5 +1,5 @@
 # POLARIS-EMS — Real-Time Digital Twin Gap & Closure Audit
-**SIH26061: Polar Energy Management & Resilience System**  
+**Polaris-EMS: Polar Energy Management & Resilience System**  
 **Audit Standard:** Final Production Acceptance Gate  
 **Execution Timestamp:** 2026-09-26T22:05:00Z  
 **Boundary Definition:** `PHYSICAL_CONNECTIVITY = DISCONNECTED`, `PROVENANCE = SIMULATED`

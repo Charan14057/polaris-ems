@@ -2,7 +2,7 @@
 ## Real-World Integration, Calibration & Operational Validation
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Phase 15 (Real-World Integration, Calibration & Operational Validation)
 **System Status:** 🟢 **`PHASE_15_FROZEN`** (Formally Frozen & Immutable)
 **Governance Event:** `PHASE15_EPISTEMIC_RECONCILIATION_COMPLETE`
@@ -85,22 +85,22 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
 
 | Test File | Phase Scope | Tests Discovered | Passing | Status |
 | :--- | :--- | :---: | :---: | :---: |
-| [`tests/test_phase1_foundation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase1_foundation.py) | Phase 1 Foundation | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase2_synthetic_environment.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase2_synthetic_environment.py) | Phase 2 Synthetic Environment | 10 | 10 | 🟢 PASS |
-| [`tests/test_phase3_ml_forecasting.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase3_ml_forecasting.py) | Phase 3 ML Forecasting | 9 | 9 | 🟢 PASS |
-| [`tests/test_phase4_digital_twin.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase4_digital_twin.py) | Phase 4 Digital Twin | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase5_scenario_engine.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase5_scenario_engine.py) | Phase 5 Scenario Engine | 17 | 17 | 🟢 PASS |
-| [`tests/test_phase6_final_audit.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase6_final_audit.py) | Phase 6 Final Audit | 45 | 45 | 🟢 PASS |
-| [`tests/test_phase6_optimizer.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase6_optimizer.py) | Phase 6 Optimizer Core | 23 | 23 | 🟢 PASS |
-| [`tests/test_phase7_resilience.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase7_resilience.py) | Phase 7 Resilience Engine | 34 | 34 | 🟢 PASS |
-| [`tests/test_phase8_policy.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase8_policy.py) | Phase 8 Policy Engine | 25 | 25 | 🟢 PASS |
-| [`tests/test_phase9_api.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase9_api.py) | Phase 9 REST API | 21 | 21 | 🟢 PASS |
-| [`tests/test_phase11_edge.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase11_edge.py) | Phase 11 Edge Intelligence | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase12_trace.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase12_trace.py) | Phase 12 Decision Trace | 10 | 10 | 🟢 PASS |
+| [`tests/test_phase1_foundation.py`](tests/test_phase1_foundation.py) | Phase 1 Foundation | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase2_synthetic_environment.py`](tests/test_phase2_synthetic_environment.py) | Phase 2 Synthetic Environment | 10 | 10 | 🟢 PASS |
+| [`tests/test_phase3_ml_forecasting.py`](tests/test_phase3_ml_forecasting.py) | Phase 3 ML Forecasting | 9 | 9 | 🟢 PASS |
+| [`tests/test_phase4_digital_twin.py`](tests/test_phase4_digital_twin.py) | Phase 4 Digital Twin | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase5_scenario_engine.py`](tests/test_phase5_scenario_engine.py) | Phase 5 Scenario Engine | 17 | 17 | 🟢 PASS |
+| [`tests/test_phase6_final_audit.py`](tests/test_phase6_final_audit.py) | Phase 6 Final Audit | 45 | 45 | 🟢 PASS |
+| [`tests/test_phase6_optimizer.py`](tests/test_phase6_optimizer.py) | Phase 6 Optimizer Core | 23 | 23 | 🟢 PASS |
+| [`tests/test_phase7_resilience.py`](tests/test_phase7_resilience.py) | Phase 7 Resilience Engine | 34 | 34 | 🟢 PASS |
+| [`tests/test_phase8_policy.py`](tests/test_phase8_policy.py) | Phase 8 Policy Engine | 25 | 25 | 🟢 PASS |
+| [`tests/test_phase9_api.py`](tests/test_phase9_api.py) | Phase 9 REST API | 21 | 21 | 🟢 PASS |
+| [`tests/test_phase11_edge.py`](tests/test_phase11_edge.py) | Phase 11 Edge Intelligence | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase12_trace.py`](tests/test_phase12_trace.py) | Phase 12 Decision Trace | 10 | 10 | 🟢 PASS |
 | **Subtotal Baseline (Phases 1–12)** | **Frozen Core Engine** | **227** | **227** | 🟢 **PASS** |
-| [`tests/test_phase13_validation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase13_validation.py) | Phase 13 Validation Suite | **19** | **19** | 🟢 **PASS** |
-| [`tests/test_phase14_deployment.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase14_deployment.py) | Phase 14 Deployment & Integrations | **20** | **20** | 🟢 **PASS** |
-| [`tests/test_phase15_operational_validation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase15_operational_validation.py) | Phase 15 Operational Validation | **22** | **22** | 🟢 **PASS** |
+| [`tests/test_phase13_validation.py`](tests/test_phase13_validation.py) | Phase 13 Validation Suite | **19** | **19** | 🟢 **PASS** |
+| [`tests/test_phase14_deployment.py`](tests/test_phase14_deployment.py) | Phase 14 Deployment & Integrations | **20** | **20** | 🟢 **PASS** |
+| [`tests/test_phase15_operational_validation.py`](tests/test_phase15_operational_validation.py) | Phase 15 Operational Validation | **22** | **22** | 🟢 **PASS** |
 | **Total System Test Suite** | **Phases 1–15** | **288** | **288** | 🟢 **PASS** |
 
 ### Named Phase 15 Tests in `test_phase15_operational_validation.py` (22 Total):
@@ -132,11 +132,11 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
 ## 5. Phase 15 Technical Implementation Details
 
 ### Workstream A: External Weather Forecast Ingestion
-- **[OpenMeteoPolarAdapter](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/adapters/openmeteo.py)**: Activated multi-horizon hourly weather forecast ingestion up to 168h for Bharati ($69^\circ\text{S}$), Maitri ($70^\circ\text{S}$), and Himadri ($79^\circ\text{N}$). Classified strictly under **`FORECAST`** provenance.
+- **[OpenMeteoPolarAdapter](backend/integrations/adapters/openmeteo.py)**: Activated multi-horizon hourly weather forecast ingestion up to 168h for Bharati ($69^\circ\text{S}$), Maitri ($70^\circ\text{S}$), and Himadri ($79^\circ\text{N}$). Classified strictly under **`FORECAST`** provenance.
 - Implemented `fetch_forecast_series()` querying temperature ($2\text{m}$), wind speed ($10\text{m}$, $\text{m/s}$), direct normal solar irradiance ($\text{W/m}^2$), surface barometric pressure ($\text{hPa}$), and relative humidity ($\%$).
 
 ### Workstream B: Data Quality, Polar Bounds & Circuit Breaker
-- **[ExternalDataValidator](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/validation.py)**:
+- **[ExternalDataValidator](backend/integrations/validation.py)**:
   - **Polar Physical Bounds**: Temperature $[-90.0, +30.0]^\circ\text{C}$, Wind $[0.0, 85.0]\text{ m/s}$, Solar $[0.0, 1400.0]\text{ W/m}^2$, Pressure $[850.0, 1050.0]\text{ hPa}$, Humidity $[0.0, 100.0]\%$.
   - **Freshness Scoring**: Scores telemetry into `FRESH`, `ACCEPTABLE`, `STALE`, and `EXPIRED`.
   - **Temporal Causality**: Strict reference time check rejects future timestamps ($> 60\text{s}$ tolerance) to eliminate data leakage.
@@ -147,26 +147,26 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
 - Zero 7th tiers permitted. External forecasts are explicitly labeled `FORECAST`; digital twin replays are labeled `SIMULATED`. Benchmark references are labeled `SYNTHETIC`.
 
 ### Workstream D & K: Real-to-Frozen Pipeline & Operational Decision Replay
-- **[OperationalReplayOrchestrator](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/replay.py)**: Directly feeds validated external weather time series through the frozen [PipelineOrchestrator](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/api/adapters/pipeline_orchestrator.py) without altering optimizer or policy rules.
+- **[OperationalReplayOrchestrator](backend/integrations/replay.py)**: Directly feeds validated external weather time series through the frozen [PipelineOrchestrator](backend/api/adapters/pipeline_orchestrator.py) without altering optimizer or policy rules.
 - Lineage is permanently bound to immutable Phase 12 Decision Trace DAG records.
 
 ### Workstream E: Model vs. Reference Residual Evaluation
-- **[ModelVsObservedEvaluator](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/evaluator.py)**: Computes Signed Mean Bias Error ($\text{MBE}$), MAE, RMSE, sMAPE ($\%$), and empirical 80% central interval coverage ($[P_{10}, P_{90}]$).
+- **[ModelVsObservedEvaluator](backend/integrations/evaluator.py)**: Computes Signed Mean Bias Error ($\text{MBE}$), MAE, RMSE, sMAPE ($\%$), and empirical 80% central interval coverage ($[P_{10}, P_{90}]$).
 - On Bharati: 48h electric load forecasts achieved $\text{MAE} = 1.33\text{ kW}$, $\text{MBE} = +0.33\text{ kW}$, and $100.0\%$ coverage against synthetic benchmark references.
 
 ### Workstream F & J: Digital Twin Consistency Check & Controlled Calibration Governance
-- **[TwinRealityCheckEngine](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/twin_reality.py)**: Evaluates physical conservation residuals across electrical ($\pm 0.05\text{ kW}$), thermal ($\pm 2.5^\circ\text{C}$), battery ($\pm 5.0\%$), and fuel ($\pm 1.0\text{ L/h}$) subsystems against benchmark reference steps.
+- **[TwinRealityCheckEngine](backend/integrations/twin_reality.py)**: Evaluates physical conservation residuals across electrical ($\pm 0.05\text{ kW}$), thermal ($\pm 2.5^\circ\text{C}$), battery ($\pm 5.0\%$), and fuel ($\pm 1.0\text{ L/h}$) subsystems against benchmark reference steps.
 - Discrepancies generate a `CalibrationCandidate` under human oversight (`PENDING_CONTROLLED_REVIEW`), enforcing the invariant that zero models are silently retrained or altered.
 
 ### Workstream G: 4-Way Operational Drift Categorization
-- **[OperationalDriftDetector](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/drift.py)**: Distinguishes:
+- **[OperationalDriftDetector](backend/integrations/drift.py)**: Distinguishes:
   1. `DATA_DRIFT`: Raw environmental/load distribution shift ($|Z| \ge 2.5\sigma$).
   2. `MODEL_DRIFT`: ML predictive error degradation on nominal inputs ($\text{MAE} / \text{MAE}_{\text{baseline}} \ge 1.6\times$).
   3. `PHYSICAL_MODEL_MISMATCH`: Divergence between digital twin equations and reference benchmark observations.
   4. `PROVIDER_FAILURE`: External API, satcom, or corrupted packet feed failures.
 
 ### Workstream H: Edge Disconnect/Reconnect Resilience
-- Verified bounded buffer queueing, duplicate protection, chronological sorting, and state reconciliation in [tests/test_phase15_operational_validation.py](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase15_operational_validation.py).
+- Verified bounded buffer queueing, duplicate protection, chronological sorting, and state reconciliation in [tests/test_phase15_operational_validation.py](tests/test_phase15_operational_validation.py).
 
 ### Workstream I: Physical Telemetry Boundary Truth
 - System truthfully reports:
@@ -178,8 +178,8 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
   ```
 
 ### Workstream L & M: Observability APIs & Truthful Frontend Dashboard
-- **REST APIs**: Extended [backend/api/routes/integrations.py](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/api/routes/integrations.py) with `/validation/metrics`, `/validation/drift`, `/validation/twin-check`, `/validation/candidates`, `/replay`, `/ingest`, and `/series/{station_id}`.
-- **Frontend Dashboard**: Added the **Real-World Validation & Drift** sub-tab in [ValidationView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ValidationView.tsx) and updated [validationApi.ts](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/api/validationApi.ts) with typed client methods and truth badges.
+- **REST APIs**: Extended [backend/api/routes/integrations.py](backend/api/routes/integrations.py) with `/validation/metrics`, `/validation/drift`, `/validation/twin-check`, `/validation/candidates`, `/replay`, `/ingest`, and `/series/{station_id}`.
+- **Frontend Dashboard**: Added the **Real-World Validation & Drift** sub-tab in [ValidationView.tsx](frontend/src/views/ValidationView.tsx) and updated [validationApi.ts](frontend/src/api/validationApi.ts) with typed client methods and truth badges.
 
 ---
 
@@ -187,13 +187,13 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
 
 The following primary documents guide Phase 15 integration and operational validation:
 
-1. [`PHASE15_BASELINE_AUDIT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE15_BASELINE_AUDIT.md) — Pre-implementation audit and architectural boundary inspection.
-2. [`PHASE15_IMPLEMENTATION_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE15_IMPLEMENTATION_REPORT.md) — Exhaustive code and module implementation report covering Workstreams A through N.
-3. [`PHASE15_VALIDATION_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE15_VALIDATION_REPORT.md) — Complete empirical test and audit results across all 15 phases.
-4. [`PHASE15_REALITY_INTEGRATION_GUIDE.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE15_REALITY_INTEGRATION_GUIDE.md) — Operator and developer guide for external feeds, bounds, and calibration governance.
-5. [`PHASE15_OPERATIONAL_VALIDATION_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE15_OPERATIONAL_VALIDATION_REPORT.md) — Operational evaluation report covering station residuals, drift disambiguation, data lineage, and replay trace audit.
-6. [`docs/master_walkthrough.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/master_walkthrough.md) — Canonical master walkthrough updated with Phase 15 architecture and 288-test regression metrics.
-7. [`docs/phase15_walkthrough.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase15_walkthrough.md) — This document.
+1. [`PHASE15_BASELINE_AUDIT.md`](PHASE15_BASELINE_AUDIT.md) — Pre-implementation audit and architectural boundary inspection.
+2. [`PHASE15_IMPLEMENTATION_REPORT.md`](PHASE15_IMPLEMENTATION_REPORT.md) — Exhaustive code and module implementation report covering Workstreams A through N.
+3. [`PHASE15_VALIDATION_REPORT.md`](PHASE15_VALIDATION_REPORT.md) — Complete empirical test and audit results across all 15 phases.
+4. [`PHASE15_REALITY_INTEGRATION_GUIDE.md`](PHASE15_REALITY_INTEGRATION_GUIDE.md) — Operator and developer guide for external feeds, bounds, and calibration governance.
+5. [`PHASE15_OPERATIONAL_VALIDATION_REPORT.md`](PHASE15_OPERATIONAL_VALIDATION_REPORT.md) — Operational evaluation report covering station residuals, drift disambiguation, data lineage, and replay trace audit.
+6. [`docs/master_walkthrough.md`](docs/master_walkthrough.md) — Canonical master walkthrough updated with Phase 15 architecture and 288-test regression metrics.
+7. [`docs/phase15_walkthrough.md`](docs/phase15_walkthrough.md) — This document.
 
 ---
 

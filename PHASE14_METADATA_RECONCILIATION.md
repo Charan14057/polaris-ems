@@ -2,7 +2,7 @@
 **Final Canonical Freeze Metadata Reconciliation**
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Status:** 🟢 **`PHASE_14_FROZEN`**  
 **Overall Project Status:** 🟢 **`PHASES_1_14_COMPLETE`**  
 **Prior Baseline:** 🟢 **`PHASE_13_FROZEN`**  
@@ -73,13 +73,13 @@ A repository-wide ripgrep scan confirmed that **all canonical Phase 14 documents
 
 | Canonical Document | Section / Line | Recorded Freeze Commit | Recorded HEAD Commit | Status |
 | :--- | :---: | :--- | :--- | :---: |
-| [`docs/master_walkthrough.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/master_walkthrough.md) | Line 342 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
-| [`docs/phase14_walkthrough.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/docs/phase14_walkthrough.md) | Line 183 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
-| [`PHASE14_FINAL_FREEZE_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_FINAL_FREEZE_REPORT.md) | Line 10 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
-| [`PHASE14_IMPLEMENTATION_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_IMPLEMENTATION_REPORT.md) | Line 9 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
-| [`PHASE14_VALIDATION_REPORT.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_VALIDATION_REPORT.md) | Line 10 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
-| [`PHASE14_DEPLOYMENT_GUIDE.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_DEPLOYMENT_GUIDE.md) | Line 5 | `PHASE_14_FROZEN` | N/A | 🟢 Verified Canonical |
-| [`PHASE14_EXTERNAL_INTEGRATION_GUIDE.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/PHASE14_EXTERNAL_INTEGRATION_GUIDE.md) | Line 7 | `PHASE_14_FROZEN` | N/A | 🟢 Verified Canonical |
+| [`docs/master_walkthrough.md`](docs/master_walkthrough.md) | Line 342 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
+| [`docs/phase14_walkthrough.md`](docs/phase14_walkthrough.md) | Line 183 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
+| [`PHASE14_FINAL_FREEZE_REPORT.md`](PHASE14_FINAL_FREEZE_REPORT.md) | Line 10 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
+| [`PHASE14_IMPLEMENTATION_REPORT.md`](PHASE14_IMPLEMENTATION_REPORT.md) | Line 9 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
+| [`PHASE14_VALIDATION_REPORT.md`](PHASE14_VALIDATION_REPORT.md) | Line 10 | `227c44e47a03c3521a45dca685e8dd4897c9b45e` | `d8a3d347a90fb746e436b0210e3281353c7767b8` | 🟢 Verified Canonical |
+| [`PHASE14_DEPLOYMENT_GUIDE.md`](PHASE14_DEPLOYMENT_GUIDE.md) | Line 5 | `PHASE_14_FROZEN` | N/A | 🟢 Verified Canonical |
+| [`PHASE14_EXTERNAL_INTEGRATION_GUIDE.md`](PHASE14_EXTERNAL_INTEGRATION_GUIDE.md) | Line 7 | `PHASE_14_FROZEN` | N/A | 🟢 Verified Canonical |
 
 **Conflicting Hash Check:**
 - Conflicting occurrences of `1ef8529...` as a freeze commit in files on disk: **0 found (CLEAN)**.

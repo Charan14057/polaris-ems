@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 13 Architecture Specification
 ## Scientific Validation, Benchmarking, Model Explainability & Reproducibility
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 13 (Validation, Benchmarking, Explainability & Reproducibility Authority)  
 **System Status**: 🟢 **PHASE 13 IMPLEMENTED & READY FOR VALIDATION**  
 

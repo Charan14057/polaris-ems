@@ -1,6 +1,6 @@
 # Phase 11 Architecture: Device Intelligence & Edge-First Field Resilience
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061: AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System: AI-Driven Smart Energy Management System for Polar Research Stations  
 **Status:** PHASE 11 FROZEN (`PHASE_11_FROZEN`)  
 **Parent Baseline:** Phases 1–10 (Frozen)
 

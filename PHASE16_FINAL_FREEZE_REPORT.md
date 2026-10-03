@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 16 Final Freeze Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Field / Hardware-in-the-Loop Validation & Reliability  
 **Phase Status:** 🟢 **`PHASE_16_FROZEN`**  
 **Project Status:** 🟢 **`PHASES_1_16_COMPLETE`**  

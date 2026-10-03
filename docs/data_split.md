@@ -1,5 +1,5 @@
 # Polaris-EMS: Chronological Data Partitioning Protocol
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Status**: Authoritative Data Partition Contract (Phase 2 Deliverable)  
 
 ---
@@ -34,7 +34,7 @@ Every station dataset is partitioned into three strictly sequential segments:
 
 ## 3. Walk-Forward Rolling Evaluation (Phase 3 Protocol)
 
-In addition to the static 70/15/15 benchmark split, [`dataset_splitter.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/data/synthetic/dataset_splitter.py) provides a rolling walk-forward generator for operational simulation:
+In addition to the static 70/15/15 benchmark split, [`dataset_splitter.py`](backend/data/synthetic/dataset_splitter.py) provides a rolling walk-forward generator for operational simulation:
 - **Initial Training Window**: 8,760 hours (1 year).
 - **Validation / Evaluation Horizon**: 720 hours (30 days).
 - **Forward Slide Step**: 168 hours (7 days).

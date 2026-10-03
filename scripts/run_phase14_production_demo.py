@@ -39,7 +39,7 @@ from backend.api.schemas.pipeline import PipelineAnalyzeRequestSchema
 def run_phase14_demonstration():
     print("\n" + "=" * 80)
     print("POLARIS-EMS: PHASE 14 PRODUCTION & REALITY BRIDGE DEMONSTRATION")
-    print("SIH26061: AI-Driven Smart Energy Management System for Polar Research Stations")
+    print("Polaris-EMS: Polar Energy Management & Resilience System")
     print("=" * 80)
 
     # 1. Configuration & Runtime Environment

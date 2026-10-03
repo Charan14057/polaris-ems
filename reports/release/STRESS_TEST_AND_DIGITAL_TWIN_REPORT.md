@@ -35,7 +35,7 @@ Post-Stress Kirchhoff Invariant   Max residual |ε| across stations   0.0000 kW 
 
 ## 2. Full-System Functional Stress Test Results
 
-The full-system test suite was executed by [`scripts/stress_test_all_functions.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/stress_test_all_functions.py) against the live FastAPI daemon (`http://127.0.0.1:8000`). All 13 suites passed with zero failures.
+The full-system test suite was executed by [`scripts/stress_test_all_functions.py`](scripts/stress_test_all_functions.py) against the live FastAPI daemon (`http://127.0.0.1:8000`). All 13 suites passed with zero failures.
 
 ### Detailed Suite Breakdown
 
@@ -80,7 +80,7 @@ Following 100 simulation advances, 14 scenario transitions, and 120 concurrent b
 
 To eliminate the "low graphics" appearance, the 3D Digital Twin was upgraded into a high-fidelity, real-world polar research station representation. All assets and effects are procedural Three.js implementations with zero external 3D model download dependencies.
 
-### 3.1 Atmospheric & Celestial Environment ([`polarEnvironment3D.ts`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/features/twin/model/polarEnvironment3D.ts))
+### 3.1 Atmospheric & Celestial Environment ([`polarEnvironment3D.ts`](frontend/src/features/twin/model/polarEnvironment3D.ts))
 1. **Celestial Polar Sky Dome:** An inverted hemisphere with procedural vertex-shader gradient recreating high-latitude polar twilight (deep navy `#060c18` transitioning to crisp glacial cyan `#0f2b48`).
 2. **360° Nunatak Mountain Ring:** A jagged, snow-capped mountain ridge surrounding the station perimeter (80 km radius scale, with alternating granite bedrock and glacial snow faces).
 3. **Polar Starfield:** 1,200 twinkling stars placed across the polar celestial sphere with subtle alpha oscillation.
@@ -89,13 +89,13 @@ To eliminate the "low graphics" appearance, the 3D Digital Twin was upgraded int
 6. **Diesel Exhaust Smoke Particles:** Powerhouse flues emit rising, dissipating dark-grey smoke particles when diesel generators are actively running, providing immediate visual confirmation of generator dispatch.
 7. **Aviation Obstruction Beacons:** 1 Hz synchronized pulsing red LED beacons mounted atop wind turbine nacelles and meteorological radomes.
 
-### 3.2 Terrain & Architectural Station Meshes ([`stationMeshBuilders.ts`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/features/twin/model/stationMeshBuilders.ts))
+### 3.2 Terrain & Architectural Station Meshes ([`stationMeshBuilders.ts`](frontend/src/features/twin/model/stationMeshBuilders.ts))
 1. **Sastrugi Wind-Carved Snow Terrain:** Ground plane featuring procedural undulations, subtle specular ice sheen, and scattered granite bedrock outcrops.
 2. **PistenBully Snowcat Crawler Tracks:** Authentic tracked-vehicle impressions pressed into the snow surface between the main station module and peripheral generator containers.
 3. **Polar Helipad & Perimeter Lighting:** Heavy concrete landing pad with high-contrast painted 'H' markings and 8 glowing runway approach beacons (`#38bdf8`).
 4. **Warm Tungsten Window Glow:** 2700K warm interior illumination (`#fef08a`) emitting from station ribbon windows and observation decks, contrasting naturally with the sub-zero polar exterior.
 
-### 3.3 Interactive Controls & Situational Telemetry HUD ([`TwinCanvas3D.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/features/twin/components/TwinCanvas3D.tsx))
+### 3.3 Interactive Controls & Situational Telemetry HUD ([`TwinCanvas3D.tsx`](frontend/src/features/twin/components/TwinCanvas3D.tsx))
 1. **Photorealistic Tone Mapping:** Enabled `THREE.ACESFilmicToneMapping` with `toneMappingExposure = 1.32` and `THREE.PCFSoftShadowMap` for natural light attenuation and realistic shadow penumbras.
 2. **Camera Preset Controls:**
    - **`HERO`:** Cinematic 3D isometric perspective capturing the station, terrain, and atmospheric sky.

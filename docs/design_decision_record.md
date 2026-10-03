@@ -8,7 +8,7 @@
 
 ---
 
-## 1. CONTEXT & PROBLEM STATEMENT
+## 1. CONTEXT & OPERATIONAL OBJECTIVE
 
 The pre-transformation Polaris-EMS interface suffered from common dashboard tropes:
 * Generic AI-generated dashboard appearance with dark cyan/neon accents.

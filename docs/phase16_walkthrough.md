@@ -2,7 +2,7 @@
 ## Field / Hardware-in-the-Loop Validation & Reliability
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Phase 16 (Field / Hardware-in-the-Loop Validation & Reliability)  
 **System Status:** 🟢 **`PHASE_16_FROZEN`** (Formally Complete, Frozen & Verified)  
 **Governance Event:** `PHASE16_EPISTEMIC_RECONCILIATION_COMPLETE`  

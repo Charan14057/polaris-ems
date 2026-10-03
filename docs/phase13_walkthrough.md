@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 13 Master Walkthrough & Execution Report
 ## Scientific Validation, Benchmarking, Model Explainability & Reproducibility
 
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase**: Phase 13 (Validation, Benchmarking, Explainability & Reproducibility)  
 **System Status**: 🟢 **PHASE 13 FROZEN (`PHASE_13_FROZEN`)**  
 **Execution Environment**: Local Integrated Runtime (Vite Proxy on `127.0.0.1:3000` $\to$ FastAPI on `127.0.0.1:8000`)  
@@ -15,11 +15,11 @@ Phase 13 establishes the empirical scientific validation, model explainability, 
 Following complete implementation, an independent empirical pre-freeze audit and final consistency check verified that all code, tests, configurations, reports, UI, and documentation tell the exact same technical story without contradiction or inflation.
 
 ### Verified Scientific Achievements:
-- **100% Final Consistency Gate**: All **12/12** criteria passed via [`scripts/verify_phase13_consistency.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase13_consistency.py).
-- **100% Phase 13 Runtime Audit**: All **14/14** scientific validation gates passed via [`scripts/verify_phase13_runtime.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase13_runtime.py).
-- **100% Phase 13 Test Suite**: All **19/19** tests passed via [`tests/test_phase13_validation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase13_validation.py).
-- **100% Data Leakage Audit**: Certified clean causality with zero future target or forward weather leakage via [`scripts/verify_phase13_leakage.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase13_leakage.py).
-- **100% End-to-End Master Demonstration**: Passed all 7 demonstration sections via [`scripts/run_phase13_demo.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/run_phase13_demo.py).
+- **100% Final Consistency Gate**: All **12/12** criteria passed via [`scripts/verify_phase13_consistency.py`](scripts/verify_phase13_consistency.py).
+- **100% Phase 13 Runtime Audit**: All **14/14** scientific validation gates passed via [`scripts/verify_phase13_runtime.py`](scripts/verify_phase13_runtime.py).
+- **100% Phase 13 Test Suite**: All **19/19** tests passed via [`tests/test_phase13_validation.py`](tests/test_phase13_validation.py).
+- **100% Data Leakage Audit**: Certified clean causality with zero future target or forward weather leakage via [`scripts/verify_phase13_leakage.py`](scripts/verify_phase13_leakage.py).
+- **100% End-to-End Master Demonstration**: Passed all 7 demonstration sections via [`scripts/run_phase13_demo.py`](scripts/run_phase13_demo.py).
 - **Total Backend Test Coverage**: **246 / 246 tests passing (100%)** across 13 test suites (Phases 1–13).
 - **Frontend Test Coverage**: **12 / 12 tests passing (100%)** in Vitest.
 - **Production Build Clean**: Compiled with 0 errors via `npm run build`.
@@ -36,20 +36,20 @@ $$\text{Total Discovered Tests} = \text{Baseline Tests (Phases 1–12)} + \text{
 
 | Test File | Phase Scope | Tests Discovered | Passing | Status |
 | :--- | :--- | :---: | :---: | :---: |
-| [`tests/test_phase1_foundation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase1_foundation.py) | Phase 1 Foundation | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase2_synthetic_environment.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase2_synthetic_environment.py) | Phase 2 Synthetic Environment | 10 | 10 | 🟢 PASS |
-| [`tests/test_phase3_ml_forecasting.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase3_ml_forecasting.py) | Phase 3 ML Forecasting | 9 | 9 | 🟢 PASS |
-| [`tests/test_phase4_digital_twin.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase4_digital_twin.py) | Phase 4 Digital Twin | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase5_scenario_engine.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase5_scenario_engine.py) | Phase 5 Scenario Engine | 17 | 17 | 🟢 PASS |
-| [`tests/test_phase6_final_audit.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase6_final_audit.py) | Phase 6 Final Audit | 45 | 45 | 🟢 PASS |
-| [`tests/test_phase6_optimizer.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase6_optimizer.py) | Phase 6 Optimizer Core | 23 | 23 | 🟢 PASS |
-| [`tests/test_phase7_resilience.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase7_resilience.py) | Phase 7 Resilience Engine | 34 | 34 | 🟢 PASS |
-| [`tests/test_phase8_policy.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase8_policy.py) | Phase 8 Policy Engine | 25 | 25 | 🟢 PASS |
-| [`tests/test_phase9_api.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase9_api.py) | Phase 9 REST API | 21 | 21 | 🟢 PASS |
-| [`tests/test_phase11_edge.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase11_edge.py) | Phase 11 Edge Intelligence | 11 | 11 | 🟢 PASS |
-| [`tests/test_phase12_trace.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase12_trace.py) | Phase 12 Decision Trace | 10 | 10 | 🟢 PASS |
+| [`tests/test_phase1_foundation.py`](tests/test_phase1_foundation.py) | Phase 1 Foundation | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase2_synthetic_environment.py`](tests/test_phase2_synthetic_environment.py) | Phase 2 Synthetic Environment | 10 | 10 | 🟢 PASS |
+| [`tests/test_phase3_ml_forecasting.py`](tests/test_phase3_ml_forecasting.py) | Phase 3 ML Forecasting | 9 | 9 | 🟢 PASS |
+| [`tests/test_phase4_digital_twin.py`](tests/test_phase4_digital_twin.py) | Phase 4 Digital Twin | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase5_scenario_engine.py`](tests/test_phase5_scenario_engine.py) | Phase 5 Scenario Engine | 17 | 17 | 🟢 PASS |
+| [`tests/test_phase6_final_audit.py`](tests/test_phase6_final_audit.py) | Phase 6 Final Audit | 45 | 45 | 🟢 PASS |
+| [`tests/test_phase6_optimizer.py`](tests/test_phase6_optimizer.py) | Phase 6 Optimizer Core | 23 | 23 | 🟢 PASS |
+| [`tests/test_phase7_resilience.py`](tests/test_phase7_resilience.py) | Phase 7 Resilience Engine | 34 | 34 | 🟢 PASS |
+| [`tests/test_phase8_policy.py`](tests/test_phase8_policy.py) | Phase 8 Policy Engine | 25 | 25 | 🟢 PASS |
+| [`tests/test_phase9_api.py`](tests/test_phase9_api.py) | Phase 9 REST API | 21 | 21 | 🟢 PASS |
+| [`tests/test_phase11_edge.py`](tests/test_phase11_edge.py) | Phase 11 Edge Intelligence | 11 | 11 | 🟢 PASS |
+| [`tests/test_phase12_trace.py`](tests/test_phase12_trace.py) | Phase 12 Decision Trace | 10 | 10 | 🟢 PASS |
 | **Subtotal Baseline (Phases 1–12)** | **Frozen Core Engine** | **227** | **227** | 🟢 **PASS** |
-| [`tests/test_phase13_validation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/tests/test_phase13_validation.py) | Phase 13 Validation Suite | **19** | **19** | 🟢 **PASS** |
+| [`tests/test_phase13_validation.py`](tests/test_phase13_validation.py) | Phase 13 Validation Suite | **19** | **19** | 🟢 **PASS** |
 | **Total System Test Suite** | **Phases 1–13** | **246** | **246** | 🟢 **PASS** |
 
 ### Named Phase 13 Tests in `test_phase13_validation.py` (19 Total):
@@ -84,7 +84,7 @@ The codebase distinguishes the scenario generation catalog from the forecast dis
 - **Phase 13 Disturbance Regime Benchmark (`backend/validation/forecast_validator.py`)**: Evaluates model degradation across **8 canonical weather disturbance regimes**:
   `NORMAL`, `CLOUD_SURGE`, `BLIZZARD`, `EXTREME_COLD`, `HIGH_WIND`, `LOW_WIND`, `SOLAR_REDUCTION`, `COMBINED_POLAR_STRESS`.
 - **Executed Evaluations**: $8\text{ regimes} \times 3\text{ stations} \times 3\text{ targets} = \mathbf{72\text{ regime evaluations}}$.
-- **UI Alignment**: The Scenarios Studio ([`ScenariosView.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ScenariosView.tsx)) displays the 14 locked scenarios from the registry. The Validation Workspace ([`ValidationView.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ValidationView.tsx)) displays the 8 benchmarked regimes and their degradation ratios directly from the validation API.
+- **UI Alignment**: The Scenarios Studio ([`ScenariosView.tsx`](frontend/src/views/ScenariosView.tsx)) displays the 14 locked scenarios from the registry. The Validation Workspace ([`ValidationView.tsx`](frontend/src/views/ValidationView.tsx)) displays the 8 benchmarked regimes and their degradation ratios directly from the validation API.
 
 ---
 
@@ -111,20 +111,20 @@ The codebase distinguishes the scenario generation catalog from the forecast dis
 
 ## 5. Generated Scientific Evidence Artifacts
 
-All benchmark outputs are persistently exported under [`reports/phase13/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/):
+All benchmark outputs are persistently exported under [`reports/phase13/`](reports/phase13/):
 
-1. [`forecast_benchmark.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/forecast_benchmark.json) & [`forecast_benchmark.csv`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/forecast_benchmark.csv) & [`forecast_benchmark.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/forecast_benchmark.md): Full metrics, baselines, and regime tables.
-2. [`forecast_calibration.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/forecast_calibration.json) & [`forecast_calibration.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/forecast_calibration.md): Conformal quantile coverage and sharpness.
-3. [`optimizer_benchmark.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/optimizer_benchmark.json) & [`optimizer_benchmark.csv`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/optimizer_benchmark.csv): HiGHS dispatch vs baseline simulation dispatch.
-4. [`resilience_validation.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/resilience_validation.json): 9-dimension stress progression and 5 property invariants.
-5. [`edge_validation.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/edge_validation.json): 7 edge degradation conditions and offline safety proof.
-6. [`explainability_report.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/explainability_report.json): Native Tree SHAP feature contributions.
-7. [`reproducibility.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/reproducibility.json), [`reproducibility.csv`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/reproducibility.csv), & [`reproducibility.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/reproducibility.md): Closed-loop decision trace replay audits.
-8. [`performance_benchmark.json`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/performance_benchmark.json): Empirical latency distributions across pipeline stages.
-9. [`leakage_audit.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/leakage_audit.md): Chronological and causal boundary audit.
-10. [`phase13_execution_baseline.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/phase13_execution_baseline.md): Pre-execution verification snapshot.
-11. [`phase13_summary.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/phase13_summary.md): Executive summary.
-12. [`SIH_TECHNICAL_EVIDENCE.md`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/reports/phase13/SIH_TECHNICAL_EVIDENCE.md): Master evidence table mapping capability to measured results.
+1. [`forecast_benchmark.json`](reports/phase13/forecast_benchmark.json) & [`forecast_benchmark.csv`](reports/phase13/forecast_benchmark.csv) & [`forecast_benchmark.md`](reports/phase13/forecast_benchmark.md): Full metrics, baselines, and regime tables.
+2. [`forecast_calibration.json`](reports/phase13/forecast_calibration.json) & [`forecast_calibration.md`](reports/phase13/forecast_calibration.md): Conformal quantile coverage and sharpness.
+3. [`optimizer_benchmark.json`](reports/phase13/optimizer_benchmark.json) & [`optimizer_benchmark.csv`](reports/phase13/optimizer_benchmark.csv): HiGHS dispatch vs baseline simulation dispatch.
+4. [`resilience_validation.json`](reports/phase13/resilience_validation.json): 9-dimension stress progression and 5 property invariants.
+5. [`edge_validation.json`](reports/phase13/edge_validation.json): 7 edge degradation conditions and offline safety proof.
+6. [`explainability_report.json`](reports/phase13/explainability_report.json): Native Tree SHAP feature contributions.
+7. [`reproducibility.json`](reports/phase13/reproducibility.json), [`reproducibility.csv`](reports/phase13/reproducibility.csv), & [`reproducibility.md`](reports/phase13/reproducibility.md): Closed-loop decision trace replay audits.
+8. [`performance_benchmark.json`](reports/phase13/performance_benchmark.json): Empirical latency distributions across pipeline stages.
+9. [`leakage_audit.md`](reports/phase13/leakage_audit.md): Chronological and causal boundary audit.
+10. [`phase13_execution_baseline.md`](reports/phase13/phase13_execution_baseline.md): Pre-execution verification snapshot.
+11. [`phase13_summary.md`](reports/phase13/phase13_summary.md): Executive summary.
+12. [`SIH_TECHNICAL_EVIDENCE.md`](reports/phase13/SIH_TECHNICAL_EVIDENCE.md): Master evidence table mapping capability to measured results.
 
 ---
 

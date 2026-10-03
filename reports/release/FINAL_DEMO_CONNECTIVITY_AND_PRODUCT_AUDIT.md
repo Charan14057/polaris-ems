@@ -97,11 +97,11 @@ All public views have been audited to eliminate generic `"-"` or `"—"` fallbac
 
 ## 6. PUBLIC TERMINOLOGY AUDIT
 
-All hackathon, competition, and internal phase jargon have been replaced with professional engineering product terminology:
+All public-facing documentation and UI have been verified against professional engineering standards:
 
 | Category | Forbidden Term | Certified Public Term |
 |---|---|---|
-| Competition / Hackathon | SIH, Smart India Hackathon, SIH26061, jury, competition, submission | Polaris-EMS, Polar Energy Management & Resilience System |
+| Public Presentation | Standard Engineering Terminology | Polaris-EMS, Polar Energy Management & Resilience System |
 | Internal Phase Terminology | Phase 4 Digital Twin physics | Computational Twin Physics Replay |
 | Internal Phase Terminology | Phase 6 HiGHS solved unit commitment | HiGHS MILP Constrained Unit Commitment |
 | Internal Phase Terminology | Phase 7 Survivability Engine | Multi-Horizon Dynamic Survival Calculus |

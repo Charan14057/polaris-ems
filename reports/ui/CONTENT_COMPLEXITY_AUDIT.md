@@ -125,7 +125,7 @@ Every major operational screen prominently answers the five core questions befor
 - **`ExplainThis` Component:** Standardized 3-question accordion ("What am I looking at?", "Why is it important?", "How is it calculated?") present across all charts, ledgers, and diagrams.
 - **`NextStepExplanation` Component:** Proactive forward-looking outlook informing the user what the system will do over the next 12 to 48 hours.
 - **`HumanDecisionSummary` Component:** 4-part structured decision card (`DECISION`, `BECAUSE`, `TO PROTECT`, `CONFIDENCE / EVIDENCE`).
-- **`QuickOrientationModal` (60-Second Understanding Test):** An interactive 7-point orientation deck accessible at any time from the masthead, enabling any judge or non-technical evaluator to understand the problem, the AI, the Twin, the Optimizer, and system trust within 60 seconds.
+- **`QuickOrientationModal` (60-Second Understanding Test):** An interactive 7-point orientation deck accessible at any time from the masthead, enabling any technical reviewer or evaluator to understand the problem, the AI, the Twin, the Optimizer, and system trust within 60 seconds.
 
 ---
 

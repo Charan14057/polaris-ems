@@ -1,5 +1,5 @@
 # Phase 11 Implementation Plan: Device Intelligence & Edge-First Field Resilience
-**Project:** Polaris-EMS (SIH Problem Statement: SIH26061)  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System  
 **Status:** In Progress (Frozen Baseline: Phases 1–10)
 
 ---

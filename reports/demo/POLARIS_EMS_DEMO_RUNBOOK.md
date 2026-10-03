@@ -9,7 +9,7 @@
 
 ## 1. Live Demonstration & Video Architecture
 
-This runbook provides the exact, click-by-click operational choreography for presenting Polaris-EMS to evaluators, technical judges, and video audiences. The recommended primary demonstration journey follows the **BLIZZARD** storm compound stress scenario on the **BHARATI** research station.
+This runbook provides the exact, click-by-click operational choreography for presenting Polaris-EMS to evaluators, technical reviewers, and video audiences. The recommended primary demonstration journey follows the **BLIZZARD** storm compound stress scenario on the **BHARATI** research station.
 
 ---
 

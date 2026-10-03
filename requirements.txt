@@ -1,5 +1,5 @@
 # POLARIS-EMS Production Dependencies (Python 3.13 compatible)
-# SIH26061: Polar Energy Management & Resilience System
+# Polaris-EMS: Polar Energy Management & Resilience System
 fastapi>=0.115.0
 uvicorn>=0.30.0
 pydantic>=2.8.0

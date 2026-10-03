@@ -1,4 +1,4 @@
-# POLARIS-EMS — SIH26061 TECHNICAL EVIDENCE PACKAGE
+# POLARIS-EMS — TECHNICAL EVIDENCE PACKAGE
 ### Scientific Validation, Benchmarking, Model Explainability & Reproducibility
 **Phase Status:** 🟢 `PHASE_13_FROZEN` | **Freeze Timestamp:** `2026-09-24T20:53:34+05:30` (UTC `2026-09-24T15:23:34Z`) | **Freeze Commit / Hash:** `ba99674fb1224f437dd5c566541e9d3eea9e2e57`  
 **Software Version:** `1.0.0` | **Suite ID:** `POLARIS-P13-BENCHMARK-SUITE-V1.0` | **Next Stage:** `PHASE_14_NOT_STARTED`
@@ -16,7 +16,7 @@
 - **Causality & Data Leakage Audit:** `CLEAN (Zero Violations)`
 
 ---
-## Consolidated SIH Evidence Table
+## Consolidated Technical Evidence Table
 
 | Capability | Test Description | Metric Measured | Measured Result | Source Authority | Provenance | Limitations | Outcome |
 |:---|:---|:---|:---|:---|:---|:---|:---:|

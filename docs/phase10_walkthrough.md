@@ -1,5 +1,5 @@
 # Polaris-EMS: Phase 10 Production Integration & Walkthrough
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **System Status**: 🟢 **PHASE 10 FROZEN — Production Build & Local Runtime Integration Verified**  
 **Target Fleet**: Bharati Station (69°S), Maitri Station (70°S), Himadri Station (79°N)  
 **Verification Environment**: Local Integrated Runtime (Vite Proxy on `127.0.0.1:3000` $\to$ FastAPI on `127.0.0.1:8000`). No remote deployment claimed.
@@ -11,10 +11,10 @@
 Phase 10 represents the visual, architectural, and runtime production integration freeze of **Polaris-EMS**. It integrates all computational engines (Phases 1–8) with the FastAPI integration layer (Phase 9) and the mission-control React frontend into a unified microgrid resilience system.
 
 ### Verified Implementation Facts:
-- **100% Audit Gate Pass**: All **13/13** runtime, provenance, and domain error gates verified cleanly via [verify_phase10_runtime.py](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase10_runtime.py) through the live Vite reverse proxy.
-- **100% Frontend Test Suite**: All **12/12** tests passing in Vitest ([api.test.ts](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/test/api.test.ts) & [components.test.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/test/components.test.tsx)).
+- **100% Audit Gate Pass**: All **13/13** runtime, provenance, and domain error gates verified cleanly via [verify_phase10_runtime.py](scripts/verify_phase10_runtime.py) through the live Vite reverse proxy.
+- **100% Frontend Test Suite**: All **12/12** tests passing in Vitest ([api.test.ts](frontend/src/test/api.test.ts) & [components.test.tsx](frontend/src/test/components.test.tsx)).
 - **100% Full Backend Regression Suite**: All **206/206** tests passing in Pytest across all modules.
-- **Production Build Clean**: TypeScript typechecking and Vite production bundling ([`frontend/dist/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/dist)) compile with zero errors.
+- **Production Build Clean**: TypeScript typechecking and Vite production bundling ([`frontend/dist/`](frontend/dist)) compile with zero errors.
 - **Strict Provenance Enforcement**: Absolute 6-tier provenance taxonomy compliance with zero fabricated 7th tiers (`REAL`, `CONFIGURED`, `ASSUMED`, `SYNTHETIC`, `FORECAST`, `SIMULATED`).
 
 ---
@@ -56,12 +56,12 @@ flowchart TD
 
 Polaris-EMS features eight dedicated operational workspaces engineered for station operators, electrical officers, and station commanders:
 
-### 1. Fleet & Station Overview ([OverviewView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/OverviewView.tsx))
+### 1. Fleet & Station Overview ([OverviewView.tsx](frontend/src/views/OverviewView.tsx))
 - **Dynamic Fleet Telemetry**: Live station switching between **Bharati** (240 kW aggregate diesel, 3 gensets), **Maitri** (187.5 kW, 3 gensets), and **Himadri** (90 kW, 2 gensets) with zero frontend hardcoding.
 - **System Health & Resilience Matrix**: Immediate visibility of composite resilience score, operational policy directives, and active threat warnings.
 - **Subsystem Telemetry Badges**: High-contrast, WCAG-compliant status badges with explicit state text (`SAFE`, `WATCH`, `THREATENED`, `CRITICAL`).
 
-### 2. Probabilistic Forecast Explorer ([ForecastView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ForecastView.tsx))
+### 2. Probabilistic Forecast Explorer ([ForecastView.tsx](frontend/src/views/ForecastView.tsx))
 - **Multi-Target Forecasting**: On-demand conformal quantile predictions ($P_{10}, P_{50}, P_{80}, P_{90}, P_{95}$) for:
   - Station electrical demand (`total_load_kw`)
   - Solar generation potential (`solar_generation_kw`)
@@ -69,7 +69,7 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
 - **Horizon Switching**: Seamless toggle between **48h tactical operational horizon** and **168h strategic weekly horizon**.
 - **Physics-Informed Bounds**: Load decomposition separating baseline thermal losses from human-driven scientific loads.
 
-### 3. Computational Energy Digital Twin ([EnergyTwinView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/EnergyTwinView.tsx))
+### 3. Computational Energy Digital Twin ([EnergyTwinView.tsx](frontend/src/views/EnergyTwinView.tsx))
 - **Subsystem Coupled Simulation**: 4-domain continuous physics simulation:
   - **Electrical**: Power balance, bus voltage stability, and unserved energy accounting.
   - **Thermal**: First-principles building heat loss and indoor temperature envelope.
@@ -77,8 +77,8 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
   - **Diesel Fuel**: Non-linear generator fuel curves and day-tank depletion tracking.
 - **Deficit Accounting**: Transparent reporting of unserved energy with `SIMULATED` provenance.
 
-### 4. Stress Scenario & What-If Studio ([ScenariosView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ScenariosView.tsx))
-- **14 Authoritative Locked Polar Scenarios ([ScenarioRegistry](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/scenarios/registry.py))**:
+### 4. Stress Scenario & What-If Studio ([ScenariosView.tsx](frontend/src/views/ScenariosView.tsx))
+- **14 Authoritative Locked Polar Scenarios ([ScenarioRegistry](backend/scenarios/registry.py))**:
   1. `NORMAL_BASELINE` — Unperturbed reference simulation trajectory under standard forecast conditions.
   2. `CLOUDY_CONDITIONS` — Elevated cloud attenuation factor (1.5x) reducing solar PV.
   3. `HEAVY_CLOUD_LOW_IRRADIANCE` — Dense overcast cloud deck reducing solar irradiance by 75%.
@@ -95,7 +95,7 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
   14. `CUSTOM` — User-defined parameter exploration with interactive overrides.
 - **Comparative Impact Matrix**: Immediate delta computations against baseline for unserved energy ($\Delta \text{kWh}$), excess diesel consumed ($\Delta \text{Liters}$), and minimum battery SOC reached.
 
-### 5. Microgrid Optimizer Dispatch ([OptimizationView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/OptimizationView.tsx))
+### 5. Microgrid Optimizer Dispatch ([OptimizationView.tsx](frontend/src/views/OptimizationView.tsx))
 - **HiGHS Rolling MILP**: Rigorous mixed-integer linear programming dispatch with verified solver optimality tiers (`EXACT_OPTIMAL` or `MIP_GAP_OPTIMAL`).
 - **3 Optimization Modes**:
   - `EXPECTED`: Cost-optimal dispatch under median $P_{50}$ forecasts.
@@ -103,7 +103,7 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
   - `SCENARIO_ROBUST`: Multi-scenario robust dispatch satisfying worst-case contingencies.
 - **Closed-Loop Twin Replay**: Every optimizer schedule is re-simulated in the Digital Twin to verify physical feasibility before dispatch approval.
 
-### 6. Resilience & Survival Horizon Assessment ([ResilienceView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ResilienceView.tsx))
+### 6. Resilience & Survival Horizon Assessment ([ResilienceView.tsx](frontend/src/views/ResilienceView.tsx))
 - **9 Quantitative Dimensions**: Radar breakdown spanning Energy Adequacy, Critical Load Resilience, Thermal Resilience, Generation Headroom, Storage Health, Fuel Endurance, Logistics Buffer, Renewable Penetration, and Recovery Potential.
 - **Subsystem Survival Horizons**: Independent calculation of hours until failure:
   - Battery endurance horizon ($h$)
@@ -112,8 +112,8 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
   - Critical load survival horizon ($h$)
 - **Advisory Recovery Pathways**: Automated generation of prioritized, actionable operator recovery interventions (e.g., non-critical load shedding, generator pre-warming). Zero frontend re-ranking; strict backend priority preserved.
 
-### 7. Operational Policy & Governance ([PolicyView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/PolicyView.tsx))
-- **Authoritative 8-Level Priority Hierarchy ([PolicyPriorityEnum](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/policy/schema.py#L46-L59))**:
+### 7. Operational Policy & Governance ([PolicyView.tsx](frontend/src/views/PolicyView.tsx))
+- **Authoritative 8-Level Priority Hierarchy ([PolicyPriorityEnum](backend/policy/schema.py#L46-L59))**:
   - **P1 — Critical Life Safety**: Station habitation & essential life-support power.
   - **P2 — Critical Load Protection**: Freeze protection heat-tracing, water pumping, emergency satcoms.
   - **P3 — Generation Reserve Protection**: Standby genset readiness when operating margin drops below thresholds.
@@ -124,7 +124,7 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
   - **P8 — Monitoring**: Supervisory telemetry observation under nominal unthreatened operations.
 - **Hysteresis Deadbands**: Stateful prevention of rapid cycling (anti-chattering) on generator start/stop and load shedding triggers.
 
-### 8. End-to-End Decision Trace ([DecisionTraceView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/DecisionTraceView.tsx))
+### 8. End-to-End Decision Trace ([DecisionTraceView.tsx](frontend/src/views/DecisionTraceView.tsx))
 - **"Why did Polaris-EMS do this?"**: Complete transparent audit trail from raw telemetry input, through forecast quantiles and scenario stress transforms, to solver constraints and final operational policy decisions.
 - **Stage Execution Profiler**: Granular latency measurements across all pipeline stages with full request correlation tracking (`X-Request-ID`).
 
@@ -132,7 +132,7 @@ Polaris-EMS features eight dedicated operational workspaces engineered for stati
 
 ## 4. Phase 10 Runtime Freeze Audit Results
 
-Ran live against `http://127.0.0.1:3000` via [verify_phase10_runtime.py](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/verify_phase10_runtime.py):
+Ran live against `http://127.0.0.1:3000` via [verify_phase10_runtime.py](scripts/verify_phase10_runtime.py):
 
 | Gate # | Audit Gate Description | Target Endpoint | Result | Verified Metric / Detail |
 | :---: | :--- | :--- | :---: | :--- |

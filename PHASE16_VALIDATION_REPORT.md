@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 16 Validation Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Field / Hardware-in-the-Loop Validation & Reliability  
 **Validation Status:** 🟢 **`ALL_TESTS_PASSED`**  
 **Validation Suite:** `tests/test_phase16_field_validation.py` (78 / 78 passing)  

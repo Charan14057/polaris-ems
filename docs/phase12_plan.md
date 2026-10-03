@@ -1,5 +1,5 @@
 # Phase 12 Implementation Plan: Decision Trace, Explainability & End-to-End Auditability
-**Project:** Polaris-EMS — Polar Energy Management & Resilience System (SIH26061)  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System  
 **Status:** In Progress (Frozen Baseline: Phases 1–11)
 
 ---

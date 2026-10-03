@@ -20,7 +20,7 @@ SIMULATION_AIR_GAP = ENFORCED
 
 ## 2. Permitted vs. Prohibited Language & Classifications
 
-To ensure academic and operational integrity during SIH evaluation and field review, the interface adheres strictly to the epistemic vocabulary guide:
+To ensure academic and operational integrity during technical evaluation and field review, the interface adheres strictly to the epistemic vocabulary guide:
 
 ### Permitted Epistemic Classifications
 - `DIGITAL TWIN`

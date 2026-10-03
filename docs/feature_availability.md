@@ -1,5 +1,5 @@
 # Polaris-EMS: Feature Availability & Leakage Prevention Matrix
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Status**: Authoritative ML Contract (Phase 2 Deliverable)  
 
 ---
@@ -57,7 +57,7 @@ graph TD
 
 ## 3. Strict Audit Verification
 
-The automated script [`leakage_auditor.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/data/synthetic/leakage_auditor.py) programmatically inspects all generated datasets before saving to disk:
+The automated script [`leakage_auditor.py`](backend/data/synthetic/leakage_auditor.py) programmatically inspects all generated datasets before saving to disk:
 - Enforces strict chronological monotonicity.
 - Confirms zero centered rolling windows ($\text{center}=\text{True}$ is forbidden).
 - Verifies that target variables do not possess zero-variance trivial signals.

@@ -1,12 +1,12 @@
-# Polaris-EMS: Phase 17 Final Release & Submission Report
+# Polaris-EMS: Phase 17 Final Release & Platform Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Target Fleet:** Bharati Station (69°S, Antarctic), Maitri Station (70°S, Antarctic), Himadri Station (79°N, Arctic)  
-**Phase Identity:** Phase 17 — Final Release, Demonstration & Submission Hardening  
+**Phase Identity:** Phase 17 — Final Release, Demonstration & Platform Hardening  
 **Release Gate Status:** 🟢 **`PHASE_17_RELEASE_READY`**  
 **Final Project State:** 🟢 **`POLARIS_EMS_FINAL_RELEASE_READY`**  
-**Governance Event:** `PHASE17_FINAL_RELEASE_AND_SUBMISSION_COMPLETE`  
+**Governance Event:** `PHASE17_FINAL_RELEASE_COMPLETE`  
 **Prior Frozen Baseline:** 🟢 **`PHASES_1_16_FROZEN`**  
 **Next Stage:** 🛑 **`NONE` (Project Engineering Complete)**  
 **Canonical Release HEAD:** `5b7256d392735b9aaead672090a1daff344166d4` (`5b7256d`)  
@@ -16,7 +16,7 @@
 
 ## 1. Executive Release Summary
 
-Polaris-EMS has completed **Phase 17: Final Release, Demonstration & Submission Hardening**, marking the successful completion of the entire project lifecycle across all seventeen engineering phases.
+Polaris-EMS has completed **Phase 17: Final Release, Demonstration & Platform Hardening**, marking the successful completion of the entire project lifecycle across all seventeen engineering phases.
 
 The system represents an industrial-grade, AI-driven energy management, digital twin, and operational resilience platform specifically engineered for Indian Antarctic and Arctic research station microgrids.
 
@@ -47,7 +47,7 @@ The system represents an industrial-grade, AI-driven energy management, digital 
 | **14** | Production Hardening & Deployment | 🟢 FROZEN | Docker multi-stage, security headers (HSTS, CSP), bounds check |
 | **15** | Real-World Integration & Calibration | 🟢 FROZEN | NWP weather feeds, reality checks, 4-way operational drift categorization |
 | **16** | Field / HIL Validation & Reliability | 🟢 FROZEN | Concrete adapters (Sim, Emu, HIL, Lab), actuation safety boundary |
-| **17** | Final Release & Submission Hardening | 🟢 COMPLETE | Authoritative master demo, release audit, submission package |
+| **17** | Final Release & Platform Hardening | 🟢 COMPLETE | Authoritative master demo, release audit, release package |
 
 ---
 
@@ -93,7 +93,7 @@ Memory & Resource Leakage        : 0% UNBOUNDED GROWTH (72h Verified)
 
 ## 5. Artifact Package Inventory
 
-The submission package is structured as follows:
+The release package is structured as follows:
 
 - **Documentation & Walkthroughs:**
   - `README.md` — Authoritative project presentation & quickstart

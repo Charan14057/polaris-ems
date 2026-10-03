@@ -108,7 +108,7 @@ def run_final_demo() -> dict:
 
     print_banner("POLARIS-EMS — PHASE 17 FINAL MASTER DEMONSTRATION")
     print(f"Timestamp: {results['timestamp']}")
-    print("SIH Problem Statement: SIH26061 — Polar Energy Management & Resilience System")
+    print("System: Polaris-EMS — Polar Energy Management & Resilience System")
     print("Target Fleet: Bharati (69°S), Maitri (70°S), Himadri (79°N)")
     print("Mode: Advisory / Supervised HIL Validation (Zero Live SCADA)")
 

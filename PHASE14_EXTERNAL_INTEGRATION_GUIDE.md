@@ -2,8 +2,7 @@
 **Provider-Agnostic Integration Architecture & Environmental Sanity Validation**
 
 **System:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061  
-**Architecture Layer:** Phase 14 Workstream C (`backend/integrations/`)  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System**Architecture Layer:** Phase 14 Workstream C (`backend/integrations/`)  
 **Status:** `PHASE_14_FROZEN`  
 **Project Status:** `PHASES_1_14_COMPLETE`  
 

@@ -1,5 +1,5 @@
 # Polaris-EMS: Synthetic Energy Environment Architecture
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Status**: Authoritative Technical Documentation (Phase 2 Deliverable)  
 **Simulator Version**: `polaris-sim-v2.0` | **Dataset Version**: `polaris-synthetic-v1.0`  
 

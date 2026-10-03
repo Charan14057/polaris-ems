@@ -13,7 +13,7 @@
 
 ## 1. Exact Stage of the Project
 
-Polaris-EMS has completed **Phase 17: Final Release, Demonstration & Submission Hardening**. All 17 computational, field, and release phases are complete (`PHASES_1_16_FROZEN`, `PHASE_17_RELEASE_READY`, `POLARIS_EMS_FINAL_RELEASE_READY`). Phase 16 established concrete device adapters (Simulator, Emulator, HIL, Lab), actuation safety boundaries, disconnect/reconnect state transitions, buffer reconciliation stress testing, fault injection schedules, long-duration operational reliability, and end-to-end trace linkage. Phase 17 verified full-system integration via the automated 14-stage master demonstration (`scripts/final_demo.py`), certified strict epistemic boundaries, ratified the immutable 6-tier provenance schema, hardened container deployment, and finalized project governance. The system is formally in the **Final Release Ready** stage (**`POLARIS_EMS_FINAL_RELEASE_READY`**).
+Polaris-EMS has completed **Phase 17: Final Release, Demonstration & Platform Hardening**. All 17 computational, field, and release phases are complete (`PHASES_1_16_FROZEN`, `PHASE_17_RELEASE_READY`, `POLARIS_EMS_FINAL_RELEASE_READY`). Phase 16 established concrete device adapters (Simulator, Emulator, HIL, Lab), actuation safety boundaries, disconnect/reconnect state transitions, buffer reconciliation stress testing, fault injection schedules, long-duration operational reliability, and end-to-end trace linkage. Phase 17 verified full-system integration via the automated 14-stage master demonstration (`scripts/final_demo.py`), certified strict epistemic boundaries, ratified the immutable 6-tier provenance schema, hardened container deployment, and finalized project governance. The system is formally in the **Final Release Ready** stage (**`POLARIS_EMS_FINAL_RELEASE_READY`**).
 
 **Phase 1–16 Frozen Authorities**: All computational forecasting (Phase 3), physical equations (Phase 4), scenarios (Phase 5), Pyomo/HiGHS optimization (Phase 6), resilience state machine (Phase 7), policy governance (Phase 8), edge autonomy (Phase 11), decision trace DAG (Phase 12), scientific validation benchmarks (Phase 13), deployment packaging (Phase 14), reality drift monitoring (Phase 15), and field/HIL device adapters (Phase 16) remain **permanently frozen and immutable**. Phase 17 strictly adheres to the governing law: *"Validate field boundaries truthfully. Never fake physical reality."*
 
@@ -96,39 +96,39 @@ flowchart TD
 
 The Polaris-EMS frontend provides 10 dedicated operational workspaces:
 
-### 1. Fleet & Station Overview ([OverviewView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/OverviewView.tsx))
+### 1. Fleet & Station Overview ([OverviewView.tsx](frontend/src/views/OverviewView.tsx))
 - **Dynamic Fleet Telemetry**: Live station switching between **Bharati** (240 kW aggregate diesel, 3 gensets), **Maitri** (187.5 kW, 3 gensets), and **Himadri** (90 kW, 2 gensets) with zero hardcoded specs.
 - **System Health & Resilience Matrix**: Immediate visibility of composite resilience score, operational policy directives, and active threat warnings.
 - **Subsystem Telemetry Badges**: High-contrast, WCAG-compliant status badges with explicit state text (`SAFE`, `WATCH`, `THREATENED`, `CRITICAL`).
 
-### 2. Probabilistic Forecast Explorer ([ForecastView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ForecastView.tsx))
+### 2. Probabilistic Forecast Explorer ([ForecastView.tsx](frontend/src/views/ForecastView.tsx))
 - **Multi-Target Forecasting**: On-demand conformal quantile predictions ($P_{10}, P_{50}, P_{90}, P_{95}$) with nominal 80% central interval $[P_{10}, P_{90}]$ for electrical load, solar PV generation, and wind turbine generation.
 - **Horizon Switching**: Instant toggle between **48h tactical operational horizon** and **168h strategic weekly horizon**.
 - **Physics-Informed Bounds**: Load decomposition separating baseline thermal losses from human-driven scientific loads.
 
-### 3. Computational Energy Digital Twin ([EnergyTwinView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/EnergyTwinView.tsx))
+### 3. Computational Energy Digital Twin ([EnergyTwinView.tsx](frontend/src/views/EnergyTwinView.tsx))
 - **Coupled 4-Domain Physics**:
   - **Electrical**: Power balance ($\le 0.1\text{ W}$ tolerance), bus voltage stability, and unserved energy accounting.
   - **Thermal**: First-principles building heat loss and indoor temperature envelope ($T_{\text{indoor}} \ge 12.0^\circ\text{C}$).
   - **Battery**: Electrochemical state-of-charge (SOC), cold-temperature capacity derating, and anti-churn rules.
   - **Diesel Fuel**: Non-linear generator fuel curves and day-tank depletion tracking.
 
-### 4. Stress Scenario & What-If Studio ([ScenariosView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ScenariosView.tsx))
+### 4. Stress Scenario & What-If Studio ([ScenariosView.tsx](frontend/src/views/ScenariosView.tsx))
 - **14 Authoritative Locked Polar Scenarios**:
   `NORMAL_BASELINE`, `CLOUDY_CONDITIONS`, `HEAVY_CLOUD_LOW_IRRADIANCE`, `HIGH_WIND`, `BLIZZARD`, `EXTREME_COLD`, `LOW_DAYLIGHT`, `POLAR_NIGHT`, `SOLAR_GENERATION_FAILURE`, `WIND_GENERATION_FAILURE`, `BATTERY_DEGRADATION`, `FUEL_RESUPPLY_DELAY`, `COMBINED_POLAR_STRESS`, and `CUSTOM`.
 - **Comparative Impact Matrix**: Immediate delta computations against baseline for unserved energy ($\Delta \text{kWh}$), excess diesel consumed ($\Delta \text{L}$), and minimum battery SOC reached.
 
-### 5. Microgrid Optimizer Dispatch ([OptimizationView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/OptimizationView.tsx))
+### 5. Microgrid Optimizer Dispatch ([OptimizationView.tsx](frontend/src/views/OptimizationView.tsx))
 - **HiGHS Rolling MILP**: Rigorous mixed-integer linear programming dispatch with verified solver optimality tiers (`EXACT_OPTIMAL` or `MIP_GAP_OPTIMAL`).
 - **3 Optimization Modes**: `EXPECTED` (median cost optimal), `CONSERVATIVE` (hedged against load spikes), `SCENARIO_ROBUST` (multi-scenario contingency robust).
 - **Closed-Loop Twin Replay**: Every optimizer schedule is re-simulated in the Digital Twin to verify physical feasibility before dispatch approval.
 
-### 6. Resilience & Survival Horizon Assessment ([ResilienceView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ResilienceView.tsx))
+### 6. Resilience & Survival Horizon Assessment ([ResilienceView.tsx](frontend/src/views/ResilienceView.tsx))
 - **9 Quantitative Dimensions**: Radar breakdown spanning Energy Adequacy, Critical Load Resilience, Thermal Resilience, Generation Headroom, Storage Health, Fuel Endurance, Logistics Buffer, Renewable Penetration, and Recovery Potential.
 - **Subsystem Survival Horizons**: Independent calculation of hours until failure: Battery ($h$), Thermal ($h$), Fuel ($h$), and Critical Life Safety ($h$).
 - **Advisory Recovery Pathways**: Prioritized, actionable operator recovery interventions with zero frontend re-ranking.
 
-### 7. Operational Policy & Governance ([PolicyView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/PolicyView.tsx))
+### 7. Operational Policy & Governance ([PolicyView.tsx](frontend/src/views/PolicyView.tsx))
 - **8-Level Priority Hierarchy**:
   - **P1**: Critical Life Safety (Habitation & life-support power)
   - **P2**: Critical Load Protection (Freeze-protection heat tracing, satcoms)
@@ -140,13 +140,13 @@ The Polaris-EMS frontend provides 10 dedicated operational workspaces:
   - **P8**: Monitoring & Supervisory Observation
 - **Hysteresis Deadbands**: Stateful prevention of rapid cycling on generator start/stop and load shedding triggers.
 
-### 8. Device Intelligence & Field Resilience ([EdgeView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/EdgeView.tsx))
+### 8. Device Intelligence & Field Resilience ([EdgeView.tsx](frontend/src/views/EdgeView.tsx))
 - **Fleet Device Inventory**: Comprehensive catalog of generators, inverters, batteries, and heat tracing circuits across all stations.
 - **Autonomous Load Shedding**: Real-time shedding plan calculation based on priority classes during generation deficits.
 - **Store-and-Forward Buffer**: Resilient telemetry caching during satcom blackouts with automatic reconciliation on reconnect.
 - **Fallback Postures**: Autonomous operational modes (`WAIT_FOR_BACKEND_DECISION`, `LOCAL_EDGE_FALLBACK`, `ISOLATED_EMERGENCY`).
 
-### 9. End-to-End Decision Trace & Explainability ([DecisionTraceView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/DecisionTraceView.tsx))
+### 9. End-to-End Decision Trace & Explainability ([DecisionTraceView.tsx](frontend/src/views/DecisionTraceView.tsx))
 - **Machine-Readable Trace ID**: Format `DT-YYYYMMDD-<STATION>-<HEX6>` uniquely tracking each pipeline execution.
 - **Lineage DAG**: Interactive visual graph displaying execution path across all 7 pipeline stages.
 - **Epistemic Tier Distinctions**:
@@ -158,7 +158,7 @@ The Polaris-EMS frontend provides 10 dedicated operational workspaces:
 - **Comparative Decision Delta**: Side-by-side delta between any two trace runs.
 - **Canonical Export**: One-click download of full trace in JSON or CSV summary format.
 
-### 10. Scientific Validation & Model Benchmarking ([ValidationView.tsx](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/views/ValidationView.tsx))
+### 10. Scientific Validation & Model Benchmarking ([ValidationView.tsx](frontend/src/views/ValidationView.tsx))
 - **Forecast Model Validation**: Pinball loss, CRPS calibration, and baseline comparison tables (XGBoost vs Persistence vs Climatology).
 - **Leakage & Temporal Audit**: Verification of strict chronological train/test splitting and zero target leakage.
 - **Tree SHAP Explainability**: Feature importance attributions for temperature, wind speed, solar irradiance, and hour of day. Labeled strictly as `MODEL CONTRIBUTION ONLY — NOT PHYSICAL CAUSATION`.
@@ -208,18 +208,18 @@ Polaris-EMS underwent an exhaustive pre-freeze reconciliation audit against raw 
 
 1. **Security & Secrets**:
    - Zero hardcoded secrets, API tokens, or credentials in source code.
-   - [`.env.example`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/.env.example) documented with all environment variables.
+   - [`.env.example`](.env.example) documented with all environment variables.
    - Zero committed `.env` files in git repository.
 2. **Architectural Isolation**:
-   - `Pyomo` and `highspy` imports are restricted strictly to [`backend/optimizer/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/optimizer/).
-   - Microgrid physics equations are restricted strictly to [`backend/twin/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/twin/).
+   - `Pyomo` and `highspy` imports are restricted strictly to [`backend/optimizer/`](backend/optimizer/).
+   - Microgrid physics equations are restricted strictly to [`backend/twin/`](backend/twin/).
    - Zero physics equations exist in the React frontend.
 3. **Observability & Error Handling**:
    - Request correlation middleware injects unique `X-Request-ID` and timing header `X-Process-Time` on every HTTP request.
    - Structured JSON error responses (`ErrorResponse`) with machine-readable error codes (`STATION_NOT_FOUND`, `VALIDATION_ERROR`, `OPTIMIZER_ERROR`).
    - Zero raw python traceback leakage in 500 error responses.
 4. **Configuration Centralization**:
-   - All station specs, device fleets, policy thresholds, and optimizer weights live in centralized JSON schemas under [`configs/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/configs/).
+   - All station specs, device fleets, policy thresholds, and optimizer weights live in centralized JSON schemas under [`configs/`](configs/).
 
 ---
 
@@ -228,21 +228,21 @@ Polaris-EMS underwent an exhaustive pre-freeze reconciliation audit against raw 
 Phase 14 establishes a hardened production wrapper around the frozen computational authorities, ensuring Polaris-EMS is deployable, externally integrable, observable, and demonstration-ready:
 
 ### Workstream A: Containerized Deployment & Packaging
-- **Multi-Stage Container**: [`deployment/Dockerfile`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/deployment/Dockerfile) compiles the React frontend (`node:20-alpine`), copies production assets into a hardened Python 3.12 slim runtime, and executes under an unprivileged user (`polarisuser:polarisgroup`).
-- **Orchestration**: [`deployment/docker-compose.yml`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/deployment/docker-compose.yml) configures memory limits (2GB), CPU allocations (2 cores), health checks (`/health/ready`), and an Nginx reverse proxy (`deployment/nginx.conf`) routing `/api` and `/health` requests with SSL termination readiness.
+- **Multi-Stage Container**: [`deployment/Dockerfile`](deployment/Dockerfile) compiles the React frontend (`node:20-alpine`), copies production assets into a hardened Python 3.12 slim runtime, and executes under an unprivileged user (`polarisuser:polarisgroup`).
+- **Orchestration**: [`deployment/docker-compose.yml`](deployment/docker-compose.yml) configures memory limits (2GB), CPU allocations (2 cores), health checks (`/health/ready`), and an Nginx reverse proxy (`deployment/nginx.conf`) routing `/api` and `/health` requests with SSL termination readiness.
 - **Graceful Lifecycle**: FastAPI `@asynccontextmanager` lifespan handler manages safe startup and clean shutdown of file handles and cache directories with zero deprecation warnings.
 
 ### Workstream B: Hierarchical Configuration
-- **Structured Pydantic Model**: [`backend/config/settings.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/config/settings.py) implements `PolarisSettings` with nested sub-models: `ApplicationSettings`, `SecuritySettings`, `ExternalProviderSettings`, `DeploymentSettings`, and `ProductSettings`.
+- **Structured Pydantic Model**: [`backend/config/settings.py`](backend/config/settings.py) implements `PolarisSettings` with nested sub-models: `ApplicationSettings`, `SecuritySettings`, `ExternalProviderSettings`, `DeploymentSettings`, and `ProductSettings`.
 - **Credential Masking**: Sensitive tokens (API keys, secret keys) are redacted in representations and audits (`mask_sensitive()`), ensuring zero leakage in logs or client-facing responses.
-- **Environment Reference**: [`.env.example`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/.env.example) documents 28 typed environment variables across all subsystems.
+- **Environment Reference**: [`.env.example`](.env.example) documents 28 typed environment variables across all subsystems.
 
 ### Workstream C: External Reality Bridge
-- **Provider-Agnostic Adapter Pattern**: [`backend/integrations/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/) introduces `AbstractBaseProviderAdapter` implemented by:
+- **Provider-Agnostic Adapter Pattern**: [`backend/integrations/`](backend/integrations/) introduces `AbstractBaseProviderAdapter` implemented by:
   - `OpenMeteoAdapter`: Global polar numerical weather prediction ingestion.
   - `NcporFormatAdapter`: Standardized Indian Antarctic/Arctic CSV and JSON telemetry import.
   - `FileSpoolerAdapter`: Air-gapped offline file drop integration.
-- **Polar Physical Bounds Validation**: [`backend/integrations/validation.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/validation.py) validates inputs against polar physical domains:
+- **Polar Physical Bounds Validation**: [`backend/integrations/validation.py`](backend/integrations/validation.py) validates inputs against polar physical domains:
   - Temperature: $[-90.0^\circ\text{C}, +30.0^\circ\text{C}]$
   - Wind Speed: $[0.0\text{ m/s}, 85.0\text{ m/s}]$
   - Solar Irradiance: $[0.0\text{ W/m}^2, 1400.0\text{ W/m}^2]$
@@ -255,8 +255,8 @@ Phase 14 establishes a hardened production wrapper around the frozen computation
 - **Structured Observability**: `/api/observability/metrics` provides runtime inference and optimizer latencies; `/api/observability/audit` reports deployment security posture and masked configuration status.
 
 ### Workstream F & G: Frontend Productization & Operator Approval Boundary
-- **Operator Review Banner**: [`frontend/src/components/common/OperatorApprovalBanner.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/components/common/OperatorApprovalBanner.tsx) makes explicit that optimizer dispatches are advisory and require human supervisory authorization before field execution.
-- **Epistemic Disclaimers**: [`frontend/src/components/layout/Header.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/components/layout/Header.tsx) renders production branding, environment indicators (`PRODUCTION_SIMULATION`), and explicit disclaimers: `SCADA: SIMULATION ONLY (ZERO PHYSICAL TELEMETRY)`.
+- **Operator Review Banner**: [`frontend/src/components/common/OperatorApprovalBanner.tsx`](frontend/src/components/common/OperatorApprovalBanner.tsx) makes explicit that optimizer dispatches are advisory and require human supervisory authorization before field execution.
+- **Epistemic Disclaimers**: [`frontend/src/components/layout/Header.tsx`](frontend/src/components/layout/Header.tsx) renders production branding, environment indicators (`PRODUCTION_SIMULATION`), and explicit disclaimers: `SCADA: SIMULATION ONLY (ZERO PHYSICAL TELEMETRY)`.
 - **Strict Provenance Display**: Guarantees all operational surfaces render only the authoritative 6 provenance tags (`REAL`, `CONFIGURED`, `ASSUMED`, `SYNTHETIC`, `FORECAST`, `SIMULATED`).
 
 ### Workstream H & I: Disaggregated Deployment Health Model
@@ -268,7 +268,7 @@ Polaris-EMS strictly separates 5 independent operational concepts:
 5. **Computational Engines** (`/health/engines`): Status of HiGHS solver, XGBoost inference, and Digital Twin.
 
 ### Workstream J: Deterministic Demonstration Hardening
-- [`scripts/run_phase14_production_demo.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/run_phase14_production_demo.py) executes a 6-step end-to-end demonstration verifying disaggregated health, reality bridge validation, ML forecasting, HiGHS optimization, closed-loop twin validation, and operator approval lifecycle.
+- [`scripts/run_phase14_production_demo.py`](scripts/run_phase14_production_demo.py) executes a 6-step end-to-end demonstration verifying disaggregated health, reality bridge validation, ML forecasting, HiGHS optimization, closed-loop twin validation, and operator approval lifecycle.
 
 ---
 
@@ -426,7 +426,7 @@ Phase 16 models polar device integration requirements through robust, truthful H
 - **CURRENT_STAGE**: `PHASE_17_RELEASE_READY`
 - **PROJECT_STATUS**: `POLARIS_EMS_FINAL_RELEASE_READY`
 - **Phases 1–16 Operational Baseline**: Permanently Complete & Frozen (`PHASES_1_16_FROZEN`).
-- **Phase 17 Release Status**: 🟢 **`PHASE_17_COMPLETE`** (Final Release, Demonstration & Submission Hardening)
+- **Phase 17 Release Status**: 🟢 **`PHASE_17_COMPLETE`** (Final Release, Demonstration & Platform Hardening)
 - **Project Canonical State**: **`POLARIS_EMS_FINAL_RELEASE_READY`**
 - **Next Phase**: 🛑 **`NONE` (Project Engineering Complete)**
 - **Backend Test Verification**: **366/366 Total Pytest tests PASS (100%)**

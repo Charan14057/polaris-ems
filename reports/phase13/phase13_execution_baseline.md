@@ -1,7 +1,7 @@
 # Polaris-EMS Phase 13 Execution Baseline
 
 **System**: Polaris-EMS — Polar Energy Management & Resilience System  
-**Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Date of Baseline**: 2026-09-24  
 **Git Commit Hash**: `ba99674fb1224f437dd5c566541e9d3eea9e2e57`  
 **Software Version**: `1.0.0`  

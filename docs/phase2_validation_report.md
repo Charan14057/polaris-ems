@@ -1,5 +1,5 @@
 # Polaris-EMS: Phase 2 Synthetic Energy Environment Validation Report
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Status**: Authoritative Quality & Validation Certification (Phase 2 Deliverable)  
 **Dataset Version**: `polaris-synthetic-v1.0` | **Simulator Version**: `polaris-sim-v2.0`  
 **Total Records Generated**: $78,912\text{ hours}$ across 3 stations ($26,304\text{ hours/station}$)  

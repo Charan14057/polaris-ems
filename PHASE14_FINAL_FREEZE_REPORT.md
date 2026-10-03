@@ -2,7 +2,7 @@
 **Deployment, External Data Integration, Productization & Demonstration Hardening**
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Status:** 🟢 **`PHASE_14_FROZEN`**  
 **Overall Project Status:** 🟢 **`PHASES_1_14_COMPLETE`**  
 **Prior Baseline:** 🟢 **`PHASE_13_FROZEN`**  
@@ -50,9 +50,9 @@ $$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 
 - **Status:** `CONTAINER_SMOKE_TEST = NOT_EXECUTED`
 - **Factual Rationale:** The Docker daemon and Docker CLI executable are not installed in the Windows host evaluation environment (`CommandNotFoundException`). In strict accordance with the Phase 14 Freeze Gate instructions, this result is recorded truthfully without fabricating a false pass.
 - **Structural & Syntactic Verification:**
-  - [`deployment/Dockerfile`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/deployment/Dockerfile): Verified multi-stage build (`node:20-alpine` builder $\to$ `python:3.12-slim` runner with unprivileged user `polarisuser:polarisgroup` UID/GID 10001).
-  - [`deployment/docker-compose.yml`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/deployment/docker-compose.yml): Configures health checks (`/health/ready`), memory bounds (2GB), CPU allocation (2 cores), and internal bridge networking.
-  - [`deployment/nginx.conf`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/deployment/nginx.conf): Reverse proxy routing `/api` and `/health` to FastAPI backend with SSL termination readiness.
+  - [`deployment/Dockerfile`](deployment/Dockerfile): Verified multi-stage build (`node:20-alpine` builder $\to$ `python:3.12-slim` runner with unprivileged user `polarisuser:polarisgroup` UID/GID 10001).
+  - [`deployment/docker-compose.yml`](deployment/docker-compose.yml): Configures health checks (`/health/ready`), memory bounds (2GB), CPU allocation (2 cores), and internal bridge networking.
+  - [`deployment/nginx.conf`](deployment/nginx.conf): Reverse proxy routing `/api` and `/health` to FastAPI backend with SSL termination readiness.
 
 ### 3.2 Python Runtime Compatibility
 - **Development Environment Runtime:** Python 3.13.7 (verified via `.venv\Scripts\python.exe --version`).
@@ -69,12 +69,12 @@ $$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 
    - FastAPI `@asynccontextmanager` lifespan handler managing safe startup/shutdown with 0 deprecation warnings.
 
 2. **Hierarchical Configuration (Workstream B):**
-   - `PolarisSettings` in [`backend/config/settings.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/config/settings.py) structuring 5 sub-models (`ApplicationSettings`, `SecuritySettings`, `ExternalProviderSettings`, `DeploymentSettings`, `ProductSettings`).
+   - `PolarisSettings` in [`backend/config/settings.py`](backend/config/settings.py) structuring 5 sub-models (`ApplicationSettings`, `SecuritySettings`, `ExternalProviderSettings`, `DeploymentSettings`, `ProductSettings`).
    - Sensitive credential masking (`mask_sensitive()`) redacting tokens from logs, audits, and API responses.
-   - Comprehensive [`.env.example`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/.env.example) documenting 28 typed environment variables.
+   - Comprehensive [`.env.example`](.env.example) documenting 28 typed environment variables.
 
 3. **External Reality Bridge (Workstream C):**
-   - Abstract adapter framework ([`backend/integrations/`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/backend/integrations/)) supporting Open-Meteo, NCPOR telemetry format, and air-gapped satcom file spooling.
+   - Abstract adapter framework ([`backend/integrations/`](backend/integrations/)) supporting Open-Meteo, NCPOR telemetry format, and air-gapped satcom file spooling.
    - Polar physical domain bounds validation (temperature $[-90^\circ\text{C}, +30^\circ\text{C}]$, wind $\le 85\text{ m/s}$, solar $\le 1400\text{ W/m}^2$, non-finite rejection).
    - Strict temporal causality enforcement ($t_{\text{obs}} \le t_{\text{origin}} + \Delta_{\text{tol}}$).
    - Safe quarantine and fallback: provider failures degrade gracefully to configured baselines without pipeline interruption.
@@ -86,14 +86,14 @@ $$\text{Total Discovered Tests} = \text{Baseline (Phases 1–12)} + \text{Phase 
    - Zero raw Python exception or stack trace leakage to clients.
 
 5. **Productization & Operator Approval Boundary (Workstreams F & G):**
-   - Operator review banner ([`frontend/src/components/common/OperatorApprovalBanner.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/components/common/OperatorApprovalBanner.tsx)) enforcing advisory posture and human supervisory authorization.
-   - Prominent header badges ([`frontend/src/components/layout/Header.tsx`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/frontend/src/components/layout/Header.tsx)): `SCADA: SIMULATION ONLY (ZERO PHYSICAL TELEMETRY)` and `PRODUCTION_SIMULATION`.
+   - Operator review banner ([`frontend/src/components/common/OperatorApprovalBanner.tsx`](frontend/src/components/common/OperatorApprovalBanner.tsx)) enforcing advisory posture and human supervisory authorization.
+   - Prominent header badges ([`frontend/src/components/layout/Header.tsx`](frontend/src/components/layout/Header.tsx)): `SCADA: SIMULATION ONLY (ZERO PHYSICAL TELEMETRY)` and `PRODUCTION_SIMULATION`.
 
 6. **Disaggregated Health Model (Workstreams H & I):**
    - Clean operational separation across `/health`, `/ready` (and `/health/ready`), `/health/providers`, `/health/physical` (`DISCONNECTED`), and `/health/engines`.
 
 7. **Deterministic Demonstration Hardening (Workstream J):**
-   - [`scripts/run_phase14_production_demo.py`](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/scripts/run_phase14_production_demo.py): Automated 6-step verification across configuration, sanity filtering, fleet loading, pipeline execution, subsystem review, and supervisory review boundary (100% PASS).
+   - [`scripts/run_phase14_production_demo.py`](scripts/run_phase14_production_demo.py): Automated 6-step verification across configuration, sanity filtering, fleet loading, pipeline execution, subsystem review, and supervisory review boundary (100% PASS).
 
 ---
 

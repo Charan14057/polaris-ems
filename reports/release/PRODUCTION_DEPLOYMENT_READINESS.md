@@ -57,10 +57,9 @@ There is **NO** live commercial or military power grid, high-voltage battery ban
 A repository-wide inspection was performed across all user-facing frontend code, views, components, titles, tooltips, dialogs, and public documentation:
 
 ```text
-PUBLIC UI FOUND:     NONE
-PUBLIC UI NOT FOUND: SIH, SIH26061, Smart India Hackathon, hackathon, competition,
-                     jury, problem statement, prototype submission, team submission,
-                     development phase numbers.
+PUBLIC UI AUDIT:     PASSED
+PUBLIC UI LABELS:    Clean professional engineering product terminology verified.
+                     No internal or non-product jargon present.
 ```
 
 - Public application title: `Polaris EMS — Polar Energy Management & Resilience System`
@@ -105,9 +104,9 @@ All operational metrics render grounded values:
 ```
 
 ### 5.1 Key Deployment Files
-1. **[Dockerfile](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/Dockerfile)**: Multi-stage non-root container (`polarisuser` UID 10001) building frontend in Stage 1 and packaging Python 3.12 slim runtime with HiGHS solver in Stage 2.
-2. **[.dockerignore](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/.dockerignore)**: Strict exclusion of `.git`, `.venv`, `node_modules`, and caches.
-3. **[render.yaml](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/render.yaml)**: Declarative Render Blueprint configuring service `polaris-ems`, health check `/health`, and environment variables.
+1. **[Dockerfile](Dockerfile)**: Multi-stage non-root container (`polarisuser` UID 10001) building frontend in Stage 1 and packaging Python 3.12 slim runtime with HiGHS solver in Stage 2.
+2. **[.dockerignore](.dockerignore)**: Strict exclusion of `.git`, `.venv`, `node_modules`, and caches.
+3. **[render.yaml](render.yaml)**: Declarative Render Blueprint configuring service `polaris-ems`, health check `/health`, and environment variables.
 
 ---
 
@@ -134,7 +133,7 @@ Automated testing validated the complete operational chain:
 2. Log in to [Render Dashboard](https://dashboard.render.com).
 3. Click **New +** → **Blueprint**.
 4. Connect the GitHub repository `Charan14057/polaris-ems`.
-5. Render detects [render.yaml](file:///c:/Users/Charan%20B/OneDrive/Desktop/polaris/render.yaml) and automatically creates the `polaris-ems` Web Service.
+5. Render detects [render.yaml](render.yaml) and automatically creates the `polaris-ems` Web Service.
 6. Click **Apply**. Render builds the Docker image and launches the application.
 
 ### 7.2 Manual Web Service Deployment

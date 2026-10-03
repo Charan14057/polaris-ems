@@ -1,5 +1,5 @@
 # Polaris-EMS: Synthetic Dataset Schema Specification
-**SIH Problem Statement**: SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Status**: Authoritative Schema Contract (Phase 2 Deliverable)  
 **Schema Version**: `v1.0` | **Granularity**: Hourly ($1\text{h}$)  
 

@@ -1,7 +1,7 @@
 # Polaris-EMS: Phase 15 Final Freeze Report
 
 **System Name:** Polaris-EMS — Polar Energy Management & Resilience System
-**SIH Problem Statement:** SIH26061 — AI-Driven Smart Energy Management System for Polar Research Stations
+**System:** Polaris-EMS — Polar Energy Management & Resilience System
 **Phase Identity:** Real-World Integration, Calibration & Operational Validation
 **Phase Status:** 🟢 **`PHASE_15_FROZEN`**
 **Project Status:** 🟢 **`PHASES_1_15_COMPLETE`**

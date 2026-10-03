@@ -2,7 +2,7 @@
 **Deployment, External Data Integration, Productization & Demonstration Hardening**
 
 **Project:** Polaris-EMS — Polar Energy Management & Resilience System  
-**SIH Problem Statement:** SIH26061: AI-Driven Smart Energy Management System for Polar Research Stations  
+**System:** Polaris-EMS — Polar Energy Management & Resilience System: AI-Driven Smart Energy Management System for Polar Research Stations  
 **Current State:** `PHASE_14_FROZEN`  
 **Prior State:** `PHASE_13_FROZEN`  
 **Project Status:** `PHASES_1_14_COMPLETE`  

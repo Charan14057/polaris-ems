@@ -1,5 +1,5 @@
 # Polaris-EMS: Research & Source Registry
-**SIH26061**: AI-Driven Smart Energy Management System for Polar Research Stations  
+**Polaris-EMS**: Polar Energy Management & Resilience System for Polar Research Stations  
 **Status**: Authoritative Documentation (PRD Section 67)
 
 ---
@@ -8,7 +8,6 @@
 
 | Entity / Portal | URL | Verified Scope / Artifacts | Classification |
 | :--- | :--- | :--- | :--- |
-| **SIH2026 Portal** | `https://sih2026.vuce.in/ps/SIH26061` | SIH26061 Problem Statement: AI-Driven Smart Energy Management System for Polar Research Stations | Source-supported fact |
 | **National Centre for Polar and Ocean Research (NCPOR)** | `https://data.ncpor.res.in/`, `https://npdc.ncpor.res.in/` | Indian Polar Program portal, AWS weather data, expedition archives | Source-supported fact |
 | **NCPOR AWS Station Telemetry** | `https://npdc.ncpor.res.in/pdc/Aws/imd/Awsdata.jsp` | In-situ meteorological observations for Maitri and Bharati (Antarctica) | Source-supported fact |
 | **NCPOR Research Stations** | `https://npdc.ncpor.res.in/npdc/research-stations.action` | Station infrastructure, geographical coordinates, seasonal operational cycles | Source-supported fact |
@@ -20,7 +19,7 @@
 
 | Reference / Project | URL / Documentation | Scope / Observed Features | Polaris-EMS Distinction / Engineering Inference |
 | :--- | :--- | :--- | :--- |
-| **PolarGrid AI** | `https://github.com/Krish-Rajput/polar_grid` | Public SIH26061 competitor. Uses synthetic polar data, XGBoost/RF forecasting, heuristic battery/diesel dispatch, simulation lab. | Polaris-EMS differentiates via: physics-informed thermal load decomposition, calibrated conformal uncertainty ($P_{10}$ to $P_{95}$), rolling constrained MILP optimizer with resupply survival constraints, and explainable decision traces. |
+| **PolarGrid AI** | `https://github.com/Krish-Rajput/polar_grid` | Uses synthetic polar data, XGBoost/RF forecasting, heuristic battery/diesel dispatch, simulation lab. | Polaris-EMS differentiates via: physics-informed thermal load decomposition, calibrated conformal uncertainty ($P_{10}$ to $P_{95}$), rolling constrained MILP optimizer with resupply survival constraints, and explainable decision traces. |
 | **NREL REopt** | `https://www.nrel.gov/reopt/` | Commercial DER optimization & resilience platform. | Polaris-EMS specializes in extreme polar constraints (polar night, sub-zero battery derating, high heating degree hours, annual resupply vessels). |
 | **HOMER Pro** | `https://homerenergy.com/homer-pro` | Microgrid techno-economic simulation & sensitivity analysis. | Polaris-EMS integrates real-time predictive ML with operational digital twin and rolling horizon dispatch. |
 | **Princess Elisabeth Antarctica** | `https://www.antarcticstation.org/station/smart_grid` | Zero-emission Antarctic polar research station microgrid. | Real-world validation that polar microgrids require strict critical vs flexible load prioritization. |
