@@ -84,4 +84,4 @@ async def generate_decision_trace(
     # Enforce trace inclusion for decision trace endpoint
     req.include_evaluation_trace = True
     req.include_suppressed = True
-    return await evaluate_policy(req=req, request=request, profile_reg=profile_reg, scenario_reg=scenario_reg)
+    return evaluate_policy(req=req, request=request, profile_reg=profile_reg, scenario_reg=scenario_reg)

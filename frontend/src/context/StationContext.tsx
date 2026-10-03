@@ -394,7 +394,15 @@ interface StationContextType {
 const StationContext = createContext<StationContextType | undefined>(undefined);
 
 export const StationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currentStation, setCurrentStation] = useState<StationId>('BHARATI');
+  const [currentStation, setCurrentStation] = useState<StationId>(() => {
+    try {
+      const saved = sessionStorage.getItem('polaris_current_station');
+      if (saved && ['BHARATI', 'MAITRI', 'HIMADRI'].includes(saved)) {
+        return saved as StationId;
+      }
+    } catch {}
+    return 'BHARATI';
+  });
   const [horizonHours, setHorizonHours] = useState<48 | 168>(48);
   const [stationDetail, setStationDetail] = useState<StationDetail | null>(null);
   const [stationSummaries, setStationSummaries] = useState<StationSummary[]>([]);
@@ -409,8 +417,23 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [policyData, setPolicyData] = useState<PolicyEvaluateResponseData | null>(null);
   const [optimizerData, setOptimizerData] = useState<OptimizeResponseData | null>(null);
   const [tracesData, setTracesData] = useState<TraceSummary[]>([]);
-  const [operationalSnapshot, setOperationalSnapshot] = useState<OperationalSnapshot>(DEFAULT_SNAPSHOT);
-  const [activeScenario, setActiveScenario] = useState<string | null>(null);
+  const [operationalSnapshot, setOperationalSnapshot] = useState<OperationalSnapshot>(() => {
+    try {
+      const savedSt = sessionStorage.getItem('polaris_current_station') as StationId;
+      if (savedSt && STATION_BASELINE_SNAPSHOTS[savedSt]) {
+        return STATION_BASELINE_SNAPSHOTS[savedSt];
+      }
+    } catch {}
+    return DEFAULT_SNAPSHOT;
+  });
+  const [activeScenario, setActiveScenario] = useState<string | null>(() => {
+    try {
+      const savedSt = sessionStorage.getItem('polaris_current_station') || 'BHARATI';
+      return sessionStorage.getItem(`polaris_active_scenario_${savedSt}`) || null;
+    } catch {
+      return null;
+    }
+  });
   const [operatingMode, setOperatingModeState] = useState<'AUTO' | 'MANUAL'>('AUTO');
   const operatingModeRef = useRef<'AUTO' | 'MANUAL'>('AUTO');
 
@@ -513,10 +536,18 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
       const powerFlow = liveData?.power_flow || null;
       const detail = detailRes?.data;
 
-      const rawScen = metadata.active_scenario || activeScenario || null;
-      const isBaseline = !rawScen || ['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL', 'NORMAL BASELINE'].includes(rawScen.toUpperCase().trim());
-      const actScen = isBaseline ? null : rawScen;
+      const savedScen = (() => {
+        try { return sessionStorage.getItem(`polaris_active_scenario_${currentStation}`) || null; } catch { return null; }
+      })();
+      const candidateScen = metadata.active_scenario || savedScen || activeScenario || null;
+      const isBaseline = !candidateScen || ['NORMAL_BASELINE', 'BASELINE', 'NOMINAL', 'NORMAL', 'NORMAL BASELINE'].includes(candidateScen.toUpperCase().trim());
+      const actScen = isBaseline ? null : candidateScen;
       setActiveScenario(actScen);
+
+      // If client session had an active scenario but backend cold-started without it, re-sync to backend
+      if (actScen && metadata.active_scenario !== actScen) {
+        api.applyLiveScenario(currentStation, actScen).catch(() => {});
+      }
 
       // Extract Solar, Wind, Diesel, Battery from TwinState
       const solarObj = twinState.solar || {};
@@ -750,6 +781,9 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
   const clearScenario = useCallback(async () => {
     setActiveScenario(null);
     try {
+      sessionStorage.removeItem(`polaris_active_scenario_${currentStation}`);
+    } catch {}
+    try {
       await api.clearLiveScenario(currentStation);
       await fetchStationData();
       showToast(
@@ -771,6 +805,9 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
       return;
     }
     setActiveScenario(id);
+    try {
+      sessionStorage.setItem(`polaris_active_scenario_${currentStation}`, id);
+    } catch {}
     try {
       await api.applyLiveScenario(currentStation, id);
       await fetchStationData();
@@ -836,7 +873,13 @@ export const StationProvider: React.FC<{ children: ReactNode }> = ({ children })
     stationId: currentStation,
     setStation: (s: StationId) => {
       setCurrentStation(s);
-      setActiveScenario(null);
+      try {
+        sessionStorage.setItem('polaris_current_station', s);
+      } catch {}
+      const savedScen = (() => {
+        try { return sessionStorage.getItem(`polaris_active_scenario_${s}`) || null; } catch { return null; }
+      })();
+      setActiveScenario(savedScen);
       // Immediately apply baseline snapshot so UI never shows empty while fetching
       setOperationalSnapshot(STATION_BASELINE_SNAPSHOTS[s] || DEFAULT_SNAPSHOT);
     },

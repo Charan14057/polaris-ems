@@ -63,7 +63,7 @@ export async function apiRequest<T>(
       let errMsg = body?.error?.message;
       if (!errMsg) {
         if (response.status === 502 || response.status === 503 || response.status === 504) {
-          errMsg = 'Polaris-EMS service is initializing on Render. Please wait a moment and retry.';
+          errMsg = 'Polaris-EMS service is initializing. Please wait a moment and retry.';
         } else if (response.status === 404) {
           errMsg = `Requested endpoint not found (${endpoint}).`;
         } else {

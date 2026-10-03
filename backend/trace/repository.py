@@ -47,7 +47,10 @@ class TraceRepository:
             storage_dir = str(base_dir / "reports" / "traces")
 
         self.storage_dir = Path(storage_dir)
-        self.storage_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
         self.max_retention_traces = max_retention_traces
         self.archive = archive or get_trace_archive()
 
@@ -57,6 +60,8 @@ class TraceRepository:
 
     def _load_existing_traces(self) -> None:
         """Indexes existing JSON trace records from the storage directory."""
+        if not self.storage_dir.exists():
+            return
         for p in self.storage_dir.glob("*/*.json"):
             try:
                 with open(p, "r", encoding="utf-8") as f:
@@ -93,13 +98,16 @@ class TraceRepository:
         # Save to memory cache
         self._memory_cache[trace.decision_trace_id] = trace
 
-        # Save to filesystem
-        station_dir = self.storage_dir / trace.station_id
-        station_dir.mkdir(parents=True, exist_ok=True)
-        file_path = station_dir / f"{trace.decision_trace_id}.json"
+        # Save to filesystem with read-only resilience
+        try:
+            station_dir = self.storage_dir / trace.station_id
+            station_dir.mkdir(parents=True, exist_ok=True)
+            file_path = station_dir / f"{trace.decision_trace_id}.json"
 
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(trace.model_dump_json(indent=2))
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(trace.model_dump_json(indent=2))
+        except OSError:
+            pass
 
     def get_trace(self, trace_id: str) -> Optional[TraceRecord]:
         """Retrieves a single TraceRecord by ID (active memory, active disk, or cold archive)."""

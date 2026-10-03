@@ -58,29 +58,37 @@ class LocalFileTraceArchive(ITraceArchive):
             archive_dir = str(base_dir / "reports" / "traces" / "archive")
         
         self.archive_dir = Path(archive_dir)
-        self.archive_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            self.archive_dir.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
         self._index: Dict[str, Path] = {}
         self._build_index()
 
     def _build_index(self) -> None:
         """Indexes available compressed archive files."""
+        if not self.archive_dir.exists():
+            return
         for p in self.archive_dir.glob("*/*.json.gz"):
             tid = p.name.replace(".json.gz", "")
             self._index[tid] = p
 
     def archive_trace(self, trace: TraceRecord) -> str:
         """Compresses and archives a TraceRecord."""
-        station_dir = self.archive_dir / trace.station_id.upper()
-        station_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            station_dir = self.archive_dir / trace.station_id.upper()
+            station_dir.mkdir(parents=True, exist_ok=True)
 
-        file_path = station_dir / f"{trace.decision_trace_id}.json.gz"
-        raw_bytes = trace.model_dump_json(indent=None).encode("utf-8")
+            file_path = station_dir / f"{trace.decision_trace_id}.json.gz"
+            raw_bytes = trace.model_dump_json(indent=None).encode("utf-8")
 
-        with gzip.open(file_path, "wb") as gz_file:
-            gz_file.write(raw_bytes)
+            with gzip.open(file_path, "wb") as gz_file:
+                gz_file.write(raw_bytes)
 
-        self._index[trace.decision_trace_id] = file_path
-        return str(file_path)
+            self._index[trace.decision_trace_id] = file_path
+            return str(file_path)
+        except OSError:
+            return f"memory://{trace.decision_trace_id}"
 
     def retrieve_archived(self, trace_id: str) -> Optional[TraceRecord]:
         """Extracts and parses a TraceRecord from compressed archive."""

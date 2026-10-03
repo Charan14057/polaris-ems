@@ -18,6 +18,9 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    sourcemap: false,
+  },
   // @ts-ignore
   test: {
     globals: true,
